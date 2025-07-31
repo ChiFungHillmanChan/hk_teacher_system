@@ -25,7 +25,7 @@ const {
 
 const { validateStudent, sanitizeInput } = require('../middleware/validation');
 
-const { body, validationResult } = require('express-validator');
+const { body, validationResult, param, query } = require('express-validator');
 
 // Import StudentReport model for records functionality
 const StudentReport = require('../models/StudentReport');
