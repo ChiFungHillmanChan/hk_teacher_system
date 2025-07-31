@@ -1,4 +1,4 @@
-// File: src/App.jsx
+// File: src/App.jsx - Updated with new routes
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -15,38 +15,39 @@ import Dashboard from './pages/dashboard/Dashboard';
 import CreateSchool from './components/forms/CreateSchool';
 import CreateStudent from './components/forms/CreateStudent';
 
-// Import new management pages
+// Import management pages
 import SchoolsManagement from './pages/schools/SchoolsManagement';
 import StudentsManagement from './pages/students/StudentsManagement';
 
-// Import new student reports components
+// Import new detail pages
+import SchoolDetail from './pages/schools/SchoolDetail';
+import StudentDetail from './pages/students/StudentDetail';
+import YearSummary from './pages/year-summary/YearSummary';
+
+// Import student reports components
 import CreateStudentRecord from './pages/reports/CreateStudentRecord';
 import StudentReports from './pages/reports/StudentReports';
 
-// Import new integration component
+// Import integration component
 import Integration from './pages/integration/Integration';
-
-// Import integration components
 import AI_Analysis from './pages/analysation/AI_Analysis';
 
 // Import layout
 import Layout from './components/layout/Layout';
 
-//Import Rate Limit error handler
-
 // Import CSS in correct order
-import './index.css'; // Vite default styles (reset)
-import './styles/components.css'; // Component styles
-import './styles/dashboard.css'; // Dashboard specific styles
-import './styles/forms.css'; // Form styles
-import './styles/globals.css'; // Global variables and base styles
-import './styles/integration.css'; // Integration page styles
-import './styles/ai-analysis.css'; // AI Analysis styles
-import './styles/layout.css'; // Layout and navigation
-import './styles/management.css'; // Management pages styles
+import './index.css';
+import './styles/components.css';
+import './styles/dashboard.css';
+import './styles/forms.css';
+import './styles/globals.css';
+import './styles/integration.css';
+import './styles/ai-analysis.css';
+import './styles/layout.css';
+import './styles/management.css';
 import './styles/rate-limit-error.css';
-import './styles/reports.css'; // Student reports styles
-import './styles/themes.css'; // Theme variables
+import './styles/reports.css';
+import './styles/themes.css';
 
 function App() {
   return (
@@ -57,8 +58,6 @@ function App() {
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-
-            {/* Temporarily redirect these to login until components are created */}
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
@@ -98,7 +97,7 @@ function App() {
               }
             />
 
-            {/* Schools Management - Replace placeholder */}
+            {/* Schools Management */}
             <Route
               path="/schools"
               element={
@@ -110,60 +109,19 @@ function App() {
               }
             />
 
-            {/* Individual School Routes (placeholders for future implementation) */}
+            {/* Individual School Detail */}
             <Route
               path="/schools/:id"
               element={
                 <ProtectedRoute>
                   <Layout>
-                    <div
-                      style={{
-                        padding: '2rem',
-                        textAlign: 'center',
-                        background: 'var(--color-background-light)',
-                        borderRadius: 'var(--border-radius-lg)',
-                        margin: '2rem',
-                      }}
-                    >
-                      <h2 style={{ color: 'var(--color-primary)', marginBottom: '1rem' }}>
-                        🏫 學校詳情
-                      </h2>
-                      <p style={{ color: 'var(--color-text-secondary)' }}>
-                        即將推出 - 查看學校詳細資料
-                      </p>
-                    </div>
+                    <SchoolDetail />
                   </Layout>
                 </ProtectedRoute>
               }
             />
 
-            <Route
-              path="/schools/:id/edit"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <div
-                      style={{
-                        padding: '2rem',
-                        textAlign: 'center',
-                        background: 'var(--color-background-light)',
-                        borderRadius: 'var(--border-radius-lg)',
-                        margin: '2rem',
-                      }}
-                    >
-                      <h2 style={{ color: 'var(--color-primary)', marginBottom: '1rem' }}>
-                        ✏️ 編輯學校
-                      </h2>
-                      <p style={{ color: 'var(--color-text-secondary)' }}>
-                        即將推出 - 編輯學校資料
-                      </p>
-                    </div>
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-
-            {/* Students Management - Replace placeholder */}
+            {/* Students Management */}
             <Route
               path="/students"
               element={
@@ -175,69 +133,31 @@ function App() {
               }
             />
 
-            {/* Individual Student Routes (placeholders for future implementation) */}
+            {/* Individual Student Detail */}
             <Route
               path="/students/:id"
               element={
                 <ProtectedRoute>
                   <Layout>
-                    <div
-                      style={{
-                        padding: '2rem',
-                        textAlign: 'center',
-                        background: 'var(--color-background-light)',
-                        borderRadius: 'var(--border-radius-lg)',
-                        margin: '2rem',
-                      }}
-                    >
-                      <h2 style={{ color: 'var(--color-primary)', marginBottom: '1rem' }}>
-                        👨‍🎓 學生詳情
-                      </h2>
-                      <p style={{ color: 'var(--color-text-secondary)' }}>
-                        即將推出 - 查看學生詳細資料
-                      </p>
-                    </div>
+                    <StudentDetail />
                   </Layout>
                 </ProtectedRoute>
               }
             />
 
-            {/* AI Analysis Route */}
-            <Route path="/ai-analysis" element={
-              <ProtectedRoute>
-                <Layout>
-                  <AI_Analysis />
-                </Layout>
-              </ProtectedRoute>
-            } />
-            
+            {/* Year Summary - 年度整理 */}
             <Route
-              path="/students/:id/edit"
+              path="/year-summary"
               element={
                 <ProtectedRoute>
                   <Layout>
-                    <div
-                      style={{
-                        padding: '2rem',
-                        textAlign: 'center',
-                        background: 'var(--color-background-light)',
-                        borderRadius: 'var(--border-radius-lg)',
-                        margin: '2rem',
-                      }}
-                    >
-                      <h2 style={{ color: 'var(--color-primary)', marginBottom: '1rem' }}>
-                        ✏️ 編輯學生
-                      </h2>
-                      <p style={{ color: 'var(--color-text-secondary)' }}>
-                        即將推出 - 編輯學生資料
-                      </p>
-                    </div>
+                    <YearSummary />
                   </Layout>
                 </ProtectedRoute>
               }
             />
 
-            {/* Student Reports System */}
+            {/* Student Reports */}
             <Route
               path="/reports"
               element={
@@ -250,23 +170,11 @@ function App() {
             />
 
             <Route
-              path="/reports/student/:studentId/create"
+              path="/reports/create"
               element={
                 <ProtectedRoute>
                   <Layout>
                     <CreateStudentRecord />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-
-            {/* Integration/Monthly Reports System */}
-            <Route
-              path="/integration"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Integration />
                   </Layout>
                 </ProtectedRoute>
               }
@@ -320,6 +228,30 @@ function App() {
                         即將推出 - 編輯現有記錄
                       </p>
                     </div>
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Integration/Monthly Reports System */}
+            <Route
+              path="/integration"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Integration />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* AI Analysis */}
+            <Route
+              path="/ai-analysis"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <AI_Analysis />
                   </Layout>
                 </ProtectedRoute>
               }

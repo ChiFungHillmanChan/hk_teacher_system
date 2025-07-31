@@ -27,7 +27,7 @@ const {
 
 const { sanitizeInput } = require('../middleware/validation');
 
-const { body } = require('express-validator');
+const { body, param, query } = require('express-validator');
 
 // Rate limiting
 const generalLimiter = rateLimit({
@@ -121,6 +121,82 @@ const validateCreateStudentReport = [
 ];
 
 // Routes
+
+router.get(
+  '/year-summary/:schoolId',
+  generalLimiter,
+  [
+    param('schoolId').isMongoId().withMessage('Valid school ID is required'),
+    query('gradeRange')
+      .optional()
+      .isIn(['grades-1-5', 'grade-6', 'all'])
+      .withMessage('Grade range must be grades-1-5, grade-6, or all'),
+    query('academicYear')
+      .optional()
+      .matches(/^\d{4}\/\d{2}$/)
+      .withMessage('Academic year must be in format YYYY/YY'),
+  ],
+  logActivity('get_year_summary_data'),
+  async (req, res) => {
+    try {
+      const { schoolId } = req.params;
+      const { gradeRange = 'all', academicYear } = req.query;
+
+      // Verify school access
+      const school = await require('../models/School').findById(schoolId);
+      if (!school) {
+        return res.status(404).json({
+          success: false,
+          message: 'School not found',
+        });
+      }
+
+      // Check user permissions
+      if (req.user.role !== 'admin') {
+        const hasAccess = req.user.schools.some(
+          userSchool => userSchool.toString() === schoolId.toString()
+        );
+        if (!hasAccess) {
+          return res.status(403).json({
+            success: false,
+            message: 'Not authorized to access this school',
+          });
+        }
+      }
+
+      // Get students for year summary
+      const Student = require('../models/Student');
+      const students = await Student.getForYearSummary(schoolId, gradeRange, {
+        academicYear
+      });
+
+      res.status(200).json({
+        success: true,
+        data: {
+          school: {
+            id: school._id,
+            name: school.name,
+            schoolType: school.schoolType
+          },
+          students,
+          summary: {
+            total: students.length,
+            byGrade: students.reduce((acc, student) => {
+              acc[student.grade] = (acc[student.grade] || 0) + 1;
+              return acc;
+            }, {})
+          }
+        },
+      });
+    } catch (error) {
+      console.error('Get year summary data error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Server error retrieving year summary data',
+      });
+    }
+  }
+);
 
 // @desc    Get report statistics
 // @route   GET /api/student-reports/stats

@@ -87,6 +87,138 @@
 }
 
 /* ========================================
+   SCHOOL DETAIL PAGE
+======================================== */
+
+.school-detail {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+.school-detail__header {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-xl);
+  border: 1px solid var(--color-border);
+}
+
+.school-detail__header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-lg);
+}
+
+.school-detail__title-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  flex: 1;
+}
+
+.school-detail__icon {
+  width: 64px;
+  height: 64px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.school-detail__title {
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.2;
+}
+
+.school-detail__subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.school-detail__actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.school-detail__content {
+  display: grid;
+  gap: var(--spacing-xl);
+}
+
+.school-detail__info-section,
+.school-detail__students-section {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-xl);
+  border: 1px solid var(--color-border);
+}
+
+.school-detail__info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.school-detail__info-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.school-detail__info-item--full {
+  grid-column: 1 / -1;
+}
+
+.school-detail__info-item label {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.school-detail__info-item span {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+}
+
+.school-detail__filters {
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background-color: var(--color-background-light);
+  border-radius: var(--border-radius-md);
+}
+
+.filters-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* ========================================
    SEARCH AND FILTER CONTROLS
 ======================================== */
 
@@ -532,6 +664,555 @@
 }
 
 /* ========================================
+   STUDENT DETAIL PAGE
+======================================== */
+
+.student-detail {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+.student-detail__header {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-xl);
+  border: 1px solid var(--color-border);
+}
+
+.student-detail__header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-lg);
+}
+
+.student-detail__title-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  flex: 1;
+}
+
+.student-detail__avatar {
+  width: 64px;
+  height: 64px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-radius: var(--border-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.student-detail__title {
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.2;
+}
+
+.student-detail__subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.student-detail__actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.student-detail__content {
+  display: grid;
+  gap: var(--spacing-xl);
+}
+
+.student-detail__info-section,
+.student-detail__reports-section {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-xl);
+  border: 1px solid var(--color-border);
+}
+
+.student-detail__info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.student-detail__info-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.student-detail__info-item--full {
+  grid-column: 1 / -1;
+}
+
+.student-detail__info-item label {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.student-detail__info-item span {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+}
+
+.form-help {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--spacing-xs);
+}
+
+/* ========================================
+   YEAR SUMMARY PAGE
+======================================== */
+
+.year-summary {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+.year-summary__header {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  border: 1px solid var(--color-border);
+}
+
+.year-summary__title-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.year-summary__icon {
+  width: 64px;
+  height: 64px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.year-summary__title {
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.year-summary__subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.year-summary__nav {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
+}
+
+.year-summary__nav-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--color-white);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.year-summary__nav-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.year-summary__nav-btn--active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.year-summary__nav-count {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: inherit;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.year-summary__nav-btn--active .year-summary__nav-count {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.year-summary__school-section {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  border: 1px solid var(--color-border);
+}
+
+.year-summary__controls {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  border: 1px solid var(--color-border);
+}
+
+.year-summary__filters {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.checkbox-label input {
+  margin: 0;
+}
+
+.year-summary__summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+.summary-stats {
+  display: flex;
+  gap: var(--spacing-xl);
+}
+
+.summary-stat {
+  text-align: center;
+}
+
+.summary-stat__value {
+  display: block;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.summary-stat__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summary-stat--success .summary-stat__value {
+  color: var(--color-success);
+}
+
+.summary-stat--warning .summary-stat__value {
+  color: var(--color-warning);
+}
+
+.summary-stat--info .summary-stat__value {
+  color: var(--color-info);
+}
+
+.summary-stat--danger .summary-stat__value {
+  color: var(--color-error);
+}
+
+.year-summary__students {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+}
+
+.students-upgrade-table {
+  overflow-x: auto;
+}
+
+.upgrade-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.radio-label:hover {
+  background-color: var(--color-background-light);
+}
+
+.radio-label input {
+  margin: 0;
+}
+
+.radio-text {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.radio-label--success .radio-text {
+  color: var(--color-success);
+}
+
+.radio-label--warning .radio-text {
+  color: var(--color-warning);
+}
+
+.radio-label--danger .radio-text {
+  color: var(--color-error);
+}
+
+.grade-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.grade-badge--next {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.grade-badge--retain {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.upgrade-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.transition-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.transition-note {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.status-badge--success {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.status-badge--warning {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.status-badge--danger {
+  background-color: var(--color-error-light);
+  color: var(--color-error);
+}
+
+/* ========================================
+   MODAL STYLES
+======================================== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  padding: var(--spacing-lg);
+}
+
+.modal-content {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-content--large {
+  max-width: 700px;
+}
+
+.modal-content--danger .modal-header {
+  background-color: var(--color-error-light);
+  color: var(--color-error);
+}
+
+.modal-content--warning .modal-header {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: var(--spacing-lg);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+.warning-box {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background-color: var(--color-warning-light);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--border-radius-md);
+  margin-top: var(--spacing-md);
+}
+
+.warning-box svg {
+  color: var(--color-warning);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.warning-box strong {
+  color: var(--color-warning);
+}
+
+.upgrade-summary-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin: var(--spacing-lg) 0;
+}
+
+.summary-detail {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background-color: var(--color-background-light);
+  border-radius: var(--border-radius-sm);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+.text-warning {
+  color: var(--color-warning);
+}
+
+.text-info {
+  color: var(--color-info);
+}
+
+.text-danger {
+  color: var(--color-error);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+/* ========================================
    EMPTY STATES
 ======================================== */
 
@@ -570,6 +1251,62 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--color-text-muted);
+}
+
+.empty-state svg {
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-lg);
+}
+
+.empty-state h3 {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.empty-state p {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ========================================
+   ERROR CONTAINER
+======================================== */
+
+.error-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: var(--spacing-xl);
+}
+
+.error-message {
+  text-align: center;
+  background-color: var(--color-white);
+  padding: var(--spacing-2xl);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  max-width: 500px;
+}
+
+.error-message h2 {
+  color: var(--color-error);
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-md);
+}
+
+.error-message p {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+
 
 /* ========================================
    PAGINATION
@@ -710,6 +1447,101 @@
 ======================================== */
 
 @media (max-width: 768px) {
+
+  .school-detail,
+  .student-detail,
+  .year-summary {
+    padding: var(--spacing-md);
+  }
+
+  .school-detail__header-content,
+  .student-detail__header-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-lg);
+  }
+
+  .school-detail__title-section,
+  .student-detail__title-section {
+    text-align: center;
+  }
+
+  .school-detail__actions,
+  .student-detail__actions {
+    justify-content: center;
+  }
+
+  .school-detail__info-grid,
+  .student-detail__info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .year-summary__nav {
+    flex-direction: column;
+  }
+
+  .year-summary__nav-btn {
+    justify-content: center;
+  }
+
+  .year-summary__controls {
+    padding: var(--spacing-md);
+  }
+
+  .year-summary__filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
+  }
+
+  .year-summary__summary {
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    align-items: stretch;
+  }
+
+  .summary-stats {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+  }
+
+  .filters-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
+  }
+
+  .filter-group {
+    justify-content: flex-start;
+  }
+
+  .modal-content {
+    margin: var(--spacing-md);
+    max-width: calc(100vw - 2rem);
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .upgrade-controls {
+    gap: var(--spacing-xs);
+  }
+
+  .radio-label {
+    padding: var(--spacing-xs);
+  }
+
+  .students-table {
+    font-size: var(--font-size-xs);
+  }
+
+  .students-table th,
+  .students-table td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
   .schools-management,
   .students-management {
     padding: var(--spacing-md);
@@ -794,6 +1626,40 @@
   }
 }
 
+/* ========================================
+   BUTTON VARIANTS
+======================================== */
+
+.btn--danger {
+  background-color: var(--color-error);
+  color: var(--color-white);
+  border: 2px solid var(--color-error);
+}
+
+.btn--danger:hover:not(:disabled) {
+  background-color: var(--color-error-hover);
+  border-color: var(--color-error-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn--warning {
+  background-color: var(--color-warning);
+  color: var(--color-white);
+  border: 2px solid var(--color-warning);
+}
+
+.btn--warning:hover:not(:disabled) {
+  background-color: var(--color-warning-hover);
+  border-color: var(--color-warning-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
 @media (max-width: 480px) {
   .schools-management__title,
   .students-management__title {
@@ -817,6 +1683,34 @@
     width: 32px;
     height: 32px;
   }
+  .school-detail__title,
+  .student-detail__title,
+  .year-summary__title {
+    font-size: var(--font-size-xl);
+  }
+
+  .school-detail__subtitle,
+  .student-detail__subtitle,
+  .year-summary__subtitle {
+    font-size: var(--font-size-base);
+  }
+
+  .school-detail__icon,
+  .student-detail__avatar,
+  .year-summary__icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .school-detail__info-section,
+  .student-detail__info-section,
+  .student-detail__reports-section,
+  .year-summary__school-section,
+  .year-summary__controls,
+  .year-summary__students {
+    padding: var(--spacing-md);
+  }
+  
 }
 
 /* ========================================

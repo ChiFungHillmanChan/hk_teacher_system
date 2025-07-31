@@ -82,6 +82,7 @@ const getStudents = async (req, res) => {
   }
 };
 
+
 // @desc    Get single student
 // @route   GET /api/students/:id
 // @access  Private
@@ -130,6 +131,67 @@ const getStudent = async (req, res) => {
     });
   }
 };
+
+// @desc    Bulk update students for year summary
+// @route   PUT /api/students/bulk-update
+// @access  Private
+const bulkUpdateStudents = async (req, res) => {
+  try {
+    const { updates } = req.body;
+    
+    if (!updates || !Array.isArray(updates)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Updates array is required',
+      });
+    }
+
+    const results = {
+      updated: 0,
+      deleted: 0,
+      errors: []
+    };
+
+    // Process each update
+    for (const update of updates) {
+      try {
+        if (update.action === 'delete') {
+          await Student.findByIdAndDelete(update.id);
+          results.deleted++;
+        } else if (update.action === 'update') {
+          await Student.findByIdAndUpdate(
+            update.id, 
+            { 
+              ...update.data,
+              lastModifiedBy: req.user._id 
+            },
+            { runValidators: true }
+          );
+          results.updated++;
+        }
+      } catch (error) {
+        results.errors.push({
+          id: update.id,
+          error: error.message
+        });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `處理完成：更新 ${results.updated} 名，刪除 ${results.deleted} 名學生`,
+      data: results
+    });
+
+  } catch (error) {
+    console.error('Bulk update students error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during bulk update',
+    });
+  }
+};
+
 
 const createStudent = async (req, res) => {
   try {
@@ -190,22 +252,61 @@ const createStudent = async (req, res) => {
       }
     }
 
+    // Enhanced duplicate checking with better error messages
+    const duplicateChecks = [];
+
+    // Check for duplicate studentId in the same school
+    if (normalizedStudentId) {
+      const existingStudentId = await Student.findOne({
+        school: school,
+        studentId: normalizedStudentId,
+        isActive: true
+      });
+
+      if (existingStudentId) {
+        duplicateChecks.push({
+          field: 'studentId',
+          message: `學號 "${normalizedStudentId}" 在此學校已存在`,
+          existingStudent: {
+            name: existingStudentId.name,
+            grade: existingStudentId.grade,
+            class: existingStudentId.class
+          }
+        });
+      }
+    }
+
     // Check for duplicate classNumber within school/year/grade/class
-    if (classNumber !== undefined && classNumber !== null) {
-      const existingStudent = await Student.findOne({
+    if (classNumber !== undefined && classNumber !== null && studentClass) {
+      const existingClassNumber = await Student.findOne({
         school: school,
         academicYear: academicYear,
         grade: grade,
         class: studentClass,
         classNumber: classNumber,
+        isActive: true
       });
 
-      if (existingStudent) {
-        return res.status(400).json({
-          success: false,
-          message: '已有學生使用該班號', // "Class number already in use"
+      if (existingClassNumber) {
+        duplicateChecks.push({
+          field: 'classNumber',
+          message: `班號 ${classNumber} 在 ${grade}${studentClass} 已被使用`,
+          existingStudent: {
+            name: existingClassNumber.name,
+            studentId: existingClassNumber.studentId
+          }
         });
       }
+    }
+
+    // Return warnings if duplicates found
+    if (duplicateChecks.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: '發現重複資料',
+        conflicts: duplicateChecks,
+        canProceed: false // Frontend can show warnings and ask user to confirm
+      });
     }
 
     // Validate grade matches school type
@@ -213,11 +314,11 @@ const createStudent = async (req, res) => {
     if (!availableGrades.includes(grade)) {
       return res.status(400).json({
         success: false,
-        message: `Grade ${grade} is not available for this school type`,
+        message: `年級 ${grade} 不適用於此學校類型`,
       });
     }
 
-    // Build the student object dynamically (exclude studentId if not provided)
+    // Build the student object dynamically
     const newStudentData = {
       name,
       nameEn,
@@ -262,13 +363,23 @@ const createStudent = async (req, res) => {
     });
   } catch (error) {
     console.error('Create student error:', error);
+    
+    // Handle MongoDB duplicate key errors
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(409).json({
+        success: false,
+        message: `${field === 'studentId' ? '學號' : '資料'} 已存在`,
+        field: field
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: 'Server error creating student',
     });
   }
 };
-
 
 // @desc    Update student
 // @route   PUT /api/students/:id
@@ -685,4 +796,5 @@ module.exports = {
   removeTeacherFromStudent,
   getMyStudents,
   getStudentStatsBySchool,
+  bulkUpdateStudents
 };

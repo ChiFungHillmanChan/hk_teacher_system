@@ -444,6 +444,25 @@ const validateUpdateSchool = [
     .optional(),
 ];
 
+const validateSchoolChange = [
+  body('newSchoolId')
+    .isMongoId()
+    .withMessage('Valid new school ID is required'),
+  
+  body('studentId')
+    .isMongoId()
+    .withMessage('Valid student ID is required'),
+    
+  body('confirmTransfer')
+    .isBoolean()
+    .withMessage('Transfer confirmation is required')
+    .custom((value) => {
+      if (!value) {
+        throw new Error('School transfer must be confirmed');
+      }
+      return true;
+    }),
+];
 // Validation rules for student creation
 const validateStudent = [
   body('name')
@@ -631,7 +650,7 @@ const exports_ = {
   validateForgotPassword,
   validateResetPassword,
   validateInviteCode,
-
+  validateSchoolChange,
   validateSchool,
   validateUpdateSchool,
   validateStudent,

@@ -322,6 +322,21 @@ const deleteSchool = async (req, res) => {
       });
     }
 
+    // Check if school has students
+    const Student = require('../models/Student');
+    const studentCount = await Student.countDocuments({ 
+      school: req.params.id,
+      isActive: true 
+    });
+
+    if (studentCount > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot delete school with ${studentCount} active students. Please transfer or remove students first.`,
+        data: { studentCount }
+      });
+    }
+
     await School.findByIdAndDelete(req.params.id);
 
     // Remove school from all users' schools array

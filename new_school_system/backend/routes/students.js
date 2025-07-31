@@ -12,6 +12,7 @@ const {
   removeTeacherFromStudent,
   getMyStudents,
   getStudentStatsBySchool,
+  bulkUpdateStudents
 } = require('../controllers/studentController');
 
 const {
@@ -318,6 +319,38 @@ router.get(
     }
   }
 );
+
+// Add this route BEFORE the individual student routes (before '/:id')
+// @desc    Bulk update students for year summary
+// @route   PUT /api/students/bulk-update
+// @access  Private
+router.put(
+  '/bulk-update',
+  generalLimiter,
+  [
+    body('updates')
+      .isArray()
+      .withMessage('Updates must be an array')
+      .custom((updates) => {
+        if (updates.length === 0) {
+          throw new Error('Updates array cannot be empty');
+        }
+        if (updates.length > 1000) {
+          throw new Error('Cannot process more than 1000 updates at once');
+        }
+        return true;
+      }),
+    body('updates.*.id')
+      .isMongoId()
+      .withMessage('Each update must have a valid student ID'),
+    body('updates.*.action')
+      .isIn(['update', 'delete'])
+      .withMessage('Action must be either update or delete'),
+  ],
+  logActivity('bulk_update_students'),
+  bulkUpdateStudents
+);
+
 
 // @desc    Update student record
 // @route   PUT /api/students/records/:recordId

@@ -49,6 +49,14 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <BookOpen size={20} />,
       path: '/reports',
       available: true
+    },
+    {
+      id: 'year_summary',
+      label: '年度整理',
+      icon: <GraduationCap size={20} />,
+      path: '/year-summary',
+      available: true,
+      badge: '新功能'
     }
   ];
 

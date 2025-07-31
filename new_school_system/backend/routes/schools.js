@@ -20,7 +20,7 @@ const { protect, authorize, logActivity, checkUserRateLimit } = require('../midd
 
 const { validateSchool, validateUpdateSchool, sanitizeInput } = require('../middleware/validation');
 
-const { body } = require('express-validator');
+const { body, param, query } = require('express-validator');
 
 // Rate limiting
 const generalLimiter = rateLimit({

@@ -383,4 +383,45 @@ studentSchema.statics.searchStudents = function (searchTerm, schoolId, options =
     .limit(options.limit || 50);
 };
 
+studentSchema.statics.getForYearSummary = function (schoolId, gradeRange, options = {}) {
+  const query = {
+    school: schoolId,
+    isActive: true,
+    status: 'enrolled'
+  };
+
+  // Filter by grade range
+  if (gradeRange === 'grades-1-5') {
+    query.grade = { 
+      $in: ['P1', 'P2', 'P3', 'P4', 'P5', 'S1', 'S2', 'S3', 'S4', 'S5'] 
+    };
+  } else if (gradeRange === 'grade-6') {
+    query.grade = { $in: ['P6', 'S6'] };
+  }
+
+  if (options.academicYear) {
+    query.academicYear = options.academicYear;
+  }
+
+  return this.find(query)
+    .populate('school', 'name nameEn schoolType')
+    .sort({ grade: 1, class: 1, classNumber: 1, name: 1 });
+};
+
+// Get next grade for a student
+studentSchema.methods.getNextGrade = function () {
+  const gradeOrder = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6'];
+  const currentIndex = gradeOrder.indexOf(this.grade);
+  
+  if (currentIndex === -1 || currentIndex === gradeOrder.length - 1) {
+    return null; // No next grade
+  }
+  
+  return gradeOrder[currentIndex + 1];
+};
+
+studentSchema.methods.canUpgrade = function () {
+  return this.getNextGrade() !== null && this.status === 'enrolled';
+};
+
 module.exports = mongoose.model('Student', studentSchema);
