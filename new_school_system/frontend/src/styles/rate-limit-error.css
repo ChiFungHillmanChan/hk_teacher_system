@@ -1,0 +1,475 @@
+/* File: src/styles/rate-limit-error.css */
+
+/* ========================================
+   RATE LIMIT ERROR STYLES
+======================================== */
+
+.rate-limit-error-fullpage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  z-index: 9999;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.rate-limit-error-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  z-index: 9999;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.rate-limit-error-content {
+  max-width: 500px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  animation: slideUpFade 0.6s ease-out;
+}
+
+.rate-limit-error-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.rate-limit-error-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: var(--color-text-primary);
+}
+
+.rate-limit-error-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.rate-limit-error-icon > * {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+.rate-limit-error-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.rate-limit-error-description {
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* ========================================
+   COUNTDOWN SECTION
+======================================== */
+
+.rate-limit-countdown {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color: white;
+}
+
+.rate-limit-countdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.rate-limit-countdown-time {
+  font-size: 3rem;
+  font-weight: 700;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.rate-limit-progress-container {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.rate-limit-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+  border-radius: 4px;
+  transition: width 1s ease-out;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+}
+
+.rate-limit-countdown-status {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ========================================
+   INFO GRID
+======================================== */
+
+.rate-limit-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.rate-limit-info-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.rate-limit-info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.rate-limit-info-card--security {
+  background: rgba(52, 152, 219, 0.1);
+  border-color: rgba(52, 152, 219, 0.2);
+}
+
+.rate-limit-info-card--performance {
+  background: rgba(46, 204, 113, 0.1);
+  border-color: rgba(46, 204, 113, 0.2);
+}
+
+.rate-limit-info-card--time {
+  background: rgba(155, 89, 182, 0.1);
+  border-color: rgba(155, 89, 182, 0.2);
+}
+
+.rate-limit-info-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.rate-limit-info-label {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.rate-limit-info-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* ========================================
+   RETRY BUTTON
+======================================== */
+
+.rate-limit-retry-btn {
+  width: 100%;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: inherit;
+}
+
+.rate-limit-retry-btn--active {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transform: translateY(0);
+}
+
+.rate-limit-retry-btn--active:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.rate-limit-retry-btn--active:active {
+  transform: translateY(0);
+}
+
+.rate-limit-retry-btn--disabled {
+  background: linear-gradient(135deg, #bdc3c7, #95a5a6);
+  cursor: not-allowed;
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+/* ========================================
+   TIPS SECTION
+======================================== */
+
+.rate-limit-tips {
+  background: rgba(241, 196, 15, 0.1);
+  border: 1px solid rgba(241, 196, 15, 0.3);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.rate-limit-tips h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f39c12;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+}
+
+.rate-limit-tips ul {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.rate-limit-tips li {
+  margin-bottom: 0.25rem;
+}
+
+/* ========================================
+   FOOTER
+======================================== */
+
+.rate-limit-footer {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  opacity: 0.7;
+}
+
+/* ========================================
+   ANIMATIONS
+======================================== */
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+@media (max-width: 480px) {
+  .rate-limit-error-content {
+    margin: 0.5rem;
+    padding: 2rem 1.5rem;
+  }
+
+  .rate-limit-error-title {
+    font-size: 1.5rem;
+  }
+
+  .rate-limit-countdown-time {
+    font-size: 2.5rem;
+  }
+
+  .rate-limit-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rate-limit-retry-btn {
+    font-size: 1rem;
+    padding: 0.875rem 1.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .rate-limit-error-content {
+    padding: 1.5rem 1rem;
+  }
+
+  .rate-limit-countdown {
+    padding: 1.5rem;
+  }
+
+  .rate-limit-countdown-time {
+    font-size: 2rem;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .rate-limit-error-content,
+  .rate-limit-retry-btn,
+  .rate-limit-info-card {
+    animation: none;
+    transition: none;
+  }
+
+  .rate-limit-error-icon > * {
+    animation: none;
+  }
+
+  .rate-limit-progress-bar {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .rate-limit-error-content {
+    background: white;
+    border: 2px solid #333;
+  }
+
+  .rate-limit-countdown {
+    background: #333;
+    color: white;
+  }
+
+  .rate-limit-info-card {
+    border-width: 2px;
+  }
+}
+
+/* Focus styles for keyboard navigation */
+.rate-limit-retry-btn:focus,
+.rate-limit-error-close:focus {
+  outline: 3px solid rgba(102, 126, 234, 0.6);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   DARK MODE SUPPORT
+======================================== */
+
+@media (prefers-color-scheme: dark) {
+  .rate-limit-error-content {
+    background: rgba(30, 30, 30, 0.95);
+    color: #f8f9fa;
+  }
+
+  .rate-limit-error-title {
+    color: #f8f9fa;
+  }
+
+  .rate-limit-error-description {
+    color: #adb5bd;
+  }
+
+  .rate-limit-tips {
+    background: rgba(241, 196, 15, 0.2);
+    border-color: rgba(241, 196, 15, 0.4);
+  }
+
+  .rate-limit-info-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .rate-limit-info-value {
+    color: #f8f9fa;
+  }
+}
+
+/* ========================================
+   PRINT STYLES
+======================================== */
+
+@media print {
+  .rate-limit-error-fullpage,
+  .rate-limit-error-modal {
+    display: none;
+  }
+}

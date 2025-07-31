@@ -1,0 +1,220 @@
+/* Integration Page Styles - integration.css */
+
+/* ========================================
+   MAIN INTEGRATION PAGE
+======================================== */
+
+.integration-page {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ========================================
+   INSTRUCTIONS SECTION
+======================================== */
+
+.integration-instructions {
+  margin: var(--spacing-8) 0;
+  display: flex;
+  justify-content: center;
+}
+
+.instruction-card {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
+  padding: var(--spacing-8);
+  max-width: 600px;
+  text-align: center;
+}
+
+.instruction-card__icon {
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-4);
+  display: flex;
+  justify-content: center;
+}
+
+.instruction-card__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-6);
+}
+
+.instruction-card__steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+  text-align: left;
+}
+
+.instruction-step {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3);
+  background-color: var(--color-background-light);
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.instruction-step svg {
+  color: var(--color-success);
+  flex-shrink: 0;
+}
+
+.instruction-card__note {
+  background-color: var(--color-background-light);
+  border-left: 4px solid var(--color-primary);
+  padding: var(--spacing-4);
+  border-radius: var(--border-radius-md);
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: left;
+  line-height: 1.6;
+}
+
+/* ========================================
+   STUDENT CARD EXTENSIONS
+======================================== */
+
+.student-card__actions {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+}
+
+.student-card__month {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ========================================
+   LOADING AND ANIMATION STYLES
+======================================== */
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn:disabled:hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ========================================
+   FILTER GRID ADJUSTMENTS FOR INTEGRATION
+======================================== */
+
+.integration-page .filter-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-4);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+@media (max-width: 768px) {
+  .instruction-card {
+    margin: 0 var(--spacing-4);
+    padding: var(--spacing-6);
+  }
+  
+  .instruction-card__steps {
+    gap: var(--spacing-3);
+  }
+  
+  .instruction-step {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-sm);
+  }
+  
+  .student-card {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-3);
+  }
+  
+  .student-card__actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .integration-page .filter-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-3);
+  }
+}
+
+@media (max-width: 480px) {
+  .instruction-card__title {
+    font-size: var(--font-size-lg);
+  }
+  
+  .instruction-step {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-2);
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY IMPROVEMENTS
+======================================== */
+
+.instruction-step:focus-within,
+.instruction-card:focus-within {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .instruction-card {
+    border-width: 2px;
+  }
+  
+  .instruction-step {
+    border: 1px solid var(--color-border);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin {
+    animation: none;
+  }
+  
+  .btn {
+    transition: none;
+  }
+}
