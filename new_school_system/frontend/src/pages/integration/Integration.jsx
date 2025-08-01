@@ -37,6 +37,19 @@ const Integration = () => {
     year: new Date().getFullYear(),
   });
 
+  const translatePerformanceLevel = level => {
+    const translations = {
+      excellent: '優秀',
+      good: '良好',
+      satisfactory: '一般',
+      fair: '一般',
+      average: '一般',
+      needs_improvement: '需改進',
+      poor: '差',
+    };
+    return translations[level] || level;
+  };
+
   // Generate academic years (current year and next 3 years)
   function generateAcademicYears() {
     const currentYear = new Date().getFullYear();
@@ -139,7 +152,6 @@ const Integration = () => {
     try {
       setGenerating(true);
 
-      // Get student info
       const selectedStudent = students.find(s => s._id === filters.student);
       const selectedSchool = schools.find(s => s._id === filters.school);
 
@@ -148,42 +160,42 @@ const Integration = () => {
         return;
       }
 
-      // Fetch all records for the student in the specified month/year
       const records = await studentReportHelpers.getByStudent(filters.student, {
         academicYear: filters.academicYear,
         page: 1,
         limit: 100,
       });
-
-      console.log('All records fetched:', records);
-
-      // Filter records by selected month and year
+      const translatePerformanceLevel = level => {
+        const translations = {
+          excellent: '優秀',
+          good: '良好',
+          satisfactory: '一般',
+          fair: '一般',
+          average: '一般',
+          needs_improvement: '需改進',
+          poor: '差',
+        };
+        return translations[level] || level;
+      };
       const monthlyRecords = records.filter(record => {
         const recordDate = new Date(record.reportDate || record.createdAt);
         const recordMonth = recordDate.getMonth() + 1;
         const recordYear = recordDate.getFullYear();
 
-        console.log(`Record date: ${recordDate}, Month: ${recordMonth}, Year: ${recordYear}`);
-        console.log(`Filter month: ${filters.month}, Filter year: ${filters.year}`);
-
         return recordMonth === filters.month && recordYear === filters.year;
       });
-
-      console.log('Filtered monthly records:', monthlyRecords);
 
       if (monthlyRecords.length === 0) {
         toast.error(`${filters.year}年${filters.month}月沒有找到任何記錄`);
         return;
       }
 
-      // Sort records by date
       monthlyRecords.sort((a, b) => {
         const dateA = new Date(a.reportDate || a.createdAt);
         const dateB = new Date(b.reportDate || b.createdAt);
         return dateA - dateB;
       });
 
-      // Generate PDF using HTML-to-PDF method
       await createHTMLToPDF(
         selectedStudent,
         selectedSchool,
@@ -203,20 +215,16 @@ const Integration = () => {
   };
 
   const createHTMLToPDF = async (student, school, records, month, year) => {
-    // Create HTML content
     const htmlContent = generateHTMLContent(student, school, records, month, year);
 
-    // Create a new window for printing
     const printWindow = window.open('', '_blank');
     printWindow.document.write(htmlContent);
     printWindow.document.close();
 
-    // Wait a bit for content to load, then print
     setTimeout(() => {
       printWindow.focus();
       printWindow.print();
 
-      // Close the window after printing
       setTimeout(() => {
         printWindow.close();
       }, 1000);
@@ -419,20 +427,19 @@ const Integration = () => {
                                       record.performance.attendance.status
                                     : '<span class="no-data">未填寫</span>'
                                 }</div>
-                                <div><strong>參與：</strong>${
-                                  record.performance.participation?.level
-                                    ? {
-                                        excellent: '優秀',
-                                        good: '良好',
-                                        average: '一般',
-                                        needs_improvement: '需改進',
-                                      }[record.performance.participation.level] ||
-                                      record.performance.participation.level
+                                 <div><strong>參與程度：</strong>${
+                                   record.performance.participation?.level
+                                     ? translatePerformanceLevel(
+                                         record.performance.participation.level
+                                       )
+                                     : '<span class="no-data">未填寫</span>'
+                                 }</div>
+                                <div><strong>理解程度：</strong>${
+                                  record.performance.understanding?.level
+                                    ? translatePerformanceLevel(
+                                        record.performance.understanding.level
+                                      )
                                     : '<span class="no-data">未填寫</span>'
-                                }</div>
-                                <div><strong>理解：</strong>${
-                                  record.performance.understanding?.level ||
-                                  '<span class="no-data">未填寫</span>'
                                 }</div>
                             </div>
                         </div>

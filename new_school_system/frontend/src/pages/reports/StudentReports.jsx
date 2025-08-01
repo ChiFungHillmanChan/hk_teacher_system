@@ -1,31 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  BookOpen, 
-  Plus, 
-  Filter, 
-  Search,
+import {
+  BookOpen,
   CalendarDays as Calendar,
-  User,
-  School,
-  GraduationCap,
-  FileText,
   Edit,
+  Eye,
+  FileText,
+  Filter,
+  Plus,
+  Search,
   Trash2,
-  Eye
+  User,
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { studentHelpers, schoolHelpers } from '../../services/api';
-import { getCurrentAcademicYear, getGradeChinese, HK_GRADES } from '../../utils/constants';
-import ReportFilters from '../../components/reports/ReportFilters';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
+import ReportFilters from '../../components/reports/ReportFilters';
+import { useAuth } from '../../context/AuthContext';
+import { schoolHelpers, studentHelpers } from '../../services/api';
+import { getCurrentAcademicYear, getGradeChinese } from '../../utils/constants';
 
-import { studentReportHelpers, handleApiError } from '../../services/api';
+import { handleApiError, studentReportHelpers } from '../../services/api';
 
 // RECOMMENDED: Utility function for consistent auth headers
 const getAuthHeaders = () => ({
   'Content-Type': 'application/json',
-  'Authorization': `Bearer ${localStorage.getItem('accessToken') || localStorage.getItem('token')}`
+  Authorization: `Bearer ${localStorage.getItem('accessToken') || localStorage.getItem('token')}`,
 });
 
 const StudentReports = () => {
@@ -41,7 +39,7 @@ const StudentReports = () => {
     academicYear: getCurrentAcademicYear(),
     school: '',
     grade: '',
-    student: ''
+    student: '',
   });
 
   // UI states
@@ -52,7 +50,7 @@ const StudentReports = () => {
   useEffect(() => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   }, []);
 
@@ -75,7 +73,6 @@ const StudentReports = () => {
     loadInitialData();
   }, []);
 
-
   // Load students when school or grade changes
   useEffect(() => {
     const loadStudents = async () => {
@@ -88,7 +85,7 @@ const StudentReports = () => {
         const params = {
           school: filters.school,
           ...(filters.grade && { grade: filters.grade }),
-          limit: 1000
+          limit: 1000,
         };
 
         // studentHelpers.getAll returns array directly now
@@ -103,7 +100,6 @@ const StudentReports = () => {
 
     loadStudents();
   }, [filters.school, filters.grade]);
-
 
   useEffect(() => {
     const loadRecords = async () => {
@@ -120,7 +116,7 @@ const StudentReports = () => {
         const recordsData = await studentReportHelpers.getByStudent(filters.student, {
           academicYear: filters.academicYear,
           page: 1,
-          limit: 100
+          limit: 100,
         });
 
         setRecords(recordsData);
@@ -149,22 +145,24 @@ const StudentReports = () => {
       return;
     }
 
-    const filtered = records.filter(record =>
-      record.topic?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (typeof record.remarks === 'string' && record.remarks?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (typeof record.remarks === 'object' && record.remarks?.teacher_comments?.toLowerCase().includes(searchTerm.toLowerCase()))
+    const filtered = records.filter(
+      record =>
+        record.topic?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        record.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (typeof record.remarks === 'string' &&
+          record.remarks?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (typeof record.remarks === 'object' &&
+          record.remarks?.teacher_comments?.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     setFilteredRecords(filtered);
   }, [searchTerm, records]);
 
-  const handleFilterChange = (newFilters) => {
+  const handleFilterChange = newFilters => {
     setFilters(prev => ({ ...prev, ...newFilters }));
   };
 
-
-  const handleDeleteRecord = async (recordId) => {
+  const handleDeleteRecord = async recordId => {
     if (!window.confirm('確定要刪除這個記錄嗎？此操作無法復原。')) {
       return;
     }
@@ -175,7 +173,6 @@ const StudentReports = () => {
       setRecords(prev => prev.filter(record => record._id !== recordId));
       setFilteredRecords(prev => prev.filter(record => record._id !== recordId));
       toast.success('記錄已成功刪除');
-      
     } catch (error) {
       const errorInfo = handleApiError(error);
       toast.error(errorInfo.message || '刪除記錄失敗');
@@ -185,15 +182,15 @@ const StudentReports = () => {
   const loadAllReports = async () => {
     try {
       setLoading(true);
-      
+
       const response = await studentReportHelpers.getAll({
         school: filters.school,
         academicYear: filters.academicYear,
         grade: filters.grade,
         page: 1,
-        limit: 100
+        limit: 100,
       });
-      
+
       const reportsData = response.data?.reports || [];
       setRecords(reportsData);
       setFilteredRecords(reportsData);
@@ -209,15 +206,15 @@ const StudentReports = () => {
   const loadMyReports = async () => {
     try {
       setLoading(true);
-      
+
       const response = await studentReportHelpers.getMyReports({
         school: filters.school,
         academicYear: filters.academicYear,
         subject: filters.subject,
         page: 1,
-        limit: 100
+        limit: 100,
       });
-      
+
       const reportsData = response.data?.reports || [];
       setRecords(reportsData);
       setFilteredRecords(reportsData);
@@ -235,9 +232,9 @@ const StudentReports = () => {
     try {
       const response = await studentReportHelpers.getStats({
         school: filters.school,
-        academicYear: filters.academicYear
+        academicYear: filters.academicYear,
       });
-      
+
       console.log('Report Statistics:', response.data);
       // You can use this data to show statistics in your UI
       return response.data;
@@ -256,10 +253,13 @@ const StudentReports = () => {
     }
 
     try {
-      const response = await fetch(`/api/student-records/student/${filters.student}?academicYear=${filters.academicYear}`, {
-        method: 'GET',
-        headers: getAuthHeaders() // Using utility function with fallback
-      });
+      const response = await fetch(
+        `/api/student-records/student/${filters.student}?academicYear=${filters.academicYear}`,
+        {
+          method: 'GET',
+          headers: getAuthHeaders(), // Using utility function with fallback
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch records');
@@ -267,21 +267,21 @@ const StudentReports = () => {
 
       const data = await response.json();
       const recordsData = data.data?.records || [];
-      
+
       setRecords(recordsData);
       setFilteredRecords(recordsData);
     } catch (error) {
       console.error('Failed to load records:', error);
       setRecords([]);
       setFilteredRecords([]);
-      
+
       if (!error.message.includes('404') && !error.message.includes('Not Found')) {
         toast.error('載入記錄失敗');
       }
     }
   };
 
-  const handleDeleteRecordWithUtil = async (recordId) => {
+  const handleDeleteRecordWithUtil = async recordId => {
     if (!window.confirm('確定要刪除這個記錄嗎？此操作無法復原。')) {
       return;
     }
@@ -290,8 +290,10 @@ const StudentReports = () => {
       const response = await fetch(`/api/student-records/${recordId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken') || localStorage.getItem('token')}` // With fallback
-        }
+          Authorization: `Bearer ${
+            localStorage.getItem('accessToken') || localStorage.getItem('token')
+          }`, // With fallback
+        },
       });
 
       if (!response.ok) {
@@ -300,7 +302,7 @@ const StudentReports = () => {
 
       setRecords(prev => prev.filter(record => record._id !== recordId));
       setFilteredRecords(prev => prev.filter(record => record._id !== recordId));
-      
+
       toast.success('記錄已成功刪除');
     } catch (error) {
       console.error('Failed to delete record:', error);
@@ -308,29 +310,29 @@ const StudentReports = () => {
     }
   };
 
-  const getPerformanceDisplay = (rating) => {
+  const getPerformanceDisplay = rating => {
     const ratingMap = {
-      'excellent': { text: '優秀', color: '#27ae60' },
-      'good': { text: '良好', color: '#3498db' },
-      'satisfactory': { text: '一般', color: '#f39c12' },
-      'needs_improvement': { text: '需改進', color: '#e74c3c' },
-      'fair': { text: '一般', color: '#f39c12' },  // for participation field
-      'poor': { text: '差', color: '#95a5a6' }
+      excellent: { text: '優秀', color: '#27ae60' },
+      good: { text: '良好', color: '#3498db' },
+      satisfactory: { text: '一般', color: '#f39c12' },
+      needs_improvement: { text: '需改進', color: '#e74c3c' },
+      fair: { text: '一般', color: '#f39c12' }, // for participation field
+      poor: { text: '差', color: '#95a5a6' },
     };
     return ratingMap[rating] || { text: rating, color: '#95a5a6' };
   };
 
-  const getHomeworkStatusDisplay = (status) => {
+  const getHomeworkStatusDisplay = status => {
     const statusMap = {
-      'assigned': { text: '已分配', color: '#3498db' },
-      'completed': { text: '已完成', color: '#27ae60' },
-      'overdue': { text: '逾期', color: '#e74c3c' }
+      assigned: { text: '已分配', color: '#3498db' },
+      completed: { text: '已完成', color: '#27ae60' },
+      overdue: { text: '逾期', color: '#e74c3c' },
     };
     return statusMap[status] || { text: status, color: '#95a5a6' };
   };
 
   // Helper function to safely render remarks
-  const renderRemarks = (remarks) => {
+  const renderRemarks = remarks => {
     if (!remarks) return null;
 
     // If remarks is a string (backward compatibility)
@@ -345,12 +347,13 @@ const StudentReports = () => {
 
     // If remarks is an object with structured data
     if (typeof remarks === 'object') {
-      const hasContent = remarks.teacher_comments || 
-                        (remarks.strengths && remarks.strengths.length > 0) ||
-                        (remarks.areas_for_improvement && remarks.areas_for_improvement.length > 0) ||
-                        (remarks.recommendations && remarks.recommendations.length > 0) ||
-                        (remarks.next_steps && remarks.next_steps.length > 0) ||
-                        remarks.parent_feedback_requested;
+      const hasContent =
+        remarks.teacher_comments ||
+        (remarks.strengths && remarks.strengths.length > 0) ||
+        (remarks.areas_for_improvement && remarks.areas_for_improvement.length > 0) ||
+        (remarks.recommendations && remarks.recommendations.length > 0) ||
+        (remarks.next_steps && remarks.next_steps.length > 0) ||
+        remarks.parent_feedback_requested;
 
       if (!hasContent) return null;
 
@@ -364,35 +367,35 @@ const StudentReports = () => {
                 <span>{remarks.teacher_comments}</span>
               </div>
             )}
-            
+
             {remarks.strengths && remarks.strengths.length > 0 && (
               <div className="remark-item">
                 <strong>優點：</strong>
                 <span>{remarks.strengths.join('、')}</span>
               </div>
             )}
-            
+
             {remarks.areas_for_improvement && remarks.areas_for_improvement.length > 0 && (
               <div className="remark-item">
                 <strong>改進方向：</strong>
                 <span>{remarks.areas_for_improvement.join('、')}</span>
               </div>
             )}
-            
+
             {remarks.recommendations && remarks.recommendations.length > 0 && (
               <div className="remark-item">
                 <strong>建議：</strong>
                 <span>{remarks.recommendations.join('、')}</span>
               </div>
             )}
-            
+
             {remarks.next_steps && remarks.next_steps.length > 0 && (
               <div className="remark-item">
                 <strong>下步計劃：</strong>
                 <span>{remarks.next_steps.join('、')}</span>
               </div>
             )}
-            
+
             {remarks.parent_feedback_requested && (
               <div className="remark-item">
                 <strong>需要家長回饋</strong>
@@ -429,26 +432,18 @@ const StudentReports = () => {
           </div>
           <div>
             <h1 className="page-title">學生報告記錄</h1>
-            <p className="page-subtitle">
-              管理和查看學生的課堂記錄與表現評估
-            </p>
+            <p className="page-subtitle">管理和查看學生的課堂記錄與表現評估</p>
           </div>
         </div>
 
         <div className="page-header__actions">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="btn btn--secondary"
-          >
+          <button onClick={() => setShowFilters(!showFilters)} className="btn btn--secondary">
             <Filter size={20} />
             {showFilters ? '隱藏篩選' : '顯示篩選'}
           </button>
 
           {filters.student && (
-            <Link
-              to={`/reports/student/${filters.student}/create`}
-              className="btn btn--primary"
-            >
+            <Link to={`/reports/student/${filters.student}/create`} className="btn btn--primary">
               <Plus size={20} />
               新增記錄
             </Link>
@@ -510,7 +505,7 @@ const StudentReports = () => {
                 type="text"
                 placeholder="搜索課題、內容或備註..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="search-bar__input"
               />
             </div>
@@ -520,7 +515,7 @@ const StudentReports = () => {
           <div className="records-section">
             {filteredRecords.length > 0 ? (
               <div className="records-list">
-                {filteredRecords.map((record) => (
+                {filteredRecords.map(record => (
                   <div key={record._id} className="record-card">
                     <div className="record-card__header">
                       <div className="record-card__date">
@@ -529,7 +524,7 @@ const StudentReports = () => {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric',
-                          weekday: 'short'
+                          weekday: 'short',
                         })}
                       </div>
                       <div className="record-card__actions">
@@ -564,19 +559,18 @@ const StudentReports = () => {
                       {record.performance && (
                         <div className="record-card__performance">
                           <span className="performance-label">學生表現：</span>
-                          <span 
+                          <span
                             className="performance-badge"
-                            style={{ 
-                              backgroundColor: getPerformanceDisplay(record.performance.rating).color + '20',
-                              color: getPerformanceDisplay(record.performance.rating).color
+                            style={{
+                              backgroundColor:
+                                getPerformanceDisplay(record.performance.rating).color + '20',
+                              color: getPerformanceDisplay(record.performance.rating).color,
                             }}
                           >
                             {getPerformanceDisplay(record.performance.rating).text}
                           </span>
                           {record.performance.notes && (
-                            <span className="performance-notes">
-                              - {record.performance.notes}
-                            </span>
+                            <span className="performance-notes">- {record.performance.notes}</span>
                           )}
                         </div>
                       )}
@@ -588,11 +582,12 @@ const StudentReports = () => {
                             {record.homework.description}
                           </span>
                           {record.homework.status && (
-                            <span 
+                            <span
                               className="homework-status"
-                              style={{ 
-                                backgroundColor: getHomeworkStatusDisplay(record.homework.status).color + '20',
-                                color: getHomeworkStatusDisplay(record.homework.status).color
+                              style={{
+                                backgroundColor:
+                                  getHomeworkStatusDisplay(record.homework.status).color + '20',
+                                color: getHomeworkStatusDisplay(record.homework.status).color,
                               }}
                             >
                               {getHomeworkStatusDisplay(record.homework.status).text}
@@ -611,12 +606,7 @@ const StudentReports = () => {
               <div className="empty-state">
                 <FileText size={48} />
                 <h3>暫無記錄</h3>
-                <p>
-                  {searchTerm ? 
-                    '沒有找到符合搜索條件的記錄' : 
-                    '該學生在此學年還沒有任何記錄'
-                  }
-                </p>
+                <p>{searchTerm ? '沒有找到符合搜索條件的記錄' : '該學生在此學年還沒有任何記錄'}</p>
                 {filters.student && !searchTerm && (
                   <Link
                     to={`/reports/student/${filters.student}/create`}

@@ -68,6 +68,19 @@ const StudentDetail = () => {
   const [showSchoolChangeModal, setShowSchoolChangeModal] = useState(false);
   const [pendingSchoolChange, setPendingSchoolChange] = useState(null);
 
+  const translatePerformanceLevel = level => {
+    const translations = {
+      excellent: '優秀',
+      good: '良好',
+      satisfactory: '一般',
+      fair: '一般',
+      average: '一般',
+      needs_improvement: '需改進',
+      poor: '差',
+    };
+    return translations[level] || level;
+  };
+
   // Load student data
   useEffect(() => {
     const loadStudent = async () => {
@@ -149,23 +162,18 @@ const StudentDetail = () => {
     loadSchools();
   }, [isEditing]);
 
-  // Helper function to get Chinese name display
   const getChineseNameDisplay = student => {
-    // If nameCh is set and different from name, show it
     if (student.nameCh && student.nameCh !== student.name) {
       return student.nameCh;
     }
 
-    // If nameCh is same as name or not set, check if name contains Chinese characters
     if (student.name && /[\u4e00-\u9fff]/.test(student.name)) {
-      return student.name; // Name contains Chinese, so it IS the Chinese name
+      return student.name;
     }
 
-    // Name doesn't contain Chinese characters and no separate nameCh
     return '未設定';
   };
 
-  // Get available grades based on school type
   const getAvailableGrades = () => {
     if (!editData.school) return HK_GRADES.ALL;
 
@@ -646,7 +654,8 @@ const StudentDetail = () => {
                       </span>
                       {record.performance?.understanding?.level && (
                         <span className="report-card__performance">
-                          理解程度: {record.performance.understanding.level}
+                          理解程度:{' '}
+                          {translatePerformanceLevel(record.performance.understanding.level)}
                         </span>
                       )}
                     </div>
