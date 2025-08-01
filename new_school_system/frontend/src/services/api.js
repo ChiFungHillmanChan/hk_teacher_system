@@ -525,6 +525,53 @@ export const healthCheck = async () => {
   }
 };
 
+export const aiAnalysisHelpers = {
+  // Check AI service status
+  checkStatus: async () => {
+    try {
+      return await apiRequest.get('/api/ai-analysis/status');
+    } catch (error) {
+      console.error('Failed to check AI service status:', error);
+      throw error;
+    }
+  },
+
+  // Extract student data from file
+  extractData: async (formData) => {
+    try {
+      return await api.post('/api/ai-analysis/extract', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 300000, // 5 minute timeout for AI processing
+      });
+    } catch (error) {
+      console.error('Failed to extract student data:', error);
+      throw error;
+    }
+  },
+
+  // Import student data
+  importData: async (importData) => {
+    try {
+      return await apiRequest.post('/api/ai-analysis/import', importData);
+    } catch (error) {
+      console.error('Failed to import student data:', error);
+      throw error;
+    }
+  },
+
+  // Get AI analysis statistics
+  getStats: async (params = {}) => {
+    try {
+      return await apiRequest.get('/api/ai-analysis/stats', { params });
+    } catch (error) {
+      console.error('Failed to fetch AI analysis stats:', error);
+      throw error;
+    }
+  },
+};
+
 // Export token manager for use in other files
 export { tokenManager };
 

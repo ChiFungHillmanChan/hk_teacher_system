@@ -1,5 +1,5 @@
-// File: src/pages/integration/AI_Analysis.jsx
-import React, { useState, useEffect } from 'react';
+// Updated AI_Analysis.jsx with your custom field requirements
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Upload, 
   FileText, 
@@ -17,12 +17,26 @@ import {
   X,
   Plus,
   Edit3,
-  Trash2
+  Trash2,
+  Wifi,
+  Settings
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { schoolHelpers, studentHelpers, handleApiError } from '../../services/api';
+import api, { schoolHelpers, studentHelpers, handleApiError } from '../../services/api';
 import { HK_GRADES, getCurrentAcademicYear } from '../../utils/constants';
 import { toast } from 'react-hot-toast';
+
+// Fallback grades array in case HK_GRADES is not properly imported
+const GRADES_FALLBACK = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6'];
+const safeHkGrades = Array.isArray(HK_GRADES) ? HK_GRADES : GRADES_FALLBACK;
+
+// Gender options for dropdown
+const GENDER_OPTIONS = [
+  { value: '', label: '選擇性別' },
+  { value: 'male', label: '男' },
+  { value: 'female', label: '女' },
+  { value: 'other', label: '其他' }
+];
 
 const AI_Analysis = () => {
   const { user } = useAuth();
@@ -35,35 +49,98 @@ const AI_Analysis = () => {
   const [mappingErrors, setMappingErrors] = useState([]);
   const [importingData, setImportingData] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [aiServiceStatus, setAiServiceStatus] = useState('checking');
+  const [retryAttempts, setRetryAttempts] = useState(0);
 
-  // Load schools data
+  // Load schools data with cleanup
   useEffect(() => {
+    let isCancelled = false;
+    
     const loadSchools = async () => {
       try {
+        // Use your existing schoolHelpers
         const schoolsData = await schoolHelpers.getAll({ limit: 200 });
-        setSchools(Array.isArray(schoolsData) ? schoolsData : []);
+        
+        if (!isCancelled) {
+          setSchools(Array.isArray(schoolsData) ? schoolsData : []);
+        }
       } catch (error) {
-        console.error('Failed to load schools:', error);
-        toast.error('載入學校資料失敗');
+        if (!isCancelled) {
+          console.error('Failed to load schools:', error);
+          const errorInfo = handleApiError(error);
+          toast.error(errorInfo.message || '載入學校資料失敗');
+        }
       }
     };
 
     loadSchools();
+    
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
-  // File selection handler
+  // Check AI service status on component mount
+  useEffect(() => {
+    checkAIServiceStatus();
+  }, []);
+
+  // Enhanced AI service status check
+  const checkAIServiceStatus = useCallback(async () => {
+    try {
+      console.log('🔍 Checking AI service status...');
+      setAiServiceStatus('checking');
+      
+      // Use your API service - it returns the full axios response
+      const response = await api.get('/api/ai-analysis/status');
+      
+      console.log('📡 Full response:', response);
+      console.log('📊 Response data:', response.data);
+      
+      // The actual data is in response.data
+      const result = response.data;
+      
+      if (result && result.success && result.data) {
+        console.log('✅ Found valid response structure');
+        console.log('📍 Available field:', result.data.available);
+        
+        const isAvailable = result.data.available === true;
+        setAiServiceStatus(isAvailable ? 'available' : 'unavailable');
+        
+        console.log(`🤖 AI Service Status: ${isAvailable ? 'Available' : 'Unavailable'}`);
+        
+        if (!isAvailable) {
+          toast.warning('AI 服務目前無法使用，請稍後再試');
+        }
+        
+        return isAvailable;
+      } else {
+        console.error('❌ Invalid response structure:', result);
+        setAiServiceStatus('unavailable');
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ AI service status check failed:', error);
+      setAiServiceStatus('unavailable');
+      
+      const errorInfo = handleApiError(error);
+      toast.error(errorInfo.message || '無法檢查 AI 服務狀態');
+      return false;
+    }
+  }, []);
+
+  // Enhanced file selection handler
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Validate file type
     const allowedTypes = [
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-      'application/vnd.ms-excel', // .xls
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
       'text/csv',
       'application/pdf',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-      'application/msword' // .doc
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/msword'
     ];
 
     if (!allowedTypes.includes(file.type)) {
@@ -71,8 +148,7 @@ const AI_Analysis = () => {
       return;
     }
 
-    // Validate file size (25MB max)
-    const maxSize = 25 * 1024 * 1024; // 25MB in bytes
+    const maxSize = 25 * 1024 * 1024;
     if (file.size > maxSize) {
       toast.error('檔案大小超過限制（最大 25MB）');
       return;
@@ -82,53 +158,93 @@ const AI_Analysis = () => {
     setExtractedData(null);
     setPreviewData([]);
     setCurrentStep(2);
+    setRetryAttempts(0);
     toast.success(`已選擇檔案：${file.name}`);
+    
+    if (aiServiceStatus !== 'available') {
+      checkAIServiceStatus();
+    }
   };
 
-  // AI analysis handler
+  // Enhanced AI analysis handler
   const handleAnalyzeFile = async () => {
-    if (!selectedFile || !selectedSchool) {
-      toast.error('請選擇檔案和學校');
+  if (!selectedFile || !selectedSchool) {
+    toast.error('請選擇檔案和學校');
+    return;
+  }
+
+  if (aiServiceStatus !== 'available') {
+    const isAvailable = await checkAIServiceStatus();
+    if (!isAvailable) {
+      toast.error('AI 服務目前無法使用，請稍後再試或聯絡管理員');
       return;
     }
+  }
 
-    try {
-      setAnalyzing(true);
-      
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('schoolId', selectedSchool);
-      formData.append('academicYear', getCurrentAcademicYear());
+  try {
+    setAnalyzing(true);
+    
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('schoolId', selectedSchool);
+    formData.append('academicYear', getCurrentAcademicYear());
 
-      const response = await fetch('/api/ai-analysis/extract', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include'
-      });
+    console.log('🚀 Starting AI analysis...');
+    
+    // Use axios api - returns full response object
+    const response = await api.post('/api/ai-analysis/extract', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      timeout: 300000, // 5 minute timeout
+    });
 
-      if (!response.ok) {
-        throw new Error('AI 分析失敗');
-      }
-
-      const result = await response.json();
-      
-      if (result.success) {
-        setExtractedData(result.data);
-        setPreviewData(result.data.students || []);
-        setMappingErrors(result.data.errors || []);
-        setCurrentStep(3);
-        toast.success(`成功提取 ${result.data.students?.length || 0} 名學生資料`);
-      } else {
-        throw new Error(result.message);
-      }
-    } catch (error) {
-      console.error('AI analysis failed:', error);
-      const errorInfo = handleApiError(error);
-      toast.error(errorInfo.message || 'AI 分析失敗');
-    } finally {
-      setAnalyzing(false);
+    console.log('📡 Analysis response:', response);
+    
+    // Extract the actual data from the response
+    const result = response.data;
+    
+    if (result && result.success) {
+      setExtractedData(result.data);
+      setPreviewData(result.data.students || []);
+      setMappingErrors(result.data.errors || []);
+      setCurrentStep(3);
+      setAiServiceStatus('available');
+      toast.success(`成功提取 ${result.data.students?.length || 0} 名學生資料`);
+    } else {
+      throw new Error(result?.message || '分析失敗，請重試');
     }
-  };
+  } catch (error) {
+    console.error('AI analysis failed:', error);
+    
+    // Use your existing error handler
+    const errorInfo = handleApiError(error);
+    
+    // Handle specific error types
+    if (error.response?.status === 503) {
+      setAiServiceStatus('unavailable');
+      toast.error('AI 服務暫時無法使用，請稍後再試');
+    } else if (error.response?.status === 500 && errorInfo.message?.includes('fetch failed')) {
+      setAiServiceStatus('unavailable');
+      if (retryAttempts < 2) {
+        toast.error(`AI 服務連接失敗，正在重試... (${retryAttempts + 1}/3)`);
+        setRetryAttempts(prev => prev + 1);
+        setTimeout(() => handleAnalyzeFile(), 3000);
+        return;
+      } else {
+        toast.error('AI 服務連接失敗，請檢查網路連接或聯絡系統管理員', { duration: 8000 });
+      }
+    } else if (error.response?.status === 429) {
+      toast.error('請求過於頻繁，請稍後再試');
+    } else if (errorInfo.isTimeout) {
+      toast.error('分析超時，請確認檔案大小或重試');
+    } else {
+      toast.error(errorInfo.message || '分析失敗，請重試');
+    }
+  } finally {
+    setAnalyzing(false);
+  }
+};
 
   // Import data handler
   const handleImportData = async () => {
@@ -140,11 +256,10 @@ const AI_Analysis = () => {
     try {
       setImportingData(true);
 
-      // Clean the data before sending - remove null/undefined/empty values and set defaults
+      // Clean the data before sending
       const cleanedStudentsData = previewData.map((student, index) => {
         const cleanedStudent = {};
         
-        // Only include fields that have actual values
         Object.keys(student).forEach(key => {
           const value = student[key];
           if (value !== null && value !== undefined && value !== '') {
@@ -152,19 +267,15 @@ const AI_Analysis = () => {
           }
         });
         
-        // Ensure we have at least one name field
-        if (!cleanedStudent.name && !cleanedStudent.nameEn && !cleanedStudent.nameCh) {
+        if (!cleanedStudent.name && !cleanedStudent.nameEn) {
           cleanedStudent.name = `學生 ${index + 1}`;
         }
         
-        // Set default gender if missing (required by Student model)
         if (!cleanedStudent.gender) {
           cleanedStudent.gender = 'other';
         }
         
-        // Ensure existsInDB flag is preserved
         cleanedStudent.existsInDB = student.existsInDB;
-        
         return cleanedStudent;
       });
 
@@ -172,35 +283,23 @@ const AI_Analysis = () => {
         schoolId: selectedSchool,
         studentsCount: cleanedStudentsData.length,
         newStudentsCount: cleanedStudentsData.filter(s => !s.existsInDB).length,
-        sampleStudent: cleanedStudentsData[0]
       });
 
-      const response = await fetch('/api/ai-analysis/import', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          schoolId: selectedSchool,
-          studentsData: cleanedStudentsData,
-          academicYear: getCurrentAcademicYear()
-        }),
-        credentials: 'include'
+      // Use axios api - returns full response object
+      const response = await api.post('/api/ai-analysis/import', {
+        schoolId: selectedSchool,
+        studentsData: cleanedStudentsData,
+        academicYear: getCurrentAcademicYear()
       });
 
-      console.log('📡 Response status:', response.status);
+      console.log('📄 Import response:', response);
       
-      const result = await response.json();
-      console.log('📄 Response data:', result);
-
-      if (!response.ok) {
-        throw new Error(result.message || `HTTP ${response.status}: ${response.statusText}`);
-      }
+      // Extract the actual data from the response
+      const result = response.data;
       
-      if (result.success) {
+      if (result && result.success) {
         toast.success(`成功匯入 ${result.data.imported} 名學生，跳過 ${result.data.skipped} 名已存在學生`);
         
-        // Show any import errors
         if (result.data.errors && result.data.errors.length > 0) {
           console.log('⚠️ Import warnings:', result.data.errors);
           result.data.errors.forEach(error => {
@@ -210,21 +309,23 @@ const AI_Analysis = () => {
         
         setCurrentStep(4);
       } else {
-        throw new Error(result.message || '匯入失敗');
+        throw new Error(result?.message || '匯入失敗');
       }
     } catch (error) {
       console.error('💥 Import failed:', error);
       
-      // Provide more specific error messages
+      // Use your existing error handler
+      const errorInfo = handleApiError(error);
+      
       let errorMessage = '資料匯入失敗';
-      if (error.message.includes('Network')) {
+      if (errorInfo.type === 'network') {
         errorMessage = '網路連接失敗，請檢查網路連接';
-      } else if (error.message.includes('403')) {
+      } else if (error.response?.status === 403) {
         errorMessage = '沒有權限執行此操作';
-      } else if (error.message.includes('401')) {
+      } else if (error.response?.status === 401) {
         errorMessage = '請重新登入後再試';
-      } else if (error.message) {
-        errorMessage = error.message;
+      } else {
+        errorMessage = errorInfo.message || '匯入失敗';
       }
       
       toast.error(errorMessage);
@@ -233,22 +334,69 @@ const AI_Analysis = () => {
     }
   };
 
-  // Reset handler
+  // Enhanced reset handler
   const handleReset = () => {
     setSelectedFile(null);
     setExtractedData(null);
     setPreviewData([]);
     setMappingErrors([]);
     setCurrentStep(1);
-    document.getElementById('file-input').value = '';
+    setRetryAttempts(0);
+    
+    const fileInput = document.getElementById('file-input');
+    if (fileInput) fileInput.value = '';
   };
 
-  // Edit student data handler
-  const handleEditStudent = (index, field, value) => {
+  // Edit student data handler with updated validation
+  const handleEditStudent = useCallback((index, field, value) => {
+    if (index < 0 || index >= previewData.length) {
+      console.warn('Invalid student index:', index);
+      return;
+    }
+
+    let sanitizedValue = value;
+    switch (field) {
+      case 'name':
+      case 'nameEn':
+        sanitizedValue = value.trim().slice(0, 100);
+        break;
+      case 'classNumber':
+        // Allow numbers and simple formats like "1", "01", "15", etc.
+        sanitizedValue = value.trim().replace(/[^0-9]/g, '');
+        if (sanitizedValue && (parseInt(sanitizedValue) < 1 || parseInt(sanitizedValue) > 50)) {
+          toast.warning(`班內號碼應在 1-50 之間: ${sanitizedValue}`);
+          return;
+        }
+        break;
+      case 'grade':
+        sanitizedValue = value.trim();
+        if (!safeHkGrades.includes(sanitizedValue)) {
+          toast.warning(`無效的年級: ${sanitizedValue}`);
+          return;
+        }
+        break;
+      case 'gender':{
+        // Validate gender options
+        const validGenders = ['male', 'female', 'other'];
+        if (!validGenders.includes(value)) {
+          toast.warning(`無效的性別: ${value}`);
+          return;
+        }
+        break;
+      }
+      case 'class':
+        sanitizedValue = value.trim().slice(0, 10);
+        break;
+    }
+
     const updatedData = [...previewData];
-    updatedData[index] = { ...updatedData[index], [field]: value };
+    updatedData[index] = { 
+      ...updatedData[index], 
+      [field]: sanitizedValue,
+      _modified: true
+    };
     setPreviewData(updatedData);
-  };
+  }, [previewData]);
 
   // Remove student handler
   const handleRemoveStudent = (index) => {
@@ -262,6 +410,30 @@ const AI_Analysis = () => {
     if (fileType?.includes('pdf')) return '📕';
     if (fileType?.includes('word') || fileType?.includes('document')) return '📝';
     return '📄';
+  };
+
+  // AI Service Status Indicator
+  const renderAIServiceStatus = () => {
+    return (
+      <div className={`ai-status-indicator ai-status-indicator--${aiServiceStatus}`}>
+        {aiServiceStatus === 'checking' ? (
+          <>
+            <Loader size={16} className="animate-spin" />
+            <span>檢查服務狀態中...</span>
+          </>
+        ) : aiServiceStatus === 'available' ? (
+          <>
+            <CheckCircle size={16} />
+            <span>AI 服務正常</span>
+          </>
+        ) : (
+          <>
+            <AlertCircle size={16} />
+            <span>AI 服務暫時無法使用</span>
+          </>
+        )}
+      </div>
+    );
   };
 
   const renderStepIndicator = () => (
@@ -299,6 +471,7 @@ const AI_Analysis = () => {
           <p className="ai-analysis__subtitle">
             使用 Google AI 自動分析 Excel、CSV、PDF 或 Word 檔案，智能提取學生資料並匯入系統
           </p>
+          {renderAIServiceStatus()}
         </div>
         {selectedFile && (
           <button 
@@ -341,6 +514,34 @@ const AI_Analysis = () => {
                 </div>
               </label>
             </div>
+
+            {/* AI Service Warning */}
+            {aiServiceStatus === 'unavailable' && (
+              <div className="ai-analysis__service-warning">
+                <AlertCircle size={20} />
+                <div>
+                  <h4>AI 服務暫時無法使用</h4>
+                  <p>請檢查網路連接或稍後再試。如果問題持續，請聯絡系統管理員。</p>
+                  <button 
+                    onClick={checkAIServiceStatus}
+                    className="btn btn--secondary btn--small"
+                    disabled={aiServiceStatus === 'checking'}
+                  >
+                    {aiServiceStatus === 'checking' ? (
+                      <>
+                        <Loader size={16} className="animate-spin" />
+                        檢查中...
+                      </>
+                    ) : (
+                      <>
+                        <Wifi size={16} />
+                        重新檢查服務狀態
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="ai-analysis__supported-formats">
               <h3>支援的檔案格式</h3>
@@ -424,13 +625,24 @@ const AI_Analysis = () => {
             <div className="ai-analysis__actions">
               <button
                 onClick={handleAnalyzeFile}
-                disabled={analyzing || !selectedSchool}
+                disabled={analyzing || !selectedSchool || aiServiceStatus === 'unavailable'}
                 className="btn btn--primary btn--large"
               >
                 {analyzing ? (
                   <>
                     <Loader size={20} className="animate-spin" />
                     AI 分析中...
+                    {retryAttempts > 0 && ` (重試 ${retryAttempts}/3)`}
+                  </>
+                ) : aiServiceStatus === 'unavailable' ? (
+                  <>
+                    <AlertCircle size={20} />
+                    AI 服務無法使用
+                  </>
+                ) : aiServiceStatus === 'checking' ? (
+                  <>
+                    <Loader size={20} className="animate-spin" />
+                    檢查服務狀態中...
                   </>
                 ) : (
                   <>
@@ -446,14 +658,17 @@ const AI_Analysis = () => {
                 <div className="ai-analysis__progress-bar">
                   <div className="ai-analysis__progress-fill"></div>
                 </div>
-                <p>正在使用 Google AI 分析檔案內容，請稍候...</p>
+                <p>
+                  正在使用 Google AI 分析檔案內容，請稍候...
+                  {retryAttempts > 0 && ` (重試 ${retryAttempts}/3)`}
+                </p>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* Step 3: Preview Data */}
+      {/* Step 3: Preview Data - UPDATED FIELD STRUCTURE */}
       {currentStep === 3 && previewData.length > 0 && (
         <div className="ai-analysis__section">
           <div className="ai-analysis__card">
@@ -489,7 +704,6 @@ const AI_Analysis = () => {
                       <th>狀態</th>
                       <th>姓名</th>
                       <th>英文姓名</th>
-                      <th>中文姓名</th>
                       <th>學號</th>
                       <th>年級</th>
                       <th>班別</th>
@@ -517,7 +731,7 @@ const AI_Analysis = () => {
                             value={student.name || ''}
                             onChange={(e) => handleEditStudent(index, 'name', e.target.value)}
                             className="ai-analysis__input"
-                            disabled={student.existsInDB}
+                            placeholder="姓名"
                           />
                         </td>
                         <td>
@@ -526,25 +740,17 @@ const AI_Analysis = () => {
                             value={student.nameEn || ''}
                             onChange={(e) => handleEditStudent(index, 'nameEn', e.target.value)}
                             className="ai-analysis__input"
-                            disabled={student.existsInDB}
+                            placeholder="English Name"
                           />
                         </td>
                         <td>
                           <input
                             type="text"
-                            value={student.nameCh || ''}
-                            onChange={(e) => handleEditStudent(index, 'nameCh', e.target.value)}
+                            value={student.classNumber || ''}
+                            onChange={(e) => handleEditStudent(index, 'classNumber', e.target.value)}
                             className="ai-analysis__input"
-                            disabled={student.existsInDB}
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="text"
-                            value={student.studentId || ''}
-                            onChange={(e) => handleEditStudent(index, 'studentId', e.target.value)}
-                            className="ai-analysis__input"
-                            disabled={student.existsInDB}
+                            placeholder="學號"
+                            maxLength="2"
                           />
                         </td>
                         <td>
@@ -552,10 +758,9 @@ const AI_Analysis = () => {
                             value={student.grade || ''}
                             onChange={(e) => handleEditStudent(index, 'grade', e.target.value)}
                             className="ai-analysis__select ai-analysis__select--small"
-                            disabled={student.existsInDB}
                           >
                             <option value="">選擇年級</option>
-                            {HK_GRADES.ALL.map(grade => (
+                            {safeHkGrades.map(grade => (
                               <option key={grade} value={grade}>{grade}</option>
                             ))}
                           </select>
@@ -566,7 +771,7 @@ const AI_Analysis = () => {
                             value={student.class || ''}
                             onChange={(e) => handleEditStudent(index, 'class', e.target.value)}
                             className="ai-analysis__input"
-                            disabled={student.existsInDB}
+                            placeholder="班別"
                           />
                         </td>
                         <td>
@@ -574,24 +779,22 @@ const AI_Analysis = () => {
                             value={student.gender || ''}
                             onChange={(e) => handleEditStudent(index, 'gender', e.target.value)}
                             className="ai-analysis__select ai-analysis__select--small"
-                            disabled={student.existsInDB}
                           >
-                            <option value="">選擇性別</option>
-                            <option value="male">男</option>
-                            <option value="female">女</option>
-                            <option value="other">其他</option>
+                            {GENDER_OPTIONS.map(option => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
                           </select>
                         </td>
                         <td>
-                          {!student.existsInDB && (
-                            <button
-                              onClick={() => handleRemoveStudent(index)}
-                              className="btn btn--danger btn--small"
-                              title="移除此學生"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          )}
+                          <button
+                            onClick={() => handleRemoveStudent(index)}
+                            className="btn btn--danger btn--small"
+                            title="移除此學生"
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -600,33 +803,10 @@ const AI_Analysis = () => {
               </div>
             </div>
 
-            <div className="ai-analysis__import-summary">
-              <div className="ai-analysis__summary-stats">
-                <div className="ai-analysis__stat">
-                  <span className="ai-analysis__stat-number">
-                    {previewData.filter(s => !s.existsInDB).length}
-                  </span>
-                  <span className="ai-analysis__stat-label">新學生</span>
-                </div>
-                <div className="ai-analysis__stat">
-                  <span className="ai-analysis__stat-number">
-                    {previewData.filter(s => s.existsInDB).length}
-                  </span>
-                  <span className="ai-analysis__stat-label">已存在</span>
-                </div>
-                <div className="ai-analysis__stat">
-                  <span className="ai-analysis__stat-number">
-                    {previewData.length}
-                  </span>
-                  <span className="ai-analysis__stat-label">總計</span>
-                </div>
-              </div>
-            </div>
-
             <div className="ai-analysis__actions">
               <button
                 onClick={handleImportData}
-                disabled={importingData || previewData.filter(s => !s.existsInDB).length === 0}
+                disabled={importingData || !previewData.length}
                 className="btn btn--primary btn--large"
               >
                 {importingData ? (

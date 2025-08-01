@@ -9,7 +9,8 @@ const {
   upload,
   extractStudentData,
   importStudentData,
-  getAIAnalysisStats
+  getAIAnalysisStats,
+  checkAIServiceStatus  // Add this import
 } = require('../controllers/aiAnalysisController');
 
 const {
@@ -130,6 +131,16 @@ const validateImportData = [
 ];
 
 // Routes
+
+// @desc    Check AI service status
+// @route   GET /api/ai-analysis/status
+// @access  Private
+router.get(
+  '/status',
+  generalLimiter,
+  logActivity('check_ai_service_status'),
+  checkAIServiceStatus
+);
 
 // @desc    Get AI analysis statistics
 // @route   GET /api/ai-analysis/stats
