@@ -1,18 +1,18 @@
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  Users, 
-  School, 
-  BookOpen, 
-  BarChart3, 
-  Settings, 
-  User,
-  X,
-  Shield,
+import {
+  BarChart3,
+  BookOpen, // Added for Integration icon
+  Brain, // Added for AI Analysis icon
+  FileText,
   GraduationCap,
-  FileText, // Added for Integration icon
-  Brain // Added for AI Analysis icon
+  Home,
+  School,
+  Settings,
+  Shield,
+  User,
+  Users,
+  X,
 } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -26,7 +26,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       label: '控制台',
       icon: <Home size={20} />,
       path: '/dashboard',
-      available: true
+      available: true,
     },
     {
       id: 'schools',
@@ -34,21 +34,21 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <School size={20} />,
       path: '/schools',
       available: true,
-      badge: isAdmin() ? '管理員' : null
+      badge: isAdmin() ? '管理員' : null,
     },
     {
       id: 'students',
       label: '學生管理',
       icon: <Users size={20} />,
       path: '/students',
-      available: true
+      available: true,
     },
     {
       id: 'reports',
       label: '學生報告記錄',
       icon: <BookOpen size={20} />,
       path: '/reports',
-      available: true
+      available: true,
     },
     {
       id: 'year_summary',
@@ -56,8 +56,8 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <GraduationCap size={20} />,
       path: '/year-summary',
       available: true,
-      badge: '新功能'
-    }
+      badge: 'new',
+    },
   ];
 
   // Integration items - NEW section for integration features
@@ -66,14 +66,14 @@ const Sidebar = ({ isOpen, onClose }) => {
       id: 'integration-divider',
       type: 'divider',
       label: '整合功能',
-      available: true
+      available: true,
     },
     {
       id: 'integration',
       label: 'PDF 報告生成',
       icon: <FileText size={20} />,
       path: '/integration',
-      available: true
+      available: true,
     },
     {
       id: 'ai-analysis',
@@ -81,8 +81,8 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <Brain size={20} />,
       path: '/ai-analysis',
       available: true,
-      badge: 'NEW'
-    }
+      badge: 'NEW',
+    },
   ];
 
   // Analytics items - Updated to separate from AI Analysis
@@ -91,7 +91,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       id: 'analytics-divider',
       type: 'divider',
       label: '分析功能',
-      available: true
+      available: true,
     },
     {
       id: 'analytics',
@@ -99,8 +99,8 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <BarChart3 size={20} />,
       path: '/analytics',
       available: true,
-      comingSoon: true
-    }
+      comingSoon: true,
+    },
   ];
 
   // Admin-only items - Translated to Traditional Chinese
@@ -109,7 +109,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       id: 'admin-divider',
       type: 'divider',
       label: '管理功能',
-      available: isAdmin()
+      available: isAdmin(),
     },
     {
       id: 'admin-users',
@@ -117,7 +117,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <Shield size={20} />,
       path: '/admin/users',
       available: isAdmin(),
-      comingSoon: true
+      comingSoon: true,
     },
     {
       id: 'admin-system',
@@ -125,8 +125,8 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <Settings size={20} />,
       path: '/admin/system',
       available: isAdmin(),
-      comingSoon: true
-    }
+      comingSoon: true,
+    },
   ];
 
   // Account items - Translated to Traditional Chinese
@@ -135,7 +135,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       id: 'account-divider',
       type: 'divider',
       label: '帳戶',
-      available: true
+      available: true,
     },
     {
       id: 'profile',
@@ -143,7 +143,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <User size={20} />,
       path: '/profile',
       available: true,
-      comingSoon: true
+      comingSoon: true,
     },
     {
       id: 'settings',
@@ -151,25 +151,25 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <Settings size={20} />,
       path: '/settings',
       available: true,
-      comingSoon: true
-    }
+      comingSoon: true,
+    },
   ];
 
   const allItems = [
-    ...navigationItems, 
-    ...integrationItems, 
-    ...analyticsItems, 
-    ...adminItems, 
-    ...accountItems
+    ...navigationItems,
+    ...integrationItems,
+    ...analyticsItems,
+    ...adminItems,
+    ...accountItems,
   ].filter(item => item.available);
 
-  const isActivePath = (path) => {
+  const isActivePath = path => {
     if (path === '/dashboard' && location.pathname === '/dashboard') return true;
     if (path !== '/dashboard' && location.pathname.startsWith(path)) return true;
     return false;
   };
 
-  const handleItemClick = (item) => {
+  const handleItemClick = item => {
     if (item.comingSoon) {
       // For now, just close sidebar for coming soon items
       onClose?.();
@@ -195,32 +195,24 @@ const Sidebar = ({ isOpen, onClose }) => {
             <GraduationCap size={24} />
             <span className="sidebar__logo-text">香港教師系統</span>
           </Link>
-          <button
-            className="sidebar__close-btn"
-            onClick={onClose}
-            aria-label="關閉選單"
-          >
+          <button className="sidebar__close-btn" onClick={onClose} aria-label="關閉選單">
             <X size={20} />
           </button>
         </div>
 
         {/* User Info */}
         <div className="sidebar__user">
-          <div className="sidebar__user-avatar">
-            {user?.name?.charAt(0).toUpperCase() || 'U'}
-          </div>
+          <div className="sidebar__user-avatar">{user?.name?.charAt(0).toUpperCase() || 'U'}</div>
           <div className="sidebar__user-info">
             <div className="sidebar__user-name">{user?.name}</div>
-            <div className="sidebar__user-role">
-              {user?.role === 'admin' ? '管理員' : '教師'}
-            </div>
+            <div className="sidebar__user-role">{user?.role === 'admin' ? '管理員' : '教師'}</div>
           </div>
         </div>
 
         {/* Navigation */}
         <nav className="sidebar__nav">
           <ul className="sidebar__nav-list">
-            {allItems.map((item) => {
+            {allItems.map(item => {
               if (item.type === 'divider') {
                 return (
                   <li key={item.id} className="sidebar__divider">
@@ -232,16 +224,12 @@ const Sidebar = ({ isOpen, onClose }) => {
               return (
                 <li key={item.id} className="sidebar__nav-item">
                   {item.comingSoon ? (
-                    <div 
+                    <div
                       className="sidebar__nav-link sidebar__nav-link--disabled"
                       onClick={() => handleItemClick(item)}
                     >
-                      <span className="sidebar__nav-icon">
-                        {item.icon}
-                      </span>
-                      <span className="sidebar__nav-text">
-                        {item.label}
-                      </span>
+                      <span className="sidebar__nav-icon">{item.icon}</span>
+                      <span className="sidebar__nav-text">{item.label}</span>
                       <span className="sidebar__nav-badge sidebar__nav-badge--coming-soon">
                         即將推出
                       </span>
@@ -254,17 +242,18 @@ const Sidebar = ({ isOpen, onClose }) => {
                       }`}
                       onClick={() => handleItemClick(item)}
                     >
-                      <span className="sidebar__nav-icon">
-                        {item.icon}
-                      </span>
-                      <span className="sidebar__nav-text">
-                        {item.label}
-                      </span>
+                      <span className="sidebar__nav-icon">{item.icon}</span>
+                      <span className="sidebar__nav-text">{item.label}</span>
                       {item.badge && (
-                        <span className={`sidebar__nav-badge ${
-                          item.badge === 'NEW' ? 'sidebar__nav-badge--new' : 
-                          item.badge === '管理員' ? 'sidebar__nav-badge--admin' : ''
-                        }`}>
+                        <span
+                          className={`sidebar__nav-badge ${
+                            item.badge === 'NEW'
+                              ? 'sidebar__nav-badge--new'
+                              : item.badge === '管理員'
+                              ? 'sidebar__nav-badge--admin'
+                              : ''
+                          }`}
+                        >
                           {item.badge}
                         </span>
                       )}
@@ -279,12 +268,8 @@ const Sidebar = ({ isOpen, onClose }) => {
         {/* Footer */}
         <div className="sidebar__footer">
           <div className="sidebar__footer-content">
-            <p className="sidebar__footer-text">
-              © 2025 香港教師系統
-            </p>
-            <p className="sidebar__footer-subtext">
-              為香港教育工作者而設
-            </p>
+            <p className="sidebar__footer-text">© 2025 香港教師系統</p>
+            <p className="sidebar__footer-subtext">為香港教育工作者而設</p>
           </div>
         </div>
       </aside>
