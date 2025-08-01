@@ -15,6 +15,7 @@ const schoolRoutes = require('./routes/schools');
 const studentRoutes = require('./routes/students');
 const studentReportRoutes = require('./routes/studentReports');
 const aiAnalysisRoutes = require('./routes/aiAnalysis');
+const meetingRecordRoutes = require('./routes/meetingRecords');
 
 // Create Express app
 const app = express();
@@ -24,7 +25,6 @@ connectDB();
 
 // Trust proxy (important for rate limiting behind reverse proxy/load balancer)
 app.set('trust proxy', 1);
-
 
 // Security middleware
 app.use(
@@ -52,9 +52,9 @@ const corsOptions = {
     // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
 
-    const allowedOrigins = process.env.CORS_ORIGINS ? 
-    process.env.CORS_ORIGINS.split(',') : 
-    ['http://localhost:3000', 'http://localhost:5173'];
+    const allowedOrigins = process.env.CORS_ORIGINS
+      ? process.env.CORS_ORIGINS.split(',')
+      : ['http://localhost:3000', 'http://localhost:5173'];
 
     // Add production domain when deployed
     if (process.env.CLIENT_URL) {
@@ -79,7 +79,7 @@ app.use(cors(corsOptions));
 const globalLimiter = rateLimit({
   max: parseInt(process.env.RATE_LIMIT_MAX) || 1000,
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  
+
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.',
@@ -167,6 +167,7 @@ app.use('/api/schools', schoolRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/student-reports', studentReportRoutes);
 app.use('/api/ai-analysis', aiAnalysisRoutes);
+app.use('/api/meeting-records', meetingRecords);
 
 // API overview endpoint
 app.get('/api', (req, res) => {
@@ -222,7 +223,7 @@ app.get('/api', (req, res) => {
         routes: [
           'GET /api/ai-analysis/stats - Get AI analysis statistics',
           'POST /api/ai-analysis/extract - Extract student data from file using AI',
-          'POST /api/ai-analysis/import - Import extracted student data to database'
+          'POST /api/ai-analysis/import - Import extracted student data to database',
         ],
       },
     },
@@ -296,14 +297,14 @@ app.get('/api', (req, res) => {
         ],
       },
     },
-    aiAnalysis: { 
-        base: '/api/ai-analysis',
-        routes: [
-          'GET /api/ai-analysis/stats - Get AI analysis statistics',
-          'POST /api/ai-analysis/extract - Extract student data from file using AI',
-          'POST /api/ai-analysis/import - Import extracted student data to database'
-        ],
-      },
+    aiAnalysis: {
+      base: '/api/ai-analysis',
+      routes: [
+        'GET /api/ai-analysis/stats - Get AI analysis statistics',
+        'POST /api/ai-analysis/extract - Extract student data from file using AI',
+        'POST /api/ai-analysis/import - Import extracted student data to database',
+      ],
+    },
 
     documentation: 'See /docs for detailed API documentation',
   });
@@ -321,7 +322,7 @@ app.all('/api/*', (req, res) => {
       '/api/schools/*',
       '/api/students/*',
       '/api/student-reports/*',
-      '/api/ai-analysis/*'
+      '/api/ai-analysis/*',
     ],
   });
 });
@@ -436,7 +437,6 @@ const PORT = process.env.PORT || 5001;
 const server = app.listen(PORT, async () => {
   console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
   console.log(`📚 API Documentation available at http://localhost:${PORT}/api`);
-
 });
 
 // Handle server startup errors

@@ -2,6 +2,7 @@ const Student = require('../models/Student');
 const School = require('../models/School');
 const User = require('../models/User');
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 // @desc    Get all students
 // @route   GET /api/students
@@ -82,7 +83,6 @@ const getStudents = async (req, res) => {
   }
 };
 
-
 // @desc    Get single student
 // @route   GET /api/students/:id
 // @access  Private
@@ -138,7 +138,7 @@ const getStudent = async (req, res) => {
 const bulkUpdateStudents = async (req, res) => {
   try {
     const { updates } = req.body;
-    
+
     if (!updates || !Array.isArray(updates)) {
       return res.status(400).json({
         success: false,
@@ -149,7 +149,7 @@ const bulkUpdateStudents = async (req, res) => {
     const results = {
       updated: 0,
       deleted: 0,
-      errors: []
+      errors: [],
     };
 
     // Process each update
@@ -160,10 +160,10 @@ const bulkUpdateStudents = async (req, res) => {
           results.deleted++;
         } else if (update.action === 'update') {
           await Student.findByIdAndUpdate(
-            update.id, 
-            { 
+            update.id,
+            {
               ...update.data,
-              lastModifiedBy: req.user._id 
+              lastModifiedBy: req.user._id,
             },
             { runValidators: true }
           );
@@ -172,7 +172,7 @@ const bulkUpdateStudents = async (req, res) => {
       } catch (error) {
         results.errors.push({
           id: update.id,
-          error: error.message
+          error: error.message,
         });
       }
     }
@@ -180,9 +180,8 @@ const bulkUpdateStudents = async (req, res) => {
     res.status(200).json({
       success: true,
       message: `處理完成：更新 ${results.updated} 名，刪除 ${results.deleted} 名學生`,
-      data: results
+      data: results,
     });
-
   } catch (error) {
     console.error('Bulk update students error:', error);
     res.status(500).json({
@@ -191,7 +190,6 @@ const bulkUpdateStudents = async (req, res) => {
     });
   }
 };
-
 
 const createStudent = async (req, res) => {
   try {
@@ -241,9 +239,7 @@ const createStudent = async (req, res) => {
 
     // Check access permissions
     if (req.user.role !== 'admin') {
-      const hasAccess = req.user.schools.some(
-        s => s.toString() === school.toString()
-      );
+      const hasAccess = req.user.schools.some(s => s.toString() === school.toString());
       if (!hasAccess) {
         return res.status(403).json({
           success: false,
@@ -260,7 +256,7 @@ const createStudent = async (req, res) => {
       const existingStudentId = await Student.findOne({
         school: school,
         studentId: normalizedStudentId,
-        isActive: true
+        isActive: true,
       });
 
       if (existingStudentId) {
@@ -270,8 +266,8 @@ const createStudent = async (req, res) => {
           existingStudent: {
             name: existingStudentId.name,
             grade: existingStudentId.grade,
-            class: existingStudentId.class
-          }
+            class: existingStudentId.class,
+          },
         });
       }
     }
@@ -284,7 +280,7 @@ const createStudent = async (req, res) => {
         grade: grade,
         class: studentClass,
         classNumber: classNumber,
-        isActive: true
+        isActive: true,
       });
 
       if (existingClassNumber) {
@@ -293,8 +289,8 @@ const createStudent = async (req, res) => {
           message: `班號 ${classNumber} 在 ${grade}${studentClass} 已被使用`,
           existingStudent: {
             name: existingClassNumber.name,
-            studentId: existingClassNumber.studentId
-          }
+            studentId: existingClassNumber.studentId,
+          },
         });
       }
     }
@@ -305,7 +301,7 @@ const createStudent = async (req, res) => {
         success: false,
         message: '發現重複資料',
         conflicts: duplicateChecks,
-        canProceed: false // Frontend can show warnings and ask user to confirm
+        canProceed: false, // Frontend can show warnings and ask user to confirm
       });
     }
 
@@ -363,14 +359,14 @@ const createStudent = async (req, res) => {
     });
   } catch (error) {
     console.error('Create student error:', error);
-    
+
     // Handle MongoDB duplicate key errors
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
       return res.status(409).json({
         success: false,
         message: `${field === 'studentId' ? '學號' : '資料'} 已存在`,
-        field: field
+        field: field,
       });
     }
 
@@ -786,6 +782,511 @@ const getStudentStatsBySchool = async (req, res) => {
   }
 };
 
+// @desc    Advanced student search with academic year progression
+// @route   GET /api/students/search/advanced
+// @access  Private
+const advancedStudentSearch = async (req, res) => {
+  try {
+    const {
+      schoolId,
+      academicYear,
+      grade,
+      class: studentClass,
+      searchTerm,
+      includeHistory = true,
+      page = 1,
+      limit = 50,
+    } = req.query;
+
+    if (!schoolId) {
+      return res.status(400).json({
+        success: false,
+        message: 'School ID is required',
+      });
+    }
+
+    // Verify school exists and user has access
+    const school = await School.findById(schoolId);
+    if (!school) {
+      return res.status(404).json({
+        success: false,
+        message: 'School not found',
+      });
+    }
+
+    // Check permissions
+    if (req.user.role !== 'admin') {
+      const hasAccess = req.user.schools.some(
+        userSchool => userSchool.toString() === schoolId.toString()
+      );
+      if (!hasAccess) {
+        return res.status(403).json({
+          success: false,
+          message: 'Not authorized to access this school',
+        });
+      }
+    }
+
+    // Build search query
+    const query = {
+      school: schoolId,
+      isActive: true,
+    };
+
+    // Academic year search - complex logic for current vs historical
+    if (academicYear) {
+      if (includeHistory === 'true') {
+        query.$or = [
+          { currentAcademicYear: academicYear },
+          { 'academicHistory.academicYear': academicYear },
+        ];
+      } else {
+        query.currentAcademicYear = academicYear;
+      }
+    }
+
+    // Text search across name fields and student ID
+    if (searchTerm) {
+      const textQuery = {
+        $or: [
+          { name: { $regex: searchTerm, $options: 'i' } },
+          { nameEn: { $regex: searchTerm, $options: 'i' } },
+          { nameCh: { $regex: searchTerm, $options: 'i' } },
+          { studentId: { $regex: searchTerm, $options: 'i' } },
+        ],
+      };
+
+      if (query.$or) {
+        query.$and = [{ $or: query.$or }, textQuery];
+        delete query.$or;
+      } else {
+        Object.assign(query, textQuery);
+      }
+    }
+
+    // Grade and class filtering (works with both current and historical data)
+    if (grade || studentClass) {
+      const gradeClassQuery = { $or: [] };
+
+      // Search in current data
+      const currentQuery = {};
+      if (grade) currentQuery.currentGrade = grade;
+      if (studentClass) currentQuery.currentClass = studentClass;
+      if (academicYear) currentQuery.currentAcademicYear = academicYear;
+
+      if (Object.keys(currentQuery).length > 0) {
+        gradeClassQuery.$or.push(currentQuery);
+      }
+
+      // Search in historical data if requested
+      if (includeHistory === 'true') {
+        const historyQuery = { academicHistory: { $elemMatch: {} } };
+        if (grade) historyQuery.academicHistory.$elemMatch.grade = grade;
+        if (studentClass) historyQuery.academicHistory.$elemMatch.class = studentClass;
+        if (academicYear) historyQuery.academicHistory.$elemMatch.academicYear = academicYear;
+
+        gradeClassQuery.$or.push(historyQuery);
+      }
+
+      if (query.$and) {
+        query.$and.push(gradeClassQuery);
+      } else if (query.$or) {
+        query.$and = [{ $or: query.$or }, gradeClassQuery];
+        delete query.$or;
+      } else {
+        Object.assign(query, gradeClassQuery);
+      }
+    }
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // Execute search
+    const students = await Student.find(query)
+      .populate('school', 'name nameEn nameCh')
+      .populate('teachers.user', 'name email')
+      .populate('academicHistory.school', 'name nameEn')
+      .sort({ currentGrade: 1, currentClass: 1, currentClassNumber: 1, name: 1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .lean();
+
+    const total = await Student.countDocuments(query);
+
+    // Process results to show relevant academic year info
+    const processedStudents = students.map(student => {
+      let relevantYearInfo = null;
+
+      if (academicYear) {
+        // Find the specific academic year data
+        if (student.currentAcademicYear === academicYear) {
+          relevantYearInfo = {
+            academicYear: student.currentAcademicYear,
+            grade: student.currentGrade,
+            class: student.currentClass,
+            classNumber: student.currentClassNumber,
+            isCurrent: true,
+          };
+        } else {
+          const historicalRecord = student.academicHistory?.find(
+            record => record.academicYear === academicYear
+          );
+          if (historicalRecord) {
+            relevantYearInfo = {
+              academicYear: historicalRecord.academicYear,
+              grade: historicalRecord.grade,
+              class: historicalRecord.class,
+              classNumber: historicalRecord.classNumber,
+              school: historicalRecord.school,
+              status: historicalRecord.status,
+              promotionStatus: historicalRecord.promotionStatus,
+              isCurrent: false,
+            };
+          }
+        }
+      }
+
+      return {
+        ...student,
+        relevantYearInfo,
+        academicYearCount: (student.academicHistory?.length || 0) + 1,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        students: processedStudents,
+        pagination: {
+          current: parseInt(page),
+          pages: Math.ceil(total / parseInt(limit)),
+          total,
+          limit: parseInt(limit),
+        },
+        searchCriteria: {
+          schoolId,
+          academicYear,
+          grade,
+          class: studentClass,
+          searchTerm,
+          includeHistory,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Advanced student search error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during search',
+    });
+  }
+};
+
+// @desc    Get student progression history
+// @route   GET /api/students/:id/progression
+// @access  Private
+const getStudentProgression = async (req, res) => {
+  try {
+    const student = await Student.findById(req.params.id)
+      .populate('school', 'name nameEn nameCh')
+      .populate('academicHistory.school', 'name nameEn nameCh')
+      .populate('teachers.user', 'name email');
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student not found',
+      });
+    }
+
+    // Check permissions
+    if (req.user.role !== 'admin') {
+      console.log('🔍 Debug authorization for progression:');
+      console.log('User ID:', req.user._id.toString());
+      console.log(
+        'User schools:',
+        req.user.schools.map(s => s.toString())
+      );
+      console.log('Student school ID:', student.school._id.toString()); // FIXED: Added ._id
+      console.log(
+        'Student teachers:',
+        student.teachers?.map(t => ({
+          user: t.user._id.toString(), // FIXED: Added ._id since teachers.user is populated
+          isPrimary: t.isPrimaryTeacher,
+        }))
+      );
+
+      // FIXED: Compare with student.school._id since school is populated
+      const hasSchoolAccess = req.user.schools.some(
+        school => school.toString() === student.school._id.toString()
+      );
+
+      // FIXED: Compare with teacher.user._id since teachers.user is populated
+      const isStudentTeacher =
+        student.teachers &&
+        student.teachers.some(teacher => teacher.user._id.toString() === req.user._id.toString());
+
+      console.log('Has school access:', hasSchoolAccess);
+      console.log('Is student teacher:', isStudentTeacher);
+
+      if (!hasSchoolAccess && !isStudentTeacher) {
+        return res.status(403).json({
+          success: false,
+          message: 'Not authorized to access this student',
+          debug:
+            process.env.NODE_ENV === 'development'
+              ? {
+                  userSchools: req.user.schools.map(s => s.toString()),
+                  studentSchool: student.school._id.toString(),
+                  hasSchoolAccess,
+                  isStudentTeacher,
+                }
+              : undefined,
+        });
+      }
+    }
+
+    // Build progression timeline
+    const progression = [
+      ...(student.academicHistory || []).map(record => ({
+        ...record.toObject(),
+        isCurrent: false,
+      })),
+      {
+        academicYear: student.currentAcademicYear,
+        grade: student.currentGrade,
+        class: student.currentClass,
+        classNumber: student.currentClassNumber,
+        school: student.school,
+        status: student.status,
+        isCurrent: true,
+        startDate: new Date(`${student.currentAcademicYear.split('/')[0]}-09-01`),
+      },
+    ].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        student: {
+          id: student._id,
+          name: student.name,
+          nameEn: student.nameEn,
+          nameCh: student.nameCh,
+          studentId: student.studentId,
+        },
+        progression,
+        summary: {
+          totalYears: progression.length,
+          currentYear: student.currentAcademicYear,
+          currentGrade: student.currentGrade,
+          currentClass: student.currentClass,
+          schoolsAttended: [...new Set(progression.map(p => p.school._id.toString()))].length,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Get student progression error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error retrieving student progression',
+    });
+  }
+};
+
+// @desc    Promote students to next academic year (Any teacher can do this)
+// @route   POST /api/students/promote-year
+// @access  Private (Any authenticated teacher/admin)
+const promoteStudentsToNextYear = async (req, res) => {
+  try {
+    const {
+      schoolId,
+      fromAcademicYear,
+      toAcademicYear,
+      promotions, // Array of { studentId, newGrade, newClass, newClassNumber, promotionStatus, finalGrades, notes }
+    } = req.body;
+
+    if (!schoolId || !fromAcademicYear || !toAcademicYear || !Array.isArray(promotions)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields for year promotion',
+      });
+    }
+
+    // Verify school exists and user has access
+    const school = await School.findById(schoolId);
+    if (!school) {
+      return res.status(404).json({
+        success: false,
+        message: 'School not found',
+      });
+    }
+
+    // Check if user has access to this school (any teacher can promote)
+    if (req.user.role !== 'admin') {
+      const hasAccess = req.user.schools.some(
+        userSchool => userSchool.toString() === schoolId.toString()
+      );
+      if (!hasAccess) {
+        return res.status(403).json({
+          success: false,
+          message: 'Not authorized to promote students in this school',
+        });
+      }
+    }
+
+    const results = {
+      successful: [],
+      failed: [],
+      total: promotions.length,
+    };
+
+    // Process each promotion
+    for (const promotion of promotions) {
+      try {
+        const student = await Student.findById(promotion.studentId);
+
+        if (!student) {
+          results.failed.push({
+            studentId: promotion.studentId,
+            error: 'Student not found',
+          });
+          continue;
+        }
+
+        if (student.school.toString() !== schoolId.toString()) {
+          results.failed.push({
+            studentId: promotion.studentId,
+            error: 'Student does not belong to specified school',
+          });
+          continue;
+        }
+
+        if (student.currentAcademicYear !== fromAcademicYear) {
+          results.failed.push({
+            studentId: promotion.studentId,
+            error: `Student is not in academic year ${fromAcademicYear}`,
+          });
+          continue;
+        }
+
+        // Store current info before promotion
+        const currentInfo = {
+          grade: student.currentGrade,
+          class: student.currentClass,
+          classNumber: student.currentClassNumber,
+        };
+
+        // Perform promotion using the method from enhanced Student model
+        await student.promoteToNextYear(
+          {
+            academicYear: toAcademicYear,
+            grade: promotion.newGrade,
+            class: promotion.newClass,
+            classNumber: promotion.newClassNumber,
+            promotionStatus: promotion.promotionStatus || 'promoted',
+            finalGrades: promotion.finalGrades || {},
+            notes: promotion.notes || '',
+          },
+          req.user._id
+        );
+
+        results.successful.push({
+          studentId: promotion.studentId,
+          name: student.name,
+          from: `${currentInfo.grade} ${currentInfo.class}${currentInfo.classNumber ? ` #${currentInfo.classNumber}` : ''}`,
+          to: `${promotion.newGrade} ${promotion.newClass}${promotion.newClassNumber ? ` #${promotion.newClassNumber}` : ''}`,
+        });
+      } catch (error) {
+        console.error(`Error promoting student ${promotion.studentId}:`, error);
+        results.failed.push({
+          studentId: promotion.studentId,
+          error: error.message,
+        });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Year promotion completed: ${results.successful.length} successful, ${results.failed.length} failed`,
+      data: results,
+    });
+  } catch (error) {
+    console.error('Promote students error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during year promotion',
+    });
+  }
+};
+
+// @desc    Get available academic years for a school
+// @route   GET /api/schools/:schoolId/academic-years-available
+// @access  Private
+const getAvailableAcademicYears = async (req, res) => {
+  try {
+    const { schoolId } = req.params;
+
+    // Verify school exists and user has access
+    const school = await School.findById(schoolId);
+    if (!school) {
+      return res.status(404).json({
+        success: false,
+        message: 'School not found',
+      });
+    }
+
+    // Check permissions - user must have access to this school
+    if (req.user.role !== 'admin') {
+      const hasAccess = req.user.schools.some(
+        userSchool => userSchool.toString() === schoolId.toString()
+      );
+      if (!hasAccess) {
+        return res.status(403).json({
+          success: false,
+          message: 'Not authorized to access this school',
+        });
+      }
+    }
+
+    // Get all unique academic years from students in this school
+    const academicYears = await Student.aggregate([
+      { $match: { school: new mongoose.Types.ObjectId(schoolId), isActive: true } },
+      {
+        $project: {
+          years: {
+            $concatArrays: [
+              ['$currentAcademicYear'],
+              { $ifNull: ['$academicHistory.academicYear', []] },
+            ],
+          },
+        },
+      },
+      { $unwind: '$years' },
+      { $group: { _id: '$years' } },
+      { $sort: { _id: -1 } },
+      { $project: { _id: 0, academicYear: '$_id' } },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        academicYears: academicYears.map(item => item.academicYear),
+        count: academicYears.length,
+        school: {
+          id: school._id,
+          name: school.name,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Get available academic years error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error retrieving academic years',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+};
+
 module.exports = {
   getStudents,
   getStudent,
@@ -796,5 +1297,9 @@ module.exports = {
   removeTeacherFromStudent,
   getMyStudents,
   getStudentStatsBySchool,
-  bulkUpdateStudents
+  bulkUpdateStudents,
+  advancedStudentSearch,
+  getStudentProgression,
+  promoteStudentsToNextYear,
+  getAvailableAcademicYears,
 };

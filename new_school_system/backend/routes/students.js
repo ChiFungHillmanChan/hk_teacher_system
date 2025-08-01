@@ -12,7 +12,11 @@ const {
   removeTeacherFromStudent,
   getMyStudents,
   getStudentStatsBySchool,
-  bulkUpdateStudents
+  bulkUpdateStudents,
+  advancedStudentSearch,
+  getStudentProgression,
+  promoteStudentsToNextYear,
+  getAvailableAcademicYears,
 } = require('../controllers/studentController');
 
 const {
@@ -188,6 +192,68 @@ router.post(
   }
 );
 
+router.get(
+  '/search/advanced',
+  generalLimiter,
+  [
+    query('schoolId').isMongoId().withMessage('Valid school ID is required'),
+    query('academicYear')
+      .optional()
+      .matches(/^\d{4}\/\d{2}$/)
+      .withMessage('Academic year must be in format YYYY/YY'),
+    query('grade')
+      .optional()
+      .isIn(['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6'])
+      .withMessage('Invalid grade'),
+    query('includeHistory')
+      .optional()
+      .isIn(['true', 'false'])
+      .withMessage('includeHistory must be true or false'),
+    query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+    query('limit')
+      .optional()
+      .isInt({ min: 1, max: 100 })
+      .withMessage('Limit must be between 1 and 100'),
+  ],
+  logActivity('advanced_student_search'),
+  advancedStudentSearch
+);
+
+router.post(
+  '/promote-year',
+  generalLimiter,
+  [
+    body('schoolId').isMongoId().withMessage('Valid school ID is required'),
+    body('fromAcademicYear')
+      .matches(/^\d{4}\/\d{2}$/)
+      .withMessage('From academic year must be in format YYYY/YY'),
+    body('toAcademicYear')
+      .matches(/^\d{4}\/\d{2}$/)
+      .withMessage('To academic year must be in format YYYY/YY'),
+    body('promotions').isArray({ min: 1 }).withMessage('Promotions must be a non-empty array'),
+    body('promotions.*.studentId')
+      .isMongoId()
+      .withMessage('Each promotion must have valid student ID'),
+    body('promotions.*.newGrade')
+      .isIn(['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6'])
+      .withMessage('Invalid new grade'),
+    body('promotions.*.newClass')
+      .optional()
+      .isLength({ max: 10 })
+      .withMessage('Class name cannot exceed 10 characters'),
+    body('promotions.*.newClassNumber')
+      .optional()
+      .isInt({ min: 1, max: 50 })
+      .withMessage('Class number must be between 1 and 50'),
+    body('promotions.*.promotionStatus')
+      .optional()
+      .isIn(['promoted', 'retained', 'transferred', 'graduated'])
+      .withMessage('Invalid promotion status'),
+  ],
+  logActivity('promote_students_to_next_year'),
+  promoteStudentsToNextYear
+);
+
 // @desc    Get all records for a specific student
 // @route   GET /api/students/:studentId/records
 // @access  Private
@@ -331,7 +397,7 @@ router.put(
     body('updates')
       .isArray()
       .withMessage('Updates must be an array')
-      .custom((updates) => {
+      .custom(updates => {
         if (updates.length === 0) {
           throw new Error('Updates array cannot be empty');
         }
@@ -340,9 +406,7 @@ router.put(
         }
         return true;
       }),
-    body('updates.*.id')
-      .isMongoId()
-      .withMessage('Each update must have a valid student ID'),
+    body('updates.*.id').isMongoId().withMessage('Each update must have a valid student ID'),
     body('updates.*.action')
       .isIn(['update', 'delete'])
       .withMessage('Action must be either update or delete'),
@@ -350,7 +414,6 @@ router.put(
   logActivity('bulk_update_students'),
   bulkUpdateStudents
 );
-
 
 // @desc    Update student record
 // @route   PUT /api/students/records/:recordId
@@ -531,6 +594,13 @@ router.delete(
   checkStudentAccess,
   logActivity('remove_teacher_from_student'),
   removeTeacherFromStudent
+);
+
+router.get(
+  '/:id/progression',
+  generalLimiter,
+  logActivity('get_student_progression'),
+  getStudentProgression
 );
 
 // Debug routes for development

@@ -16,6 +16,9 @@ const {
   getSchoolStats,
 } = require('../controllers/schoolController');
 
+// Add this import at the top of routes/schools.js
+const { getAvailableAcademicYears } = require('../controllers/studentController');
+
 const { protect, authorize, logActivity, checkUserRateLimit } = require('../middleware/auth');
 
 const { validateSchool, validateUpdateSchool, sanitizeInput } = require('../middleware/validation');
@@ -81,6 +84,14 @@ router.post('/', generalLimiter, validateSchool, logActivity('create_school'), c
 // @route   GET /api/schools/:id
 // @access  Private
 router.get('/:id', generalLimiter, logActivity('get_school'), getSchool);
+
+router.get(
+  '/:schoolId/academic-years-available',
+  generalLimiter,
+  [param('schoolId').isMongoId().withMessage('Valid school ID is required')],
+  logActivity('get_available_academic_years'),
+  getAvailableAcademicYears
+);
 
 // @desc    Update school
 // @route   PUT /api/schools/:id
