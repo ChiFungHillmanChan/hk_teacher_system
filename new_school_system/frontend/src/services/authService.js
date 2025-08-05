@@ -1,5 +1,5 @@
 // File: src/services/authService.js
-import { apiRequest } from '.';
+import { apiRequest } from './api';
 
 export const authService = {
   login: async credentials => {
