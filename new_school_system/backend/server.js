@@ -205,7 +205,6 @@ app.get('/api/public-test-schools', async (req, res) => {
     });
   }
 });
-
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/schools', schoolRoutes);
