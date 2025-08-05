@@ -14,10 +14,7 @@ const connectDB = async () => {
     }
 
     // Connect to MongoDB with simplified options
-    const conn = await mongoose.connect(
-      process.env.MONGODB_URI || 'mongodb://localhost:27017/hk-teacher-db',
-      options
-    );
+    const conn = await mongoose.connect(process.env.MONGODB_URI, options);
 
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
 
@@ -73,43 +70,6 @@ const checkDBHealth = async () => {
       status: 'error',
       error: error.message,
     };
-  }
-};
-
-// Initialize database with default data
-const initializeDatabase = async () => {
-  try {
-    // Wait for connection to be ready
-    if (mongoose.connection.readyState !== 1) {
-      console.log('⏳ Waiting for database connection...');
-      return;
-    }
-
-    const User = require('../models/User');
-
-    // Check if admin user exists
-    const adminExists = await User.findOne({ role: 'admin' });
-
-    if (!adminExists && process.env.NODE_ENV === 'development') {
-      // Create default admin user for development
-      const adminUser = new User({
-        name: 'System Administrator',
-        email: 'admin@hkteacher.dev',
-        password: 'Admin123!@#', // This will be hashed by the pre-save middleware
-        role: 'admin',
-        emailVerified: true,
-        isActive: true,
-      });
-
-      await adminUser.save();
-      console.log('👤 Default admin user created for development');
-      console.log('📧 Email: admin@hkteacher.dev');
-      console.log('🔑 Password: Admin123!@#');
-    }
-
-    console.log('✅ Database initialization completed');
-  } catch (error) {
-    console.error('❌ Database initialization failed:', error);
   }
 };
 
@@ -190,7 +150,6 @@ const getDatabaseStats = async () => {
 module.exports = {
   connectDB,
   checkDBHealth,
-  initializeDatabase,
   createIndexes,
   backupDatabase,
   cleanupOldData,

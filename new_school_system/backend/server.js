@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 require('dotenv').config();
+const mongoose = require('mongoose');
 
 // Import database connection and configuration
 const { connectDB, checkDBHealth, initializeDatabase } = require('./config/database');
