@@ -1,0 +1,291 @@
+/* Authentication Pages Styles */
+
+/* ========================================
+   AUTH PAGE LAYOUT
+======================================== */
+
+.auth-page {
+  min-height: 100vh;
+  background-color: var(--color-background-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-6);
+}
+
+.auth-page__container {
+  width: 100%;
+  max-width: 420px;
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-xl);
+  padding: var(--spacing-8);
+  animation: slideUp 0.4s ease-out;
+}
+
+.auth-page__header {
+  text-align: center;
+  margin-bottom: var(--spacing-8);
+}
+
+.auth-page__title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-2);
+  line-height: 1.2;
+}
+
+.auth-page__subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.auth-page__footer {
+  text-align: center;
+  margin-top: var(--spacing-8);
+  padding-top: var(--spacing-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.auth-page__signup-prompt {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.auth-page__link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-semibold);
+  transition: color var(--transition-fast);
+}
+
+.auth-page__link:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+/* ========================================
+   AUTH FORM
+======================================== */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+/* ========================================
+   AUTH ERROR BANNER
+======================================== */
+
+.auth-error-banner {
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4);
+  background-color: var(--color-error-light);
+  border: 1px solid var(--color-error-border);
+  border-radius: var(--border-radius-md);
+  animation: slideDown 0.3s ease-out;
+}
+
+.auth-error-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.auth-error-content svg {
+  flex-shrink: 0;
+}
+
+/* ========================================
+   EMAIL CONFIRMATION STATES
+======================================== */
+
+.email-sent-confirmation {
+  text-align: center;
+  padding: var(--spacing-6) 0;
+}
+
+.email-sent-icon {
+  margin-bottom: var(--spacing-6);
+  color: var(--color-success);
+}
+
+.email-sent-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-4);
+}
+
+.email-sent-message {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-2);
+}
+
+.email-sent-address {
+  font-size: var(--font-size-base);
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-2) var(--spacing-4);
+  background-color: var(--color-primary-light);
+  border-radius: var(--border-radius-md);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.email-sent-instructions {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-6);
+  line-height: 1.5;
+}
+
+/* ========================================
+   FORGOT PASSWORD STYLES
+======================================== */
+
+.forgot-password-info,
+.reset-password-info {
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4);
+  background-color: var(--color-primary-light);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  border-radius: var(--border-radius-md);
+}
+
+.forgot-password-description,
+.reset-password-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.forgot-password-back,
+.reset-password-back {
+  text-align: center;
+  margin-top: var(--spacing-6);
+}
+
+.forgot-password-back-link,
+.reset-password-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.forgot-password-back-link:hover,
+.reset-password-back-link:hover {
+  color: var(--color-primary);
+}
+
+/* ========================================
+   DEMO CREDENTIALS
+======================================== */
+
+.demo-credentials {
+  margin-top: var(--spacing-6);
+  padding: var(--spacing-4);
+  background-color: var(--color-background-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  text-align: center;
+}
+
+.demo-credentials h4 {
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  margin: 0 0 var(--spacing-2) 0;
+  font-weight: var(--font-weight-semibold);
+}
+
+.demo-credentials p {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin: var(--spacing-1) 0;
+  font-family: var(--font-family-mono);
+}
+
+/* ========================================
+   ANIMATIONS
+======================================== */
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+@media (max-width: 768px) {
+  .auth-page {
+    padding: var(--spacing-4);
+    align-items: flex-start;
+    padding-top: var(--spacing-8);
+  }
+  
+  .auth-page__container {
+    padding: var(--spacing-6);
+  }
+  
+  .auth-page__title {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-page {
+    padding: var(--spacing-2);
+  }
+  
+  .auth-page__container {
+    padding: var(--spacing-4);
+    max-width: 100%;
+    margin: 0;
+    border-radius: var(--border-radius-lg);
+  }
+  
+  .auth-page__title {
+    font-size: var(--font-size-xl);
+  }
+
+  .auth-error-banner {
+    margin-bottom: var(--spacing-4);
+    padding: var(--spacing-3);
+  }
+  
+  .auth-error-content {
+    font-size: var(--font-size-xs);
+  }
+}

@@ -196,7 +196,23 @@ const studentSchema = new mongoose.Schema(
   }
 );
 
-// NEW: Methods for academic progression
+const validateGradeAgainstSchoolType = async function () {
+  if (this.isModified('currentGrade') || this.isModified('school')) {
+    const school = await this.constructor.model('School').findById(this.school);
+    if (school) {
+      const availableGrades = school.getAvailableGrades();
+      if (!availableGrades.includes(this.currentGrade)) {
+        throw new Error(
+          `Grade ${this.currentGrade} is not available for school type ${school.schoolType}`
+        );
+      }
+    }
+  }
+};
+
+// Apply the validation as a pre-save hook
+studentSchema.pre('save', validateGradeAgainstSchoolType);
+
 studentSchema.methods.promoteToNextYear = function (nextYearData, userId) {
   const currentRecord = {
     academicYear: this.currentAcademicYear,

@@ -1,0 +1,113 @@
+/* Button Base Styles */
+
+/* ========================================
+   BUTTON BASE
+======================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  font-family: inherit;
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  border: 2px solid transparent;
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  position: relative;
+  outline: none;
+  user-select: none;
+  white-space: nowrap;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* ========================================
+   FOCUS STATES
+======================================== */
+
+.btn:focus {
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   DISABLED STATES
+======================================== */
+
+.btn:disabled,
+.btn--loading {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  pointer-events: none;
+}
+
+/* ========================================
+   LOADING STATE
+======================================== */
+
+.btn--loading {
+  position: relative;
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: var(--border-radius-full);
+  animation: var(--animation-spin);
+}
+
+/* ========================================
+   ICON ALIGNMENT
+======================================== */
+
+.btn svg {
+  flex-shrink: 0;
+}
+
+.btn--icon-only {
+  padding: var(--spacing-3);
+  aspect-ratio: 1;
+}
+
+.btn--icon-left svg:first-child {
+  margin-right: var(--spacing-1);
+}
+
+.btn--icon-right svg:last-child {
+  margin-left: var(--spacing-1);
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+  
+  .btn:hover {
+    transform: none;
+  }
+  
+  .btn-spinner {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .btn {
+    border-width: 3px;
+  }
+}

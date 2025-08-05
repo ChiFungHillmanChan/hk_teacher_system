@@ -1,0 +1,389 @@
+/* Form Group Layouts */
+
+/* ========================================
+   FORM GROUP BASE
+======================================== */
+
+.form-group {
+  margin-bottom: var(--spacing-6);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+/* ========================================
+   FORM SECTIONS
+======================================== */
+
+.form-section {
+  margin-bottom: var(--spacing-8);
+  width: 100%;
+}
+
+.form-section:last-of-type {
+  margin-bottom: var(--spacing-6);
+}
+
+.form-section-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-6);
+  padding-bottom: var(--spacing-3);
+  border-bottom: 2px solid var(--color-primary-light);
+  position: relative;
+}
+
+.form-section-title::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background-color: var(--color-primary);
+}
+
+.form-section-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-4);
+  line-height: var(--line-height-relaxed);
+}
+
+/* ========================================
+   FORM ROWS AND GRIDS
+======================================== */
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-6);
+  margin-bottom: var(--spacing-6);
+  width: 100%;
+}
+
+.form-row:last-child {
+  margin-bottom: 0;
+}
+
+.form-row--three {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.form-row--four {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: var(--grid-auto-200);
+  gap: var(--spacing-6);
+  margin-bottom: var(--spacing-6);
+}
+
+.form-grid--large {
+  grid-template-columns: var(--grid-auto-300);
+}
+
+.form-grid--small {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+/* ========================================
+   FORM GROUP VARIANTS
+======================================== */
+
+.form-group--full {
+  grid-column: 1 / -1;
+}
+
+.form-group--half {
+  grid-column: span 1;
+}
+
+.form-group--inline {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-4);
+}
+
+.form-group--inline .form-label {
+  margin-bottom: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.form-group--stacked {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+/* ========================================
+   FORM ACTIONS
+======================================== */
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-4);
+  padding-top: var(--spacing-6);
+  border-top: 1px solid var(--color-border-light);
+  margin-top: var(--spacing-8);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-actions--center {
+  justify-content: center;
+}
+
+.form-actions--start {
+  justify-content: flex-start;
+}
+
+.form-actions--between {
+  justify-content: space-between;
+}
+
+.form-actions--full {
+  flex-direction: column;
+}
+
+.form-actions--full .btn {
+  width: 100%;
+}
+
+/* ========================================
+   FORM OPTIONS
+======================================== */
+
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--spacing-4) 0;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+}
+
+.form-options--center {
+  justify-content: center;
+}
+
+.form-options--column {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-3);
+}
+
+/* ========================================
+   CHECKBOX/RADIO GROUPS
+======================================== */
+
+.checkbox-group,
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.checkbox-group--horizontal,
+.radio-group--horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+}
+
+.checkbox-group--grid,
+.radio-group--grid {
+  display: grid;
+  grid-template-columns: var(--grid-auto-200);
+  gap: var(--spacing-3);
+}
+
+/* ========================================
+   FORM CONTAINERS
+======================================== */
+
+.form-container {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-container--card {
+  padding: var(--spacing-8);
+}
+
+.form-container--bordered {
+  border: 2px solid var(--color-border);
+}
+
+/* ========================================
+   FORM STEPS/WIZARD
+======================================== */
+
+.form-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-8);
+  padding: var(--spacing-6);
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+  opacity: 0.4;
+  transition: all var(--transition-normal);
+}
+
+.form-step--active {
+  opacity: 1;
+}
+
+.form-step--completed {
+  opacity: 1;
+}
+
+.form-step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-full);
+  background-color: var(--color-background-light);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-bold);
+  transition: all var(--transition-normal);
+}
+
+.form-step--active .form-step-number {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.form-step--completed .form-step-number {
+  background-color: var(--color-success);
+  color: var(--color-white);
+}
+
+.form-step-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.form-step--active .form-step-label {
+  color: var(--color-text-primary);
+}
+
+.form-step-divider {
+  width: 60px;
+  height: 2px;
+  background-color: var(--color-border);
+  margin: 0 var(--spacing-4);
+}
+
+/* ========================================
+   RESPONSIVE FORM LAYOUTS
+======================================== */
+
+@media (max-width: 1023px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+  }
+
+  .form-row--three {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row--four {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+  }
+
+  .form-container--card {
+    padding: var(--spacing-6);
+  }
+}
+
+@media (max-width: 767px) {
+  .form-row--four {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: var(--spacing-3);
+  }
+
+  .form-options {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-3);
+  }
+
+  .checkbox-group--horizontal,
+  .radio-group--horizontal {
+    flex-direction: column;
+  }
+
+  .checkbox-group--grid,
+  .radio-group--grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-steps {
+    flex-direction: column;
+    gap: var(--spacing-4);
+  }
+
+  .form-step-divider {
+    width: 2px;
+    height: 30px;
+    margin: var(--spacing-2) 0;
+  }
+
+  .form-container--card {
+    padding: var(--spacing-4);
+  }
+}
+
+@media (max-width: 479px) {
+  .form-group--inline {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-2);
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+
+  .form-container--card {
+    padding: var(--spacing-3);
+  }
+}

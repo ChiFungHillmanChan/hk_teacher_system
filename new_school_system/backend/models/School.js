@@ -16,31 +16,35 @@ const schoolSchema = new mongoose.Schema(
     },
     schoolType: {
       type: String,
-      enum: ['primary', 'secondary', 'both'],
+      enum: ['primary', 'secondary', 'both', 'special'],
       required: [true, 'Please specify school type'],
     },
     district: {
       type: String,
-      enum: [
-        'Central and Western',
-        'Eastern',
-        'Southern',
-        'Wan Chai',
-        'Kowloon City',
-        'Kwun Tong',
-        'Sham Shui Po',
-        'Wong Tai Sin',
-        'Yau Tsim Mong',
-        'Islands',
-        'Kwai Tsing',
-        'North',
-        'Sai Kung',
-        'Sha Tin',
-        'Tai Po',
-        'Tsuen Wan',
-        'Tuen Mun',
-        'Yuen Long',
-      ],
+      enum: {
+        values: [
+          'Central and Western',
+          'Eastern',
+          'Islands',
+          'Kowloon City',
+          'Kwai Tsing',
+          'Kwun Tong',
+          'North',
+          'Sai Kung',
+          'Sha Tin',
+          'Sham Shui Po',
+          'Southern',
+          'Tai Po',
+          'Tsuen Wan',
+          'Tuen Mun',
+          'Wan Chai',
+          'Wong Tai Sin',
+          'Yau Tsim Mong',
+          'Yuen Long',
+        ],
+        message: 'District must be a valid Hong Kong district',
+      },
+      default: null,
     },
 
     // 位置資訊 - Location Information
@@ -287,6 +291,16 @@ schoolSchema.methods.getAvailableGrades = function () {
 
 // Static method to get default subjects for Hong Kong schools
 schoolSchema.statics.getDefaultSubjects = function (schoolType) {
+  console.log(`[School.getDefaultSubjects] 📚 Getting subjects for: ${schoolType}`);
+
+  // ✅ ADD: Input validation
+  if (!schoolType || typeof schoolType !== 'string') {
+    console.warn(
+      '[School.getDefaultSubjects] ⚠️ Invalid schoolType provided, returning empty array'
+    );
+    return [];
+  }
+
   const primarySubjects = [
     { name: 'Chinese Language', nameEn: 'Chinese Language', nameCh: '中國語文', code: 'CHI' },
     { name: 'English Language', nameEn: 'English Language', nameCh: '英國語文', code: 'ENG' },
@@ -306,13 +320,31 @@ schoolSchema.statics.getDefaultSubjects = function (schoolType) {
     { name: 'Geography', nameEn: 'Geography', nameCh: '地理', code: 'GEO' },
   ];
 
+  const senSubjects = [
+    {
+      name: 'Social Skills Training',
+      nameEn: 'Social Skills Training',
+      nameCh: '社交技能訓練',
+      code: 'SST',
+    },
+    { name: 'Life Skills', nameEn: 'Life Skills', nameCh: '生活技能', code: 'LS' },
+    { name: 'Speech Therapy', nameEn: 'Speech Therapy', nameCh: '言語治療', code: 'ST' },
+    {
+      name: 'Occupational Therapy',
+      nameEn: 'Occupational Therapy',
+      nameCh: '職業治療',
+      code: 'OT',
+    },
+    { name: 'Sensory Integration', nameEn: 'Sensory Integration', nameCh: '感統訓練', code: 'SI' },
+  ];
+
   switch (schoolType) {
     case 'primary':
       return primarySubjects;
     case 'secondary':
       return secondarySubjects;
-    case 'both':
-      return [...primarySubjects, ...secondarySubjects];
+    case 'special':
+      return [...primarySubjects, ...secondarySubjects, ...senSubjects];
     default:
       return [];
   }

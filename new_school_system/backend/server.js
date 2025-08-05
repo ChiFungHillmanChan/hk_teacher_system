@@ -15,7 +15,7 @@ const schoolRoutes = require('./routes/schools');
 const studentRoutes = require('./routes/students');
 const studentReportRoutes = require('./routes/studentReports');
 const aiAnalysisRoutes = require('./routes/aiAnalysis');
-const meetingRecordRoutes = require('./routes/meetingRecords');
+const meetingRecordRoutes = require('./routes/meetingRecord');
 
 // Create Express app
 const app = express();
@@ -167,7 +167,7 @@ app.use('/api/schools', schoolRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/student-reports', studentReportRoutes);
 app.use('/api/ai-analysis', aiAnalysisRoutes);
-app.use('/api/meeting-records', meetingRecords);
+app.use('/api/meeting-records', meetingRecordRoutes);
 
 // API overview endpoint
 app.get('/api', (req, res) => {

@@ -1,0 +1,143 @@
+/* Integration Page Header */
+
+/* ========================================
+   PAGE HEADER
+======================================== */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-8);
+  padding: var(--spacing-8);
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border-light);
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+}
+
+.page-header__content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  flex: 1;
+  min-width: 0;
+}
+
+.page-header__icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  border-radius: var(--border-radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  flex-shrink: 0;
+  box-shadow: var(--shadow-md);
+}
+
+.page-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-2) 0;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.page-header__actions {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   RESPONSIVE PAGE HEADER
+======================================== */
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--spacing-6);
+  }
+
+  .page-header__content {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-3);
+  }
+
+  .page-header__icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto;
+  }
+
+  .page-title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .page-header__actions {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    padding: var(--spacing-4);
+  }
+
+  .page-title {
+    font-size: var(--font-size-xl);
+  }
+
+  .page-subtitle {
+    font-size: var(--font-size-sm);
+  }
+
+  .page-header__actions {
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .page-header__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .page-header {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ========================================
+   HIGH CONTRAST MODE
+======================================== */
+
+@media (prefers-contrast: high) {
+  .page-header {
+    border-width: 2px;
+  }
+
+  .page-title {
+    font-weight: var(--font-weight-bold);
+  }
+}

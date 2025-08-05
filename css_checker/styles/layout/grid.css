@@ -1,0 +1,72 @@
+/* Layout Grid System - Main Application Structure */
+
+/* ========================================
+   MAIN LAYOUT GRID
+======================================== */
+
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--header-height) 1fr;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar main";
+  min-height: 100vh;
+  background-color: var(--color-background-light);
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* ========================================
+   LAYOUT OVERLAY
+======================================== */
+
+.layout__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-modal-backdrop);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+  display: none;
+}
+
+.layout__overlay--active {
+  opacity: 1;
+  visibility: visible;
+  display: block;
+}
+
+/* ========================================
+   RESPONSIVE GRID LAYOUT
+======================================== */
+
+/* Force full-screen layout for widths above 1024px */
+@media (min-width: 1024px) {
+  .layout {
+    min-width: 1024px;
+  }
+  
+  .layout__overlay {
+    display: none !important;
+  }
+}
+
+/* Tablet and mobile - only apply mobile layout below 1024px */
+@media (max-width: 1023px) {
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "main";
+    min-width: 100%;
+  }
+
+  .layout__overlay {
+    display: block;
+  }
+}

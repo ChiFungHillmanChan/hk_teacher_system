@@ -1,0 +1,391 @@
+/* Student Detail Tabs Feature */
+
+/* ========================================
+   STUDENT DETAIL TABS SYSTEM
+======================================== */
+
+.student-detail__records-section {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  margin-top: var(--spacing-8);
+}
+
+/* ========================================
+   TABS HEADER
+======================================== */
+
+.tabs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-6);
+  background-color: var(--color-background-light);
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--spacing-6);
+}
+
+.tabs-nav {
+  display: flex;
+  gap: var(--spacing-2);
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-1);
+  border: 1px solid var(--color-border);
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
+  background: none;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.tab-button:hover {
+  background-color: var(--color-background-light);
+  color: var(--color-text-primary);
+}
+
+.tab-button--active {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.tab-icon {
+  display: flex;
+  align-items: center;
+}
+
+.tab-label {
+  font-weight: var(--font-weight-semibold);
+}
+
+.tab-count {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: inherit;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  min-width: 24px;
+  text-align: center;
+}
+
+.tab-button--active .tab-count {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ========================================
+   YEAR FILTER
+======================================== */
+
+.year-filter {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.year-filter__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.year-filter__select {
+  min-width: 140px;
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-white);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  transition: all var(--transition-fast);
+}
+
+.year-filter__select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+/* ========================================
+   TAB CONTENT
+======================================== */
+
+.tab-content {
+  padding: var(--spacing-6);
+  min-height: 400px;
+}
+
+.tab-content--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 300px;
+  color: var(--color-text-muted);
+}
+
+.tab-content--empty svg {
+  margin-bottom: var(--spacing-4);
+  color: var(--color-text-muted);
+}
+
+.tab-content--empty h3 {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-2);
+}
+
+.tab-content--empty p {
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-4);
+}
+
+/* ========================================
+   TAB PANELS
+======================================== */
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel--active {
+  display: block;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.tab-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-6);
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+}
+
+.tab-panel__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.tab-panel__actions {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+}
+
+/* ========================================
+   RECORDS LIST
+======================================== */
+
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.record-item {
+  background-color: var(--color-background-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-5);
+  transition: all var(--transition-fast);
+}
+
+.record-item:hover {
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-border);
+}
+
+.record-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-3);
+  gap: var(--spacing-4);
+}
+
+.record-item__title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-1);
+}
+
+.record-item__date {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.record-item__actions {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.record-item__content {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ========================================
+   LOADING STATES
+======================================== */
+
+.tab-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.tab-loading__spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border-light);
+  border-top: 3px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* ========================================
+   ANIMATIONS
+======================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+@media (max-width: 768px) {
+  .tabs-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-4);
+  }
+
+  .tabs-nav {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .tabs-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-button {
+    flex-shrink: 0;
+  }
+
+  .year-filter {
+    justify-content: center;
+  }
+
+  .tab-panel__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tab-panel__actions {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-content {
+    padding: var(--spacing-4);
+  }
+
+  .record-item {
+    padding: var(--spacing-4);
+  }
+
+  .record-item__header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-2);
+  }
+
+  .record-item__actions {
+    align-self: flex-end;
+  }
+
+  .tab-button {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-xs);
+  }
+
+  .tab-count {
+    padding: var(--spacing-0-5) var(--spacing-1);
+    min-width: 20px;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-panel--active,
+  .record-item {
+    animation: none;
+    transition: none;
+  }
+
+  .tab-loading__spinner {
+    animation: none;
+  }
+}
+
+/* Focus styles for keyboard navigation */
+.tab-button:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.year-filter__select:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

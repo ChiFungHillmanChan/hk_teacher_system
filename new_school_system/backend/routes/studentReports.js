@@ -32,7 +32,7 @@ const { body, param, query } = require('express-validator');
 // Rate limiting
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 5000,
   message: {
     success: false,
     message: 'Too many requests, please try again later.',
@@ -49,7 +49,7 @@ const createLimiter = rateLimit({
 });
 
 // Apply middleware to all routes
-router.use(protect); // All routes require authentication
+router.use(protect);
 router.use(sanitizeInput);
 router.use(checkUserRateLimit);
 
@@ -120,6 +120,150 @@ const validateCreateStudentReport = [
     .withMessage('Status must be draft, submitted, reviewed, approved, or archived'),
 ];
 
+const validateUpdateStudentReport = [
+  body('subjectDetails.topic')
+    .optional()
+    .isLength({ min: 1, max: 200 })
+    .withMessage('Topic must be between 1-200 characters'),
+  body('subjectDetails.duration')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Duration must be at least 1 minute'),
+  body('subjectDetails.learningObjectives')
+    .optional()
+    .isArray()
+    .withMessage('Learning objectives must be an array'),
+  body('subjectDetails.materials').optional().isArray().withMessage('Materials must be an array'),
+  body('subjectDetails.activities').optional().isArray().withMessage('Activities must be an array'),
+  body('content')
+    .optional()
+    .isLength({ max: 1000 })
+    .withMessage('Content cannot exceed 1000 characters'),
+  body('performance.participation.level')
+    .optional()
+    .isIn(['excellent', 'good', 'fair', 'poor', 'not_applicable'])
+    .withMessage('Participation level must be excellent, good, fair, poor, or not_applicable'),
+  body('performance.participation.engagement')
+    .optional()
+    .isIn(['very_active', 'active', 'moderate', 'passive', 'disengaged'])
+    .withMessage('Engagement must be very_active, active, moderate, passive, or disengaged'),
+  body('performance.participation.contribution')
+    .optional()
+    .isLength({ max: 500 })
+    .withMessage('Participation contribution cannot exceed 500 characters'),
+  body('performance.understanding.level')
+    .optional()
+    .isIn(['excellent', 'good', 'satisfactory', 'needs_improvement', 'poor'])
+    .withMessage(
+      'Understanding level must be excellent, good, satisfactory, needs_improvement, or poor'
+    ),
+  body('performance.understanding.concepts_mastered')
+    .optional()
+    .isArray()
+    .withMessage('Concepts mastered must be an array'),
+  body('performance.understanding.concepts_struggling')
+    .optional()
+    .isArray()
+    .withMessage('Concepts struggling must be an array'),
+  body('performance.understanding.comprehension_notes')
+    .optional()
+    .isLength({ max: 500 })
+    .withMessage('Comprehension notes cannot exceed 500 characters'),
+  body('performance.assessment.type')
+    .optional()
+    .isIn([
+      'quiz',
+      'test',
+      'assignment',
+      'project',
+      'presentation',
+      'observation',
+      'peer_assessment',
+      'self_assessment',
+    ])
+    .withMessage('Assessment type must be valid'),
+  body('performance.assessment.score')
+    .optional()
+    .isInt({ min: 0, max: 100 })
+    .withMessage('Assessment score must be between 0 and 100'),
+  body('performance.assessment.grade')
+    .optional()
+    .isIn(['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'F', 'P'])
+    .withMessage('Grade must be valid'),
+  body('performance.assessment.feedback')
+    .optional()
+    .isLength({ max: 500 })
+    .withMessage('Assessment feedback cannot exceed 500 characters'),
+  body('homework.assigned').optional().isBoolean().withMessage('Homework assigned must be boolean'),
+  body('homework.details.description')
+    .optional()
+    .isLength({ max: 500 })
+    .withMessage('Homework description cannot exceed 500 characters'),
+  body('homework.details.due_date')
+    .optional()
+    .isISO8601()
+    .toDate()
+    .withMessage('Due date must be valid'),
+  body('homework.details.estimated_time')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Estimated time must be positive integer'),
+  body('homework.completion.status')
+    .optional()
+    .isIn(['completed', 'partial', 'not_completed', 'not_applicable', 'pending'])
+    .withMessage('Homework status must be valid'),
+  body('homework.completion.quality')
+    .optional()
+    .isIn(['excellent', 'good', 'satisfactory', 'needs_improvement', 'poor', 'not_applicable'])
+    .withMessage('Homework quality must be valid'),
+  body('homework.completion.timeliness')
+    .optional()
+    .isIn(['on_time', 'late', 'very_late', 'not_submitted', 'not_applicable'])
+    .withMessage('Timeliness must be valid'),
+  body('homework.completion.effort')
+    .optional()
+    .isIn(['excellent', 'good', 'satisfactory', 'minimal', 'none'])
+    .withMessage('Effort must be valid'),
+  body('behavior.conduct')
+    .optional()
+    .isIn(['excellent', 'good', 'satisfactory', 'needs_improvement', 'poor'])
+    .withMessage('Conduct must be excellent, good, satisfactory, needs_improvement, or poor'),
+  body('behavior.cooperation')
+    .optional()
+    .isIn(['excellent', 'good', 'satisfactory', 'needs_improvement', 'poor'])
+    .withMessage('Cooperation must be excellent, good, satisfactory, needs_improvement, or poor'),
+  body('behavior.respect')
+    .optional()
+    .isIn(['excellent', 'good', 'satisfactory', 'needs_improvement', 'poor'])
+    .withMessage('Respect must be excellent, good, satisfactory, needs_improvement, or poor'),
+  body('behavior.following_instructions')
+    .optional()
+    .isIn(['excellent', 'good', 'satisfactory', 'needs_improvement', 'poor'])
+    .withMessage(
+      'Following instructions must be excellent, good, satisfactory, needs_improvement, or poor'
+    ),
+  body('behavior.notes')
+    .optional()
+    .isLength({ max: 500 })
+    .withMessage('Behavior notes cannot exceed 500 characters'),
+  body('remarks.teacher_comments')
+    .optional()
+    .isLength({ max: 1000 })
+    .withMessage('Teacher comments cannot exceed 1000 characters'),
+  body('remarks.strengths').optional().isArray().withMessage('Strengths must be an array'),
+  body('remarks.areas_for_improvement')
+    .optional()
+    .isArray()
+    .withMessage('Areas for improvement must be an array'),
+  body('remarks.recommendations')
+    .optional()
+    .isArray()
+    .withMessage('Recommendations must be an array'),
+  body('remarks.next_steps').optional().isArray().withMessage('Next steps must be an array'),
+  body('tags').optional().isArray().withMessage('Tags must be an array'),
+  body('isPrivate').optional().isBoolean().withMessage('isPrivate must be a boolean'),
+];
+
 // Routes
 
 router.get(
@@ -167,7 +311,7 @@ router.get(
       // Get students for year summary
       const Student = require('../models/Student');
       const students = await Student.getForYearSummary(schoolId, gradeRange, {
-        academicYear
+        academicYear,
       });
 
       res.status(200).json({
@@ -176,7 +320,7 @@ router.get(
           school: {
             id: school._id,
             name: school.name,
-            schoolType: school.schoolType
+            schoolType: school.schoolType,
           },
           students,
           summary: {
@@ -184,8 +328,8 @@ router.get(
             byGrade: students.reduce((acc, student) => {
               acc[student.grade] = (acc[student.grade] || 0) + 1;
               return acc;
-            }, {})
-          }
+            }, {}),
+          },
         },
       });
     } catch (error) {
@@ -252,7 +396,7 @@ router.put(
   '/:id',
   generalLimiter,
   checkReportAccess,
-  validateCreateStudentReport,
+  validateUpdateStudentReport,
   logActivity('update_student_report'),
   updateStudentReport
 );
@@ -287,7 +431,6 @@ router.put(
 router.put(
   '/:id/review',
   generalLimiter,
-  authorize('admin'), // Only admins can review reports
   checkReportAccess,
   logActivity('review_report'),
   reviewReport
@@ -299,7 +442,6 @@ router.put(
 router.put(
   '/:id/approve',
   generalLimiter,
-  authorize('admin'), // Only admins can approve reports
   checkReportAccess,
   logActivity('approve_report'),
   approveReport

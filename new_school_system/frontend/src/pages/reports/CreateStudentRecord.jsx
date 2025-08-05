@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
 import {
+  AlertCircle,
   ArrowLeft,
-  User,
-  Calendar,
   BookOpen,
+  Calendar,
+  CheckCircle,
   Clock,
   FileText,
   MessageSquare,
   Save,
-  AlertCircle,
   Target,
+  User,
   Users,
-  CheckCircle
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-hot-toast';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { studentHelpers, studentReportHelpers, handleApiError } from '../../services/api';
+import { handleApiError, studentHelpers, studentReportHelpers } from '../../services/api';
 import { getGradeChinese } from '../../utils/constants';
 
 const CreateStudentRecord = () => {
@@ -27,14 +27,14 @@ const CreateStudentRecord = () => {
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState(null); 
+  const [formError, setFormError] = useState(null);
 
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-    setValue
+    setValue,
   } = useForm({
     defaultValues: {
       date: new Date().toISOString().split('T')[0],
@@ -50,8 +50,8 @@ const CreateStudentRecord = () => {
       areasForImprovement: '',
       recommendations: '',
       homeworkDescription: '',
-      homeworkDueDate: ''
-    }
+      homeworkDueDate: '',
+    },
   });
 
   // Load student data
@@ -85,55 +85,55 @@ const CreateStudentRecord = () => {
 
   const mapPerformanceRating = (rating, fieldType) => {
     console.log(`🔍 Mapping ${rating} for ${fieldType}`); // Debug log
-    
+
     const mappings = {
       participation: {
-        'excellent': 'excellent',
-        'good': 'good', 
-        'fair': 'fair',
-        'poor': 'poor'
+        excellent: 'excellent',
+        good: 'good',
+        fair: 'fair',
+        poor: 'poor',
       },
       understanding: {
-        'excellent': 'excellent',
-        'good': 'good',
-        'fair': 'satisfactory',
-        'poor': 'needs_improvement'
+        excellent: 'excellent',
+        good: 'good',
+        fair: 'satisfactory',
+        poor: 'needs_improvement',
       },
       conduct: {
-        'excellent': 'excellent',
-        'good': 'good',
-        'fair': 'satisfactory', 
-        'poor': 'needs_improvement'
-      }
+        excellent: 'excellent',
+        good: 'good',
+        fair: 'satisfactory',
+        poor: 'needs_improvement',
+      },
     };
-    
+
     const result = mappings[fieldType]?.[rating] || rating;
     console.log(`✅ Mapped to: ${result}`); // Debug log
     return result;
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async data => {
     try {
       setIsSubmitting(true);
       setFormError(null);
-      
+
       // Validate user authentication
       if (!user) {
         throw new Error('用戶信息無效，請重新登錄');
       }
-      
+
       // Get user ID - handle both 'id' and '_id' formats
       const userId = user._id || user.id;
-      
+
       if (!userId) {
         throw new Error('用戶ID缺失，請重新登錄');
       }
-      
+
       // Validate student and school data
       if (!student || !student.school) {
         throw new Error('學生信息無效，請重新載入頁面');
       }
-      
+
       // Prepare student report data with all fields
       const reportData = {
         student: studentId,
@@ -141,41 +141,43 @@ const CreateStudentRecord = () => {
         academicYear: getCurrentAcademicYear(),
         reportDate: new Date(data.date).toISOString(),
         term: 'continuous',
-        
+
         subject: {
           name: data.subject?.trim() || '一般課程',
-          teacher: userId
+          teacher: userId,
         },
-        
+
         subjectDetails: {
           topic: data.topic.trim(),
           duration: parseInt(data.duration) || 60,
           learningObjectives: data.content ? [data.content.trim()] : [],
           materials: [],
-          activities: []
+          activities: [],
         },
-        
+
         // Content field (separate from subjectDetails)
         content: data.content?.trim() || '',
-        
+
         performance: {
           attendance: {
             status: 'present',
-            punctuality: 'good'
+            punctuality: 'good',
           },
           participation: {
             level: mapPerformanceRating(data.performanceRating, 'participation'),
             engagement: 'active',
-            ...(data.performanceNotes?.trim() && { contribution: data.performanceNotes.trim() })
+            ...(data.performanceNotes?.trim() && { contribution: data.performanceNotes.trim() }),
           },
           understanding: {
             level: mapPerformanceRating(data.performanceRating, 'understanding'),
-            ...(data.performanceNotes?.trim() && { comprehension_notes: data.performanceNotes.trim() })
+            ...(data.performanceNotes?.trim() && {
+              comprehension_notes: data.performanceNotes.trim(),
+            }),
           },
           assessment: {
             type: 'observation',
-            ...(data.performanceNotes?.trim() && { feedback: data.performanceNotes.trim() })
-          }
+            ...(data.performanceNotes?.trim() && { feedback: data.performanceNotes.trim() }),
+          },
         },
 
         behavior: {
@@ -183,21 +185,35 @@ const CreateStudentRecord = () => {
           cooperation: 'satisfactory',
           respect: 'satisfactory',
           following_instructions: 'satisfactory',
-          ...(data.performanceNotes?.trim() && { notes: data.performanceNotes.trim() })
+          ...(data.performanceNotes?.trim() && { notes: data.performanceNotes.trim() }),
         },
 
-        
         remarks: {
           teacher_comments: data.teacherComments?.trim() || '',
-          strengths: data.strengths ? data.strengths.split(',').map(s => s.trim()).filter(s => s) : [],
-          areas_for_improvement: data.areasForImprovement ? data.areasForImprovement.split(',').map(s => s.trim()).filter(s => s) : [],
-          recommendations: data.recommendations ? data.recommendations.split(',').map(s => s.trim()).filter(s => s) : [],
-          follow_up_required: false
+          strengths: data.strengths
+            ? data.strengths
+                .split(',')
+                .map(s => s.trim())
+                .filter(s => s)
+            : [],
+          areas_for_improvement: data.areasForImprovement
+            ? data.areasForImprovement
+                .split(',')
+                .map(s => s.trim())
+                .filter(s => s)
+            : [],
+          recommendations: data.recommendations
+            ? data.recommendations
+                .split(',')
+                .map(s => s.trim())
+                .filter(s => s)
+            : [],
+          follow_up_required: false,
         },
-        
+
         tags: [],
         isPrivate: false,
-        status: 'submitted'
+        status: 'submitted',
       };
 
       // Add homework if provided
@@ -206,11 +222,11 @@ const CreateStudentRecord = () => {
           details: {
             description: data.homeworkDescription.trim(),
             ...(data.homeworkDueDate && { due_date: new Date(data.homeworkDueDate).toISOString() }),
-            estimated_duration: 30
+            estimated_duration: 30,
           },
           completion: {
-            status: 'pending'
-          }
+            status: 'pending',
+          },
         };
       }
 
@@ -218,23 +234,21 @@ const CreateStudentRecord = () => {
       if (!reportData.subject.teacher) {
         throw new Error('教師信息缺失，請重新登錄');
       }
-      
+
       if (!reportData.student) {
         throw new Error('學生信息缺失，請檢查學生ID');
       }
 
-
       // Create the report
       const createPromise = studentReportHelpers.create(reportData);
-    
+
       await toast.promise(createPromise, {
         loading: '正在新增課堂記錄...',
         success: '課堂記錄已成功建立！',
-        error: '建立失敗，請查看下方錯誤'
+        error: '建立失敗，請查看下方錯誤',
       });
-      
+
       navigate('/reports');
-      
     } catch (error) {
       console.error('Failed to create student record:', error);
       const errorInfo = handleApiError(error);
@@ -262,10 +276,7 @@ const CreateStudentRecord = () => {
           <AlertCircle size={48} />
           <h2>找不到學生資料</h2>
           <p>請檢查學生ID是否正確，或返回重新選擇。</p>
-          <button 
-            onClick={() => navigate('/reports')} 
-            className="btn btn--primary"
-          >
+          <button onClick={() => navigate('/reports')} className="btn btn--primary">
             返回報告頁面
           </button>
         </div>
@@ -284,12 +295,10 @@ const CreateStudentRecord = () => {
             </div>
             <div>
               <h1 className="page-title">建立課堂記錄</h1>
-              <p className="page-subtitle">
-                為 {student.name} 建立新的課堂記錄
-              </p>
+              <p className="page-subtitle">為 {student.name} 建立新的課堂記錄</p>
             </div>
           </div>
-          
+
           <button
             type="button"
             onClick={() => navigate(-1)}
@@ -309,8 +318,11 @@ const CreateStudentRecord = () => {
           <div className="student-info-card__details">
             <h3 className="student-info-card__name">{student.name}</h3>
             <div className="student-info-card__meta">
-              <span>學生編號：{student.studentId || '未設定'}</span>
-              <span>年級：{getGradeChinese(student.grade)}{student.class && ` ${student.class}班`}</span>
+              <span>學生編號：{student.studentId || '未設定學生編號\n'}</span>
+              <span>
+                年級：{getGradeChinese(student.grade)}
+                {student.class && ` ${student.class}班`}
+              </span>
               <span>學年：{getCurrentAcademicYear()}</span>
             </div>
           </div>
@@ -322,7 +334,7 @@ const CreateStudentRecord = () => {
             {/* Basic Information */}
             <div className="form-section">
               <h2 className="form-section-title">基本資料</h2>
-              
+
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="date" className="form-label">
@@ -331,7 +343,7 @@ const CreateStudentRecord = () => {
                   </label>
                   <input
                     {...register('date', {
-                      required: '日期為必填項目'
+                      required: '日期為必填項目',
                     })}
                     id="date"
                     type="date"
@@ -355,8 +367,8 @@ const CreateStudentRecord = () => {
                     {...register('subject', {
                       maxLength: {
                         value: 100,
-                        message: '科目名稱不能超過100個字符'
-                      }
+                        message: '科目名稱不能超過100個字符',
+                      },
                     })}
                     id="subject"
                     type="text"
@@ -384,8 +396,8 @@ const CreateStudentRecord = () => {
                       required: '課題為必填項目',
                       maxLength: {
                         value: 200,
-                        message: '課題不能超過200個字符'
-                      }
+                        message: '課題不能超過200個字符',
+                      },
                     })}
                     id="topic"
                     type="text"
@@ -410,12 +422,12 @@ const CreateStudentRecord = () => {
                     {...register('duration', {
                       min: {
                         value: 1,
-                        message: '課時必須至少1分鐘'
+                        message: '課時必須至少1分鐘',
                       },
                       max: {
                         value: 300,
-                        message: '課時不能超過300分鐘'
-                      }
+                        message: '課時不能超過300分鐘',
+                      },
                     })}
                     id="duration"
                     type="number"
@@ -443,8 +455,8 @@ const CreateStudentRecord = () => {
                   {...register('content', {
                     maxLength: {
                       value: 1000,
-                      message: '課堂內容不能超過1000個字符'
-                    }
+                      message: '課堂內容不能超過1000個字符',
+                    },
                   })}
                   id="content"
                   rows="4"
@@ -464,7 +476,7 @@ const CreateStudentRecord = () => {
             {/* Performance Assessment */}
             <div className="form-section">
               <h2 className="form-section-title">學習表現</h2>
-              
+
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="attendanceStatus" className="form-label">
@@ -527,7 +539,7 @@ const CreateStudentRecord = () => {
             {/* Detailed Remarks */}
             <div className="form-section">
               <h2 className="form-section-title">詳細備註</h2>
-              
+
               <div className="form-group">
                 <label htmlFor="teacherComments" className="form-label">
                   <MessageSquare size={16} />
@@ -537,8 +549,8 @@ const CreateStudentRecord = () => {
                   {...register('teacherComments', {
                     maxLength: {
                       value: 1000,
-                      message: '教師評語不能超過1000個字符'
-                    }
+                      message: '教師評語不能超過1000個字符',
+                    },
                   })}
                   id="teacherComments"
                   rows="3"
@@ -567,9 +579,7 @@ const CreateStudentRecord = () => {
                     className="form-input"
                     disabled={isSubmitting}
                   />
-                  <div className="form-help">
-                    多個優點請用逗號分隔
-                  </div>
+                  <div className="form-help">多個優點請用逗號分隔</div>
                 </div>
 
                 <div className="form-group">
@@ -584,9 +594,7 @@ const CreateStudentRecord = () => {
                     className="form-input"
                     disabled={isSubmitting}
                   />
-                  <div className="form-help">
-                    多個改進方向請用逗號分隔
-                  </div>
+                  <div className="form-help">多個改進方向請用逗號分隔</div>
                 </div>
               </div>
 
@@ -602,16 +610,14 @@ const CreateStudentRecord = () => {
                   className="form-input"
                   disabled={isSubmitting}
                 />
-                <div className="form-help">
-                  多個建議請用逗號分隔
-                </div>
+                <div className="form-help">多個建議請用逗號分隔</div>
               </div>
             </div>
 
             {/* Homework (Optional) */}
             <div className="form-section">
               <h2 className="form-section-title">功課安排（可選）</h2>
-              
+
               <div className="form-group">
                 <label htmlFor="homeworkDescription" className="form-label">
                   功課描述
@@ -620,8 +626,8 @@ const CreateStudentRecord = () => {
                   {...register('homeworkDescription', {
                     maxLength: {
                       value: 500,
-                      message: '功課描述不能超過500個字符'
-                    }
+                      message: '功課描述不能超過500個字符',
+                    },
                   })}
                   id="homeworkDescription"
                   rows="3"
@@ -655,9 +661,7 @@ const CreateStudentRecord = () => {
                     {errors.homeworkDueDate.message}
                   </div>
                 )}
-                <div className="form-help">
-                  如有功課安排，請設定截止日期
-                </div>
+                <div className="form-help">如有功課安排，請設定截止日期</div>
               </div>
             </div>
 
@@ -672,7 +676,7 @@ const CreateStudentRecord = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  borderRadius: '6px'
+                  borderRadius: '6px',
                 }}
               >
                 <AlertCircle size={18} />
@@ -690,7 +694,7 @@ const CreateStudentRecord = () => {
               >
                 取消
               </button>
-              
+
               <button
                 type="submit"
                 className={`btn btn--primary ${isSubmitting ? 'btn--loading' : ''}`}

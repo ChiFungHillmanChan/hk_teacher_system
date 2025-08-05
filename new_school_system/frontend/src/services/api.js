@@ -156,54 +156,109 @@ export const apiRequest = {
 export const schoolHelpers = {
   getAll: async (params = {}) => {
     try {
-      return await apiRequest.get('/api/schools', { params });
+      const result = await apiRequest.get('/api/schools', { params });
+      return result;
     } catch (error) {
-      console.error('Failed to fetch schools:', error);
+      console.error('❌ Failed to fetch schools:', error);
       throw error;
     }
   },
 
   getById: async id => {
     try {
-      return await apiRequest.get(`/api/schools/${id}`);
+      console.log('🔍 Fetching school by ID:', id);
+      const result = await apiRequest.get(`/api/schools/${id}`);
+      console.log('✅ School fetched successfully:', result?.name);
+      return result;
     } catch (error) {
-      console.error(`Failed to fetch school ${id}:`, error);
+      console.error(`❌ Failed to fetch school ${id}:`, error);
       throw error;
     }
   },
 
   create: async schoolData => {
     try {
-      return await apiRequest.post('/api/schools', schoolData);
+      console.log('➕ Creating school:', schoolData?.name);
+      const result = await apiRequest.post('/api/schools', schoolData);
+      console.log('✅ School created successfully:', result?.name);
+      return result;
     } catch (error) {
-      console.error('Failed to create school:', error);
+      console.error('❌ Failed to create school:', error);
       throw error;
     }
   },
 
   update: async (id, schoolData) => {
     try {
-      return await apiRequest.put(`/api/schools/${id}`, schoolData);
+      console.log('📝 Updating school:', id, schoolData);
+
+      // Log the exact data being sent
+      console.log('Update payload:', JSON.stringify(schoolData, null, 2));
+
+      const result = await apiRequest.put(`/api/schools/${id}`, schoolData);
+      console.log('✅ School updated successfully:', result?.name);
+      return result;
     } catch (error) {
-      console.error(`Failed to update school ${id}:`, error);
+      console.error(`❌ Failed to update school ${id}:`, error);
+
+      // Log detailed error information
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+        console.error('Error response headers:', error.response.headers);
+      } else if (error.request) {
+        console.error('Error request:', error.request);
+      } else {
+        console.error('Error message:', error.message);
+      }
+
       throw error;
     }
   },
 
   delete: async id => {
     try {
-      return await apiRequest.delete(`/api/schools/${id}`);
+      console.log('🗑️ Deleting school:', id);
+
+      // First check if school exists and get details
+      const schoolToDelete = await apiRequest.get(`/api/schools/${id}`);
+      console.log('School to delete:', schoolToDelete?.name);
+
+      const result = await apiRequest.delete(`/api/schools/${id}`);
+      console.log('✅ School deleted successfully');
+      return result;
     } catch (error) {
-      console.error(`Failed to delete school ${id}:`, error);
+      console.error(`❌ Failed to delete school ${id}:`, error);
+
+      // Enhanced error logging for delete operation
+      if (error.response?.status === 404) {
+        console.error('School not found for deletion');
+      } else if (error.response?.status === 403) {
+        console.error('Permission denied for school deletion');
+      } else if (error.response?.status === 409) {
+        console.error('Cannot delete school - may have associated data');
+      }
+
       throw error;
     }
   },
 
   getStats: async id => {
     try {
-      return await apiRequest.get(`/api/schools/${id}/stats`);
+      const result = await apiRequest.get(`/api/schools/${id}/stats`);
+      return result;
     } catch (error) {
-      console.error(`Failed to fetch school stats for ${id}:`, error);
+      console.error(`❌ Failed to fetch school stats for ${id}:`, error);
+      throw error;
+    }
+  },
+
+  getAvailableAcademicYears: async schoolId => {
+    try {
+      const result = await apiRequest.get(`/api/schools/${schoolId}/academic-years-available`);
+      return result;
+    } catch (error) {
+      console.error(`❌ Failed to fetch academic years for school ${schoolId}:`, error);
       throw error;
     }
   },
@@ -213,69 +268,322 @@ export const schoolHelpers = {
 export const studentHelpers = {
   getAll: async (params = {}) => {
     try {
-      return await apiRequest.get('/api/students', { params });
+      console.log('🔍 Fetching all students with params:', params);
+      const result = await apiRequest.get('/api/students', { params });
+      console.log(`✅ Students fetched successfully: ${result?.length || 0} students`);
+      return result;
     } catch (error) {
-      console.error('Failed to fetch students:', error);
+      console.error('❌ Failed to fetch students:', error);
       throw error;
     }
   },
 
   getById: async id => {
     try {
-      return await apiRequest.get(`/api/students/${id}`);
+      console.log('🔍 Fetching student by ID:', id);
+      const result = await apiRequest.get(`/api/students/${id}`);
+      console.log('✅ Student fetched successfully:', result?.name);
+      return result;
     } catch (error) {
-      console.error(`Failed to fetch student ${id}:`, error);
+      console.error(`❌ Failed to fetch student ${id}:`, error);
       throw error;
     }
   },
 
   create: async studentData => {
     try {
-      return await apiRequest.post('/api/students', studentData);
+      console.log('➕ Creating student:', studentData?.name);
+
+      // Log the exact data being sent for debugging
+      console.log(
+        'Student creation payload:',
+        JSON.stringify(
+          {
+            name: studentData.name,
+            school: studentData.school,
+            grade: studentData.grade,
+            class: studentData.class,
+            classNumber: studentData.classNumber,
+          },
+          null,
+          2
+        )
+      );
+
+      const result = await apiRequest.post('/api/students', studentData);
+      console.log('✅ Student created successfully:', result?.name, 'ID:', result?._id);
+      return result;
     } catch (error) {
-      console.error('Failed to create student:', error);
-      throw error;
+      console.error('❌ Failed to create student:', error);
+
+      // Log detailed error information for debugging
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+      } else if (error.request) {
+        console.error('Error request:', error.request);
+      } else {
+        console.error('Error message:', error.message);
+      }
+
+      // Re-throw with more context
+      const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
+      throw new Error(`創建學生失敗: ${errorMessage}`);
     }
   },
 
   update: async (id, studentData) => {
     try {
-      return await apiRequest.put(`/api/students/${id}`, studentData);
+      console.log('📝 Updating student:', id, studentData?.name);
+
+      // Log the exact data being sent for debugging
+      console.log('Student update payload:', JSON.stringify(studentData, null, 2));
+
+      const result = await apiRequest.put(`/api/students/${id}`, studentData);
+      console.log('✅ Student updated successfully:', result?.name);
+      return result;
     } catch (error) {
-      console.error(`Failed to update student ${id}:`, error);
-      throw error;
+      console.error(`❌ Failed to update student ${id}:`, error);
+
+      // Log detailed error information
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+        console.error('Error response headers:', error.response.headers);
+      } else if (error.request) {
+        console.error('Error request:', error.request);
+      } else {
+        console.error('Error message:', error.message);
+      }
+
+      // Re-throw with more context
+      const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
+      throw new Error(`更新學生失敗: ${errorMessage}`);
     }
   },
 
   delete: async id => {
     try {
-      return await apiRequest.delete(`/api/students/${id}`);
+      console.log('🗑️ Deleting student:', id);
+
+      // First check if student exists and get details
+      const studentToDelete = await apiRequest.get(`/api/students/${id}`);
+      console.log('Student to delete:', studentToDelete?.name);
+
+      const result = await apiRequest.delete(`/api/students/${id}`);
+      console.log('✅ Student deleted successfully');
+      return result;
     } catch (error) {
-      console.error(`Failed to delete student ${id}:`, error);
+      console.error(`❌ Failed to delete student ${id}:`, error);
+
+      // Enhanced error logging for delete operation
+      if (error.response?.status === 404) {
+        console.error('Student not found for deletion');
+      } else if (error.response?.status === 403) {
+        console.error('Permission denied for student deletion');
+      } else if (error.response?.status === 409) {
+        console.error('Cannot delete student - may have associated data');
+      }
+
       throw error;
     }
   },
 
   getMyStudents: async (params = {}) => {
     try {
-      return await apiRequest.get('/api/students/my-students', { params });
+      console.log('🔍 Fetching my students');
+      const result = await apiRequest.get('/api/students/my-students', { params });
+      console.log(`✅ My students fetched successfully: ${result?.length || 0} students`);
+      return result;
     } catch (error) {
-      console.error('Failed to fetch my students:', error);
+      console.error('❌ Failed to fetch my students:', error);
       throw error;
     }
   },
 
-  getStats: async schoolId => {
+  getStatsBySchool: async schoolId => {
     try {
-      return await apiRequest.get(`/api/students/stats/${schoolId}`);
+      console.log('📊 Fetching student stats for school:', schoolId);
+      const result = await apiRequest.get(`/api/students/stats/${schoolId}`);
+      console.log('✅ Student stats fetched successfully');
+      return result;
     } catch (error) {
-      console.error(`Failed to fetch student stats for school ${schoolId}:`, error);
+      console.error(`❌ Failed to fetch student stats for school ${schoolId}:`, error);
+      throw error;
+    }
+  },
+
+  addTeacher: async (studentId, teacherData) => {
+    try {
+      console.log('👨‍🏫 Adding teacher to student:', studentId);
+      const result = await apiRequest.post(`/api/students/${studentId}/teachers`, teacherData);
+      console.log('✅ Teacher added to student successfully');
+      return result;
+    } catch (error) {
+      console.error(`❌ Failed to add teacher to student ${studentId}:`, error);
+      throw error;
+    }
+  },
+
+  removeTeacher: async (studentId, teacherId) => {
+    try {
+      console.log('🗑️ Removing teacher from student:', studentId, teacherId);
+      const result = await apiRequest.delete(`/api/students/${studentId}/teachers/${teacherId}`);
+      console.log('✅ Teacher removed from student successfully');
+      return result;
+    } catch (error) {
+      console.error(`❌ Failed to remove teacher from student ${studentId}:`, error);
+      throw error;
+    }
+  },
+
+  searchByName: async (name, params = {}) => {
+    try {
+      console.log('🔍 Searching students by name:', name);
+      const allParams = { ...params, search: name };
+      const result = await apiRequest.get('/api/students', { params: allParams });
+      console.log(`✅ Student search completed: ${result?.length || 0} results`);
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to search students by name:', error);
+      throw error;
+    }
+  },
+
+  searchBySchool: async (schoolId, params = {}) => {
+    try {
+      console.log('🔍 Searching students by school:', schoolId);
+      const allParams = { ...params, school: schoolId };
+      const result = await apiRequest.get('/api/students', { params: allParams });
+      console.log(`✅ School student search completed: ${result?.length || 0} results`);
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to search students by school:', error);
+      throw error;
+    }
+  },
+
+  searchByGrade: async (grade, params = {}) => {
+    try {
+      console.log('🔍 Searching students by grade:', grade);
+      const allParams = { ...params, grade };
+      const result = await apiRequest.get('/api/students', { params: allParams });
+      console.log(`✅ Grade student search completed: ${result?.length || 0} results`);
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to search students by grade:', error);
+      throw error;
+    }
+  },
+
+  batchCreate: async (studentsData, onProgress) => {
+    try {
+      console.log(`🔄 Batch creating ${studentsData.length} students`);
+
+      const results = [];
+      let successCount = 0;
+      let failureCount = 0;
+
+      for (const [index, studentData] of studentsData.entries()) {
+        try {
+          if (onProgress) {
+            onProgress({
+              current: index,
+              total: studentsData.length,
+              currentStudent: studentData.name,
+              message: `創建學生: ${studentData.name}`,
+            });
+          }
+
+          const result = await studentHelpers.create(studentData);
+          results.push({
+            index,
+            success: true,
+            data: result,
+            studentData,
+          });
+          successCount++;
+        } catch (error) {
+          console.error(`❌ Failed to create student ${index}:`, error);
+          results.push({
+            index,
+            success: false,
+            error: error.message,
+            studentData,
+          });
+          failureCount++;
+        }
+      }
+
+      console.log(`✅ Batch create completed: ${successCount} success, ${failureCount} failed`);
+
+      return {
+        results,
+        successCount,
+        failureCount,
+        totalProcessed: successCount + failureCount,
+      };
+    } catch (error) {
+      console.error('❌ Failed to batch create students:', error);
+      throw error;
+    }
+  },
+
+  batchUpdate: async (updates, onProgress) => {
+    try {
+      console.log(`🔄 Batch updating ${updates.length} students`);
+
+      const results = [];
+      let successCount = 0;
+      let failureCount = 0;
+
+      for (const [index, { id, data }] of updates.entries()) {
+        try {
+          if (onProgress) {
+            onProgress({
+              current: index,
+              total: updates.length,
+              currentStudent: data.name || id,
+              message: `更新學生: ${data.name || id}`,
+            });
+          }
+
+          const result = await studentHelpers.update(id, data);
+          results.push({
+            index,
+            success: true,
+            data: result,
+            updateData: data,
+          });
+          successCount++;
+        } catch (error) {
+          console.error(`❌ Failed to update student ${id}:`, error);
+          results.push({
+            index,
+            success: false,
+            error: error.message,
+            updateData: data,
+            studentId: id,
+          });
+          failureCount++;
+        }
+      }
+
+      console.log(`✅ Batch update completed: ${successCount} success, ${failureCount} failed`);
+
+      return {
+        results,
+        successCount,
+        failureCount,
+        totalProcessed: successCount + failureCount,
+      };
+    } catch (error) {
+      console.error('❌ Failed to batch update students:', error);
       throw error;
     }
   },
 };
 
-// ✨ NEW: Student Reports API helpers
 export const studentReportHelpers = {
   // Get all student reports
   getAll: async (params = {}) => {
@@ -290,9 +598,16 @@ export const studentReportHelpers = {
   // Get single student report
   getById: async id => {
     try {
-      return await apiRequest.get(`/api/student-reports/${id}`);
+      console.log('🔍 Fetching student report by ID:', id);
+      const response = await api.get(`/api/student-reports/${id}`);
+
+      // Handle the response structure properly
+      const reportData = response.data?.data || response.data;
+
+      console.log('✅ Student report fetched successfully:', reportData?.subjectDetails?.topic);
+      return reportData;
     } catch (error) {
-      console.error(`Failed to fetch student report ${id}:`, error);
+      console.error(`❌ Failed to fetch student report ${id}:`, error);
       throw error;
     }
   },
@@ -310,9 +625,33 @@ export const studentReportHelpers = {
   // Update student report
   update: async (id, reportData) => {
     try {
-      return await apiRequest.put(`/api/student-reports/${id}`, reportData);
+      console.log('📝 Updating student report:', id);
+      console.log('📤 Update payload:', JSON.stringify(reportData, null, 2));
+
+      // Use direct axios call for better control over response handling
+      const response = await api.put(`/api/student-reports/${id}`, reportData);
+
+      console.log('📥 Raw update response:', response.data);
+
+      // Handle the response structure properly
+      const updatedData = response.data?.data || response.data;
+
+      console.log('✅ Student report updated successfully:', updatedData?.subjectDetails?.topic);
+      return updatedData;
     } catch (error) {
-      console.error(`Failed to update student report ${id}:`, error);
+      console.error(`❌ Failed to update student report ${id}:`, error);
+
+      // Enhanced error logging for debugging
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+        console.error('Error response headers:', error.response.headers);
+      } else if (error.request) {
+        console.error('Error request:', error.request);
+      } else {
+        console.error('Error message:', error.message);
+      }
+
       throw error;
     }
   },
@@ -537,7 +876,7 @@ export const aiAnalysisHelpers = {
   },
 
   // Extract student data from file
-  extractData: async (formData) => {
+  extractData: async formData => {
     try {
       return await api.post('/api/ai-analysis/extract', formData, {
         headers: {
@@ -552,7 +891,7 @@ export const aiAnalysisHelpers = {
   },
 
   // Import student data
-  importData: async (importData) => {
+  importData: async importData => {
     try {
       return await apiRequest.post('/api/ai-analysis/import', importData);
     } catch (error) {
@@ -568,6 +907,144 @@ export const aiAnalysisHelpers = {
     } catch (error) {
       console.error('Failed to fetch AI analysis stats:', error);
       throw error;
+    }
+  },
+};
+
+export const meetingRecordHelpers = {
+  getAll: async (params = {}) => {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const url = queryString ? `/api/meeting-records?${queryString}` : '/api/meeting-records';
+
+      // Use direct axios call to avoid unwrap issues
+      const response = await api.get(url);
+
+      // Handle response structure
+      if (response.data?.success && response.data?.data) {
+        return response.data.data;
+      }
+      return response.data || [];
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  getById: async id => {
+    try {
+      const response = await api.get(`/api/meeting-records/${id}`);
+
+      // Handle response structure
+      if (response.data?.success && response.data?.data) {
+        return response.data.data;
+      }
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  create: async data => {
+    try {
+      const response = await api.post('/api/meeting-records', data);
+
+      // Handle response structure
+      if (response.data?.success && response.data?.data) {
+        return response.data.data;
+      }
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  update: async (id, data) => {
+    try {
+      const response = await api.put(`/api/meeting-records/${id}`, data);
+
+      // Handle response structure
+      if (response.data?.success && response.data?.data) {
+        return response.data.data;
+      }
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  delete: async id => {
+    try {
+      const response = await api.delete(`/api/meeting-records/${id}`);
+
+      // Handle response structure
+      if (response.data?.success) {
+        return response.data;
+      }
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  // FIXED: Special handling for getByStudent to match backend response
+  getByStudent: async (studentId, params = {}) => {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const url = queryString
+        ? `/api/meeting-records/student/${studentId}?${queryString}`
+        : `/api/meeting-records/student/${studentId}`;
+
+      console.log('🔍 Making API call to:', url);
+      console.log('📤 With params:', params);
+
+      // Use direct axios call to get full response structure
+      const response = await api.get(url);
+
+      console.log('📥 Raw API response:', response.data);
+
+      // Return the full response to let the component handle structure
+      return response.data;
+    } catch (error) {
+      console.error('❌ API Error in getByStudent:', error);
+      throw handleApiError(error);
+    }
+  },
+
+  getStats: async (params = {}) => {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const url = queryString
+        ? `/api/meeting-records/stats?${queryString}`
+        : '/api/meeting-records/stats';
+
+      const response = await api.get(url);
+
+      // Handle response structure
+      if (response.data?.success && response.data?.data) {
+        return response.data.data;
+      }
+      return response.data || {};
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  getByYear: async (schoolId, academicYear, params = {}) => {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const url = queryString
+        ? `/api/meeting-records/by-year/${schoolId}/${academicYear}?${queryString}`
+        : `/api/meeting-records/by-year/${schoolId}/${academicYear}`;
+
+      const response = await api.get(url);
+
+      // Handle response structure
+      if (response.data?.success && response.data?.data) {
+        return response.data.data;
+      }
+      return response.data || [];
+    } catch (error) {
+      throw handleApiError(error);
     }
   },
 };

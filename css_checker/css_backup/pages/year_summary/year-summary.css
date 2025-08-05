@@ -1,0 +1,188 @@
+/* Year Summary Main Layout */
+
+/* ========================================
+   YEAR SUMMARY PAGE CONTAINER
+======================================== */
+
+.year-summary {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--spacing-6);
+  min-height: calc(100vh - 80px);
+}
+
+/* ========================================
+   YEAR SUMMARY HEADER
+======================================== */
+
+.year-summary__header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-6);
+  margin-bottom: var(--spacing-8);
+  padding: var(--spacing-8);
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border-light);
+}
+
+.year-summary__title-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  flex: 1;
+}
+
+.year-summary__icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  border-radius: var(--border-radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  flex-shrink: 0;
+  box-shadow: var(--shadow-md);
+}
+
+.year-summary__title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-2) 0;
+  line-height: 1.2;
+}
+
+.year-summary__subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ========================================
+   SCHOOL SELECTION SECTION
+======================================== */
+
+.year-summary__school-section {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
+  padding: var(--spacing-6);
+  margin-bottom: var(--spacing-8);
+}
+
+.year-summary__school-section .form-group {
+  margin-bottom: 0;
+  max-width: 400px;
+}
+
+/* ========================================
+   EMPTY STATE
+======================================== */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-16);
+  background-color: var(--color-white);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--border-radius-lg);
+  margin: var(--spacing-8) 0;
+}
+
+.empty-state svg {
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-6);
+}
+
+.empty-state h3 {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-4);
+}
+
+.empty-state p {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-6);
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+
+/* ========================================
+   TRANSITION INFO
+======================================== */
+
+.transition-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  align-items: flex-start;
+}
+
+.transition-note {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+@media (max-width: 768px) {
+  .year-summary {
+    padding: var(--spacing-4);
+  }
+
+  .year-summary__header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--spacing-6);
+  }
+
+  .year-summary__title-section {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-3);
+  }
+
+  .year-summary__icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .year-summary__title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .year-summary__school-section .form-group {
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .year-summary {
+    padding: var(--spacing-3);
+  }
+
+  .year-summary__header {
+    padding: var(--spacing-4);
+  }
+
+  .year-summary__title {
+    font-size: var(--font-size-xl);
+  }
+
+  .empty-state {
+    padding: var(--spacing-8);
+  }
+}

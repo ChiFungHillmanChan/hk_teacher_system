@@ -1,0 +1,172 @@
+/* Year Summary Navigation Tabs */
+
+/* ========================================
+   PAGE NAVIGATION
+======================================== */
+
+.year-summary__nav {
+  display: flex;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-8);
+  background-color: var(--color-white);
+  padding: var(--spacing-6);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
+}
+
+.year-summary__nav-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4) var(--spacing-6);
+  background-color: var(--color-background-light);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  flex: 1;
+  justify-content: center;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.year-summary__nav-btn:hover {
+  background-color: var(--color-white);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.year-summary__nav-btn--active {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  border-color: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: var(--shadow-lg);
+}
+
+.year-summary__nav-btn--active:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.year-summary__nav-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
+  transform: scaleX(0);
+  transition: transform var(--transition-normal);
+}
+
+.year-summary__nav-btn:hover::before {
+  transform: scaleX(1);
+}
+
+.year-summary__nav-btn--active::before {
+  transform: scaleX(1);
+}
+
+.year-summary__nav-count {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: inherit;
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  min-width: 32px;
+  text-align: center;
+  line-height: 1.2;
+  margin-left: var(--spacing-2);
+}
+
+.year-summary__nav-btn:not(.year-summary__nav-btn--active) .year-summary__nav-count {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+/* ========================================
+   RESPONSIVE NAVIGATION
+======================================== */
+
+@media (max-width: 768px) {
+  .year-summary__nav {
+    flex-direction: column;
+    gap: var(--spacing-3);
+  }
+
+  .year-summary__nav-btn {
+    flex: none;
+    justify-content: flex-start;
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+
+  .year-summary__nav-count {
+    margin-left: auto;
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .year-summary__nav {
+    padding: var(--spacing-4);
+  }
+
+  .year-summary__nav-btn {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-3);
+  }
+
+  .year-summary__nav-count {
+    font-size: var(--font-size-xs);
+    min-width: 24px;
+    padding: var(--spacing-1) var(--spacing-2);
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .year-summary__nav-btn {
+    transition: none;
+  }
+
+  .year-summary__nav-btn:hover,
+  .year-summary__nav-btn--active:hover {
+    transform: none;
+  }
+
+  .year-summary__nav-btn::before {
+    transition: none;
+  }
+}
+
+.year-summary__nav-btn:focus {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   HIGH CONTRAST MODE
+======================================== */
+
+@media (prefers-contrast: high) {
+  .year-summary__nav-btn {
+    border-width: 3px;
+  }
+
+  .year-summary__nav-btn--active {
+    border-width: 3px;
+    font-weight: var(--font-weight-bold);
+  }
+}

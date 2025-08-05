@@ -1,0 +1,7 @@
+/* Integration Feature Index - Import all integration styles */
+
+@import './integration.css';
+@import './page-header.css';
+@import './student-info.css';
+@import './instructions.css';
+@import './filters.css';

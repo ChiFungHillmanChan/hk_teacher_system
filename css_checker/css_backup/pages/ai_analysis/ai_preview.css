@@ -1,0 +1,182 @@
+/* AI Analysis Preview Components */
+
+/* ========================================
+   PREVIEW TABLE
+======================================== */
+
+.ai-analysis__preview-table {
+  padding: var(--spacing-4);
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.ai-analysis__table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.ai-analysis__table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--color-white);
+  min-width: 800px;
+}
+
+.ai-analysis__table th {
+  background-color: var(--color-background-light);
+  padding: var(--spacing-4);
+  text-align: left;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  border-bottom: 2px solid var(--color-border);
+  white-space: nowrap;
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ai-analysis__table td {
+  padding: var(--spacing-3);
+  border-bottom: 1px solid var(--color-border-light);
+  vertical-align: middle;
+}
+
+.ai-analysis__table tr:hover {
+  background-color: var(--color-background-light);
+}
+
+.ai-analysis__row--exists {
+  background-color: rgba(52, 152, 219, 0.05);
+}
+
+.ai-analysis__row--exists:hover {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* ========================================
+   STATUS BADGES
+======================================== */
+
+.ai-analysis__status {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ai-analysis__status--new {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
+}
+
+.ai-analysis__status--exists {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+/* ========================================
+   EDITABLE INPUTS
+======================================== */
+
+.ai-analysis__input {
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-white);
+  color: var(--color-text-primary);
+  transition: all var(--transition-fast);
+  min-width: 80px;
+}
+
+.ai-analysis__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+  background-color: var(--color-white);
+}
+
+.ai-analysis__input:disabled {
+  background-color: var(--color-background-light);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.ai-analysis__input::placeholder {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* ========================================
+   TABLE ACTIONS
+======================================== */
+
+.ai-analysis__table .btn--danger {
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-xs);
+  min-height: 28px;
+  gap: var(--spacing-1);
+}
+
+.ai-analysis__table .btn--danger:hover {
+  transform: scale(1.05);
+}
+
+/* ========================================
+   RESPONSIVE PREVIEW TABLE
+======================================== */
+
+@media (max-width: 1024px) {
+  .ai-analysis__table {
+    font-size: var(--font-size-xs);
+    min-width: 700px;
+  }
+
+  .ai-analysis__table th,
+  .ai-analysis__table td {
+    padding: var(--spacing-2);
+  }
+
+  .ai-analysis__input {
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-1) var(--spacing-2);
+  }
+}
+
+@media (max-width: 768px) {
+  .ai-analysis__preview-table {
+    padding: var(--spacing-3);
+    max-height: 500px;
+  }
+
+  .ai-analysis__table {
+    min-width: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-analysis__preview-table {
+    padding: var(--spacing-2);
+    max-height: 400px;
+  }
+
+  .ai-analysis__table th,
+  .ai-analysis__table td {
+    padding: var(--spacing-1);
+  }
+
+  .ai-analysis__status {
+    font-size: 10px;
+    padding: 2px var(--spacing-1);
+  }
+}

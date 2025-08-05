@@ -1,0 +1,8 @@
+/* Components Index - Import all component styles */
+
+@import './buttons/index.css';
+@import './forms/index.css';
+@import './cards/index.css';
+@import './badges/index.css';
+@import './tables/index.css';
+@import './modals/index.css';

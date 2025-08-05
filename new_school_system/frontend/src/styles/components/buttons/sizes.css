@@ -1,0 +1,172 @@
+/* Button Sizes */
+
+/* ========================================
+   EXTRA SMALL
+======================================== */
+
+.btn--xs {
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-xs);
+  min-height: 24px;
+  gap: var(--spacing-1);
+}
+
+.btn--xs svg {
+  width: 12px;
+  height: 12px;
+}
+
+.btn--xs.btn--icon-only {
+  padding: var(--spacing-1);
+  width: 24px;
+  height: 24px;
+}
+
+/* ========================================
+   SMALL
+======================================== */
+
+.btn--small,
+.btn--sm {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-sm);
+  min-height: 32px;
+  gap: var(--spacing-1-5);
+}
+
+.btn--small svg,
+.btn--sm svg {
+  width: 14px;
+  height: 14px;
+}
+
+.btn--small.btn--icon-only,
+.btn--sm.btn--icon-only {
+  padding: var(--spacing-2);
+  width: 32px;
+  height: 32px;
+}
+
+/* ========================================
+   MEDIUM (DEFAULT)
+======================================== */
+
+.btn--medium,
+.btn--md,
+.btn {
+  padding: var(--spacing-3) var(--spacing-6);
+  font-size: var(--font-size-base);
+  min-height: 40px;
+  gap: var(--spacing-2);
+}
+
+.btn--medium svg,
+.btn--md svg,
+.btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn--medium.btn--icon-only,
+.btn--md.btn--icon-only,
+.btn.btn--icon-only {
+  padding: var(--spacing-3);
+  width: 40px;
+  height: 40px;
+}
+
+/* ========================================
+   LARGE
+======================================== */
+
+.btn--large,
+.btn--lg {
+  padding: var(--spacing-4) var(--spacing-8);
+  font-size: var(--font-size-lg);
+  min-height: 48px;
+  gap: var(--spacing-2-5);
+}
+
+.btn--large svg,
+.btn--lg svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn--large.btn--icon-only,
+.btn--lg.btn--icon-only {
+  padding: var(--spacing-4);
+  width: 48px;
+  height: 48px;
+}
+
+/* ========================================
+   EXTRA LARGE
+======================================== */
+
+.btn--xl {
+  padding: var(--spacing-5) var(--spacing-10);
+  font-size: var(--font-size-xl);
+  min-height: 56px;
+  gap: var(--spacing-3);
+}
+
+.btn--xl svg {
+  width: 20px;
+  height: 20px;
+}
+
+.btn--xl.btn--icon-only {
+  padding: var(--spacing-5);
+  width: 56px;
+  height: 56px;
+}
+
+/* ========================================
+   FULL WIDTH
+======================================== */
+
+.btn--full {
+  width: 100%;
+}
+
+/* ========================================
+   RESPONSIVE SIZES
+======================================== */
+
+@media (max-width: 768px) {
+  .btn--responsive {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .btn--large,
+  .btn--lg {
+    padding: var(--spacing-3) var(--spacing-6);
+    font-size: var(--font-size-base);
+    min-height: 44px;
+  }
+  
+  .btn--xl {
+    padding: var(--spacing-4) var(--spacing-8);
+    font-size: var(--font-size-lg);
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    min-height: 44px; /* Better touch targets on mobile */
+  }
+  
+  .btn--small,
+  .btn--sm {
+    min-height: 36px;
+  }
+  
+  .btn--large,
+  .btn--lg,
+  .btn--xl {
+    min-height: 48px;
+  }
+}

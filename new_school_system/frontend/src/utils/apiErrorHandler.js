@@ -1,18 +1,8 @@
 import { toast } from 'react-hot-toast';
 
-export const createApiErrorHandler = setRateLimitError => {
+export const createApiErrorHandler = _ => {
   return error => {
     console.error('API Error:', error);
-
-    // Handle rate limiting
-    if (error.status === 429) {
-      const retryAfter = error.data?.retryAfter || error.retryAfter || 900;
-      setRateLimitError({
-        retryAfter: retryAfter,
-        originalError: error,
-      });
-      return; // Don't show toast for rate limit, show the error page instead
-    }
 
     // Handle other errors with toast notifications
     const errorMessage = error.message || error.data?.message || '發生未知錯誤';

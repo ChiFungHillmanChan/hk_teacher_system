@@ -1,0 +1,272 @@
+/* Integration Student Info */
+
+/* ========================================
+   SELECTED STUDENT INFO
+======================================== */
+
+.selected-student-info {
+  margin-bottom: var(--spacing-8);
+}
+
+.student-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-6);
+  padding: var(--spacing-6);
+  background-color: var(--color-white);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.student-card:hover {
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-2px);
+}
+
+.student-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
+}
+
+/* ========================================
+   STUDENT CARD AVATAR
+======================================== */
+
+.student-card__avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--border-radius-full);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.student-card__avatar::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: rotate(45deg);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+/* ========================================
+   STUDENT CARD INFO
+======================================== */
+
+.student-card__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.student-card__name {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-3) 0;
+  line-height: 1.2;
+}
+
+.student-card__details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+  align-items: center;
+}
+
+.student-card__grade,
+.student-card__school,
+.student-card__year,
+.student-card__month {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.student-card__grade {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border: var(--border-info-medium);
+}
+
+.student-card__school {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
+}
+
+.student-card__year {
+  background-color: var(--color-info-light);
+  color: var(--color-info);
+  border: var(--border-info-medium);
+}
+
+.student-card__month {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning-border);
+}
+
+/* ========================================
+   STUDENT CARD ACTIONS
+======================================== */
+
+.student-card__actions {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.student-card__actions .btn {
+  min-width: 140px;
+  justify-content: center;
+}
+
+/* ========================================
+   RESPONSIVE STUDENT CARD
+======================================== */
+
+@media (max-width: 768px) {
+  .student-card {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-4);
+    padding: var(--spacing-5);
+  }
+
+  .student-card__avatar {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto;
+  }
+
+  .student-card__name {
+    font-size: var(--font-size-xl);
+    text-align: center;
+  }
+
+  .student-card__details {
+    justify-content: center;
+    gap: var(--spacing-2);
+  }
+
+  .student-card__actions {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .student-card {
+    padding: var(--spacing-4);
+  }
+
+  .student-card__avatar {
+    width: 56px;
+    height: 56px;
+  }
+
+  .student-card__name {
+    font-size: var(--font-size-lg);
+  }
+
+  .student-card__details {
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .student-card__grade,
+  .student-card__school,
+  .student-card__year,
+  .student-card__month {
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-1) var(--spacing-2);
+  }
+
+  .student-card__actions {
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .student-card__actions .btn {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .student-card {
+    transition: none;
+  }
+
+  .student-card:hover {
+    transform: none;
+  }
+
+  .student-card__avatar::after {
+    animation: none;
+  }
+}
+
+.student-card:focus-within {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   HIGH CONTRAST MODE
+======================================== */
+
+@media (prefers-contrast: high) {
+  .student-card {
+    border-width: 3px;
+  }
+
+  .student-card__grade,
+  .student-card__school,
+  .student-card__year,
+  .student-card__month {
+    border-width: 2px;
+    font-weight: var(--font-weight-bold);
+  }
+
+  .student-card__name {
+    font-weight: var(--font-weight-bold);
+  }
+}

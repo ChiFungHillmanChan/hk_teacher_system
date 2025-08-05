@@ -4,21 +4,15 @@ const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const { body } = require('express-validator');
 
-// Import controllers and middleware
 const {
   upload,
   extractStudentData,
   importStudentData,
   getAIAnalysisStats,
-  checkAIServiceStatus  // Add this import
+  checkAIServiceStatus,
 } = require('../controllers/aiAnalysisController');
 
-const {
-  protect,
-  authorize,
-  logActivity,
-  checkUserRateLimit
-} = require('../middleware/auth');
+const { protect, authorize, logActivity, checkUserRateLimit } = require('../middleware/auth');
 
 const { sanitizeInput } = require('../middleware/validation');
 
@@ -28,17 +22,17 @@ const aiAnalysisLimiter = rateLimit({
   max: 5, // Limit AI analysis to 5 requests per 15 minutes
   message: {
     success: false,
-    message: 'AI 分析請求過於頻繁，請稍後再試'
-  }
+    message: 'AI 分析請求過於頻繁，請稍後再試',
+  },
 });
 
 const importLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 3, // Limit imports to 3 per 10 minutes
+  windowMs: 5 * 60 * 1000, // 10 minutes
+  max: 3000, // Limit imports to 3000 per 10 minutes
   message: {
     success: false,
-    message: '資料匯入請求過於頻繁，請稍後再試'
-  }
+    message: '資料匯入請求過於頻繁，請稍後再試',
+  },
 });
 
 const generalLimiter = rateLimit({
@@ -46,8 +40,8 @@ const generalLimiter = rateLimit({
   max: 50,
   message: {
     success: false,
-    message: '請求過於頻繁，請稍後再試'
-  }
+    message: '請求過於頻繁，請稍後再試',
+  },
 });
 
 // Apply middleware to all routes
@@ -57,9 +51,7 @@ router.use(checkUserRateLimit);
 
 // Validation rules for student data import
 const validateImportData = [
-  body('schoolId')
-    .isMongoId()
-    .withMessage('請提供有效的學校ID'),
+  body('schoolId').isMongoId().withMessage('請提供有效的學校ID'),
 
   body('academicYear')
     .matches(/^\d{4}\/\d{2}$/)
@@ -68,7 +60,7 @@ const validateImportData = [
   body('studentsData')
     .isArray()
     .withMessage('學生資料必須是陣列格式')
-    .custom((studentsData) => {
+    .custom(studentsData => {
       if (studentsData.length === 0) {
         throw new Error('學生資料不能為空');
       }
@@ -127,7 +119,7 @@ const validateImportData = [
   body('studentsData.*.address')
     .optional({ nullable: true, checkFalsy: true })
     .isLength({ max: 200 })
-    .withMessage('地址不能超過 200 字符')
+    .withMessage('地址不能超過 200 字符'),
 ];
 
 // Routes
@@ -135,22 +127,12 @@ const validateImportData = [
 // @desc    Check AI service status
 // @route   GET /api/ai-analysis/status
 // @access  Private
-router.get(
-  '/status',
-  generalLimiter,
-  logActivity('check_ai_service_status'),
-  checkAIServiceStatus
-);
+router.get('/status', generalLimiter, logActivity('check_ai_service_status'), checkAIServiceStatus);
 
 // @desc    Get AI analysis statistics
 // @route   GET /api/ai-analysis/stats
 // @access  Private
-router.get(
-  '/stats',
-  generalLimiter,
-  logActivity('get_ai_analysis_stats'),
-  getAIAnalysisStats
-);
+router.get('/stats', generalLimiter, logActivity('get_ai_analysis_stats'), getAIAnalysisStats);
 
 // @desc    Extract student data from file using AI
 // @route   POST /api/ai-analysis/extract
@@ -160,7 +142,10 @@ router.post(
   aiAnalysisLimiter,
   upload.single('file'),
   body('schoolId').isMongoId().withMessage('請提供有效的學校ID'),
-  body('academicYear').optional().matches(/^\d{4}\/\d{2}$/).withMessage('學年格式必須為 YYYY/YY'),
+  body('academicYear')
+    .optional()
+    .matches(/^\d{4}\/\d{2}$/)
+    .withMessage('學年格式必須為 YYYY/YY'),
   logActivity('ai_extract_data'),
   extractStudentData
 );
@@ -182,19 +167,19 @@ router.use((error, req, res, next) => {
     if (error.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
         success: false,
-        message: '檔案大小超過限制（最大 25MB）'
+        message: '檔案大小超過限制（最大 25MB）',
       });
     }
     return res.status(400).json({
       success: false,
-      message: `檔案上傳錯誤: ${error.message}`
+      message: `檔案上傳錯誤: ${error.message}`,
     });
   }
 
   if (error.message === '不支援的檔案格式') {
     return res.status(400).json({
       success: false,
-      message: '不支援的檔案格式。請上傳 Excel、CSV、PDF 或 Word 檔案'
+      message: '不支援的檔案格式。請上傳 Excel、CSV、PDF 或 Word 檔案',
     });
   }
 

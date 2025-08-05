@@ -1,0 +1,288 @@
+/* Year Summary Student Table */
+
+/* ========================================
+   STUDENTS CONTAINER
+======================================== */
+
+.year-summary__students {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border-light);
+  overflow: hidden;
+}
+
+.students-upgrade-table {
+  overflow-x: auto;
+}
+
+/* ========================================
+   UPGRADE CONTROLS
+======================================== */
+
+.upgrade-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  min-width: 200px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+  user-select: none;
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+  background-color: var(--color-background-light);
+}
+
+.radio-label:hover {
+  background-color: var(--color-white);
+  border-color: var(--color-border);
+}
+
+.radio-label input[type='radio'] {
+  margin: 0;
+  accent-color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.radio-text {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  line-height: 1.3;
+}
+
+/* Radio Label Variants */
+.radio-label--warning {
+  background-color: var(--color-warning-light);
+  border-color: var(--color-warning-border);
+}
+
+.radio-label--warning .radio-text {
+  color: var(--color-warning);
+}
+
+.radio-label--warning:hover {
+  background-color: rgba(243, 156, 18, 0.15);
+  border-color: var(--color-warning);
+}
+
+.radio-label--success {
+  background-color: var(--color-success-light);
+  border-color: var(--color-success-border);
+}
+
+.radio-label--success .radio-text {
+  color: var(--color-success);
+}
+
+.radio-label--success:hover {
+  background-color: rgba(39, 174, 96, 0.15);
+  border-color: var(--color-success);
+}
+
+.radio-label--danger {
+  background-color: var(--color-error-light);
+  border-color: var(--color-error-border);
+}
+
+.radio-label--danger .radio-text {
+  color: var(--color-error);
+}
+
+.radio-label--danger:hover {
+  background-color: rgba(231, 76, 60, 0.15);
+  border-color: var(--color-error);
+}
+
+/* Selected state */
+.radio-label input[type='radio']:checked + .radio-text,
+.radio-label:has(input[type='radio']:checked) .radio-text {
+  font-weight: var(--font-weight-semibold);
+}
+
+.radio-label:has(input[type='radio']:checked) {
+  border-width: 2px;
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.radio-label--warning:has(input[type='radio']:checked) {
+  border-color: var(--color-warning);
+  background-color: var(--color-warning-light-bg);
+}
+
+.radio-label--success:has(input[type='radio']:checked) {
+  border-color: var(--color-success);
+  background-color: rgba(39, 174, 96, 0.1);
+}
+
+.radio-label--danger:has(input[type='radio']:checked) {
+  border-color: var(--color-error);
+  background-color: rgba(231, 76, 60, 0.1);
+}
+
+/* ========================================
+   UPGRADE PREVIEW
+======================================== */
+
+.upgrade-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.grade-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-1) var(--spacing-3);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.grade-badge--next {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
+}
+
+.grade-badge--retain {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning-border);
+}
+
+/* ========================================
+   STATUS BADGES
+======================================== */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.status-badge--success {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
+}
+
+.status-badge--warning {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning-border);
+}
+
+.status-badge--danger {
+  background-color: var(--color-error-light);
+  color: var(--color-error);
+  border: 1px solid var(--color-error-border);
+}
+
+/* ========================================
+   RESPONSIVE TABLE
+======================================== */
+
+@media (max-width: 768px) {
+  .students-upgrade-table {
+    font-size: var(--font-size-sm);
+  }
+
+  .upgrade-controls {
+    min-width: 150px;
+    gap: var(--spacing-1);
+  }
+
+  .radio-label {
+    padding: var(--spacing-1) var(--spacing-2);
+  }
+
+  .radio-text {
+    font-size: var(--font-size-xs);
+  }
+
+  .grade-badge {
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-0-5) var(--spacing-2);
+  }
+
+  .status-badge {
+    font-size: 10px;
+    padding: var(--spacing-0-5) var(--spacing-1);
+  }
+}
+
+@media (max-width: 480px) {
+  .upgrade-controls {
+    min-width: 120px;
+  }
+
+  .radio-label {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--spacing-1);
+  }
+
+  .radio-text {
+    justify-content: center;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .radio-label,
+  .grade-badge,
+  .status-badge {
+    transition: none;
+  }
+}
+
+.radio-label:focus-within {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   HIGH CONTRAST MODE
+======================================== */
+
+@media (prefers-contrast: high) {
+  .radio-label {
+    border-width: 2px;
+  }
+
+  .radio-label:has(input[type='radio']:checked) {
+    border-width: 3px;
+  }
+
+  .grade-badge,
+  .status-badge {
+    border-width: 2px;
+    font-weight: var(--font-weight-bold);
+  }
+}

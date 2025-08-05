@@ -1,0 +1,5 @@
+/* Base Styles Index - Import all base styles */
+
+@import './reset.css';
+@import './variables.css';
+@import './typography.css';

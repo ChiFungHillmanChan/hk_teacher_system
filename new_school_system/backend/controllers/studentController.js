@@ -27,7 +27,7 @@ const getStudents = async (req, res) => {
     }
 
     if (req.query.academicYear) {
-      query.academicYear = req.query.academicYear;
+      query.currentAcademicYear = req.query.academicYear;
     }
 
     if (req.query.grade) {
@@ -193,12 +193,21 @@ const bulkUpdateStudents = async (req, res) => {
 
 const createStudent = async (req, res) => {
   try {
+    // validation result from express-validator
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
         errors: errors.array(),
+      });
+    }
+
+    // auth guard
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required to create student',
       });
     }
 
@@ -220,12 +229,17 @@ const createStudent = async (req, res) => {
       notes,
     } = req.body;
 
-    // Normalize studentId (only set if non-empty)
+    if (!academicYear) {
+      const currentYear = new Date().getFullYear();
+      const nextYear = (currentYear + 1).toString().slice(-2);
+      academicYear = `${currentYear}/${nextYear}`;
+      console.log(`[Student] 🗓️ Auto-generated academic year: ${academicYear}`);
+    }
+
+    // Normalize studentId
     let normalizedStudentId;
     if (studentId && typeof studentId === 'string' && studentId.trim() !== '') {
       normalizedStudentId = studentId.trim();
-    } else {
-      normalizedStudentId = undefined;
     }
 
     // Verify school exists
@@ -237,9 +251,9 @@ const createStudent = async (req, res) => {
       });
     }
 
-    // Check access permissions
+    // Access control
     if (req.user.role !== 'admin') {
-      const hasAccess = req.user.schools.some(s => s.toString() === school.toString());
+      const hasAccess = (req.user.schools || []).some(s => s.toString() === school.toString());
       if (!hasAccess) {
         return res.status(403).json({
           success: false,
@@ -248,10 +262,9 @@ const createStudent = async (req, res) => {
       }
     }
 
-    // Enhanced duplicate checking with better error messages
+    // Enhanced duplicate checking (using current* fields)
     const duplicateChecks = [];
 
-    // Check for duplicate studentId in the same school
     if (normalizedStudentId) {
       const existingStudentId = await Student.findOne({
         school: school,
@@ -265,21 +278,26 @@ const createStudent = async (req, res) => {
           message: `學號 "${normalizedStudentId}" 在此學校已存在`,
           existingStudent: {
             name: existingStudentId.name,
-            grade: existingStudentId.grade,
-            class: existingStudentId.class,
+            grade: existingStudentId.currentGrade,
+            class: existingStudentId.currentClass,
           },
         });
       }
     }
 
-    // Check for duplicate classNumber within school/year/grade/class
-    if (classNumber !== undefined && classNumber !== null && studentClass) {
+    if (
+      classNumber !== undefined &&
+      classNumber !== null &&
+      studentClass &&
+      academicYear &&
+      grade
+    ) {
       const existingClassNumber = await Student.findOne({
         school: school,
-        academicYear: academicYear,
-        grade: grade,
-        class: studentClass,
-        classNumber: classNumber,
+        currentAcademicYear: academicYear,
+        currentGrade: grade,
+        currentClass: studentClass,
+        currentClassNumber: classNumber,
         isActive: true,
       });
 
@@ -295,17 +313,16 @@ const createStudent = async (req, res) => {
       }
     }
 
-    // Return warnings if duplicates found
     if (duplicateChecks.length > 0) {
       return res.status(409).json({
         success: false,
         message: '發現重複資料',
         conflicts: duplicateChecks,
-        canProceed: false, // Frontend can show warnings and ask user to confirm
+        canProceed: false,
       });
     }
 
-    // Validate grade matches school type
+    // Validate grade against school type
     const availableGrades = schoolDoc.getAvailableGrades();
     if (!availableGrades.includes(grade)) {
       return res.status(400).json({
@@ -314,22 +331,50 @@ const createStudent = async (req, res) => {
       });
     }
 
-    // Build the student object dynamically
+    // Derive startDate from academicYear (e.g., interpret "2025/26" as September 1, 2025)
+    let startDate;
+    if (academicYear) {
+      const [startYearStr] = academicYear.split('/');
+      const startYear = parseInt(startYearStr, 10);
+      if (!isNaN(startYear)) {
+        startDate = new Date(startYear, 8, 1); // September 1 of startYear
+      }
+    }
+    if (!startDate) {
+      startDate = new Date(); // fallback to now if parsing failed
+    }
+
+    // Construct student payload aligned with updated schema
     const newStudentData = {
       name,
       nameEn,
       nameCh,
       school,
-      academicYear,
-      grade,
-      class: studentClass,
-      classNumber,
       dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
       gender,
       contactInfo: contactInfo || {},
       medicalInfo: medicalInfo || {},
       academicInfo: academicInfo || {},
       notes,
+      // required current fields
+      currentAcademicYear: academicYear,
+      currentGrade: grade,
+      currentClass: studentClass,
+      currentClassNumber: classNumber,
+      // initial academic history entry
+      academicHistory: [
+        {
+          academicYear,
+          grade,
+          class: studentClass,
+          classNumber,
+          school,
+          startDate,
+          status: 'enrolled',
+          promotionStatus: 'pending',
+          createdBy: req.user._id,
+        },
+      ],
       teachers: [
         {
           user: req.user._id,
@@ -360,7 +405,20 @@ const createStudent = async (req, res) => {
   } catch (error) {
     console.error('Create student error:', error);
 
-    // Handle MongoDB duplicate key errors
+    // Surface Mongoose validation errors as 400
+    if (error.name === 'ValidationError') {
+      const formatted = Object.values(error.errors).map(e => ({
+        field: e.path,
+        message: e.message,
+      }));
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: formatted,
+      });
+    }
+
+    // Duplicate key (unique) error
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
       return res.status(409).json({
@@ -486,11 +544,11 @@ const deleteStudent = async (req, res) => {
 
     // Check permissions (admin or primary teacher)
     if (req.user.role !== 'admin') {
-      const isPrimaryTeacher = student.teachers.some(
-        teacher => teacher.user.toString() === req.user._id.toString() && teacher.isPrimaryTeacher
+      const isAssociatedTeacher = student.teachers.some(
+        teacher => teacher.user.toString() === req.user._id.toString()
       );
 
-      if (!isPrimaryTeacher) {
+      if (!isAssociatedTeacher) {
         return res.status(403).json({
           success: false,
           message: 'Not authorized to delete this student',

@@ -36,9 +36,9 @@ const StudentReports = () => {
 
   // Filter states
   const [filters, setFilters] = useState({
-    academicYear: getCurrentAcademicYear(),
+    currentAcademicYear: getCurrentAcademicYear(),
     school: '',
-    grade: '',
+    currentGrade: '',
     student: '',
   });
 
@@ -61,6 +61,7 @@ const StudentReports = () => {
         setLoading(true);
         const schoolsData = await schoolHelpers.getAll({ limit: 200 });
         const schools = Array.isArray(schoolsData) ? schoolsData : [];
+
         setSchools(schools);
       } catch (error) {
         console.error('Failed to load initial data:', error);
@@ -73,33 +74,37 @@ const StudentReports = () => {
     loadInitialData();
   }, []);
 
-  // Load students when school or grade changes
   useEffect(() => {
     const loadStudents = async () => {
-      if (!filters.school) {
-        setStudents([]);
-        return;
-      }
-
       try {
         const params = {
           school: filters.school,
-          ...(filters.grade && { grade: filters.grade }),
+          currentAcademicYear: filters.currentAcademicYear,
+          ...(filters.currentGrade && { currentGrade: filters.currentGrade }),
           limit: 1000,
         };
 
-        // studentHelpers.getAll returns array directly now
+
         const studentsData = await studentHelpers.getAll(params);
-        const students = Array.isArray(studentsData) ? studentsData : [];
-        setStudents(students);
+        const allStudents = Array.isArray(studentsData) ? studentsData : [];
+        
+        const filteredStudents = allStudents.filter(student => {
+          const academicYearMatch = student.currentAcademicYear === filters.currentAcademicYear;
+          const gradeMatch = !filters.currentGrade || student.currentGrade === filters.currentGrade;
+          
+          return academicYearMatch && gradeMatch;
+        });
+  
+        setStudents(filteredStudents);
       } catch (error) {
-        console.error('Failed to load students:', error);
+        console.error('❌ Failed to load students:', error);
         toast.error('載入學生列表失敗');
+        setStudents([]);
       }
     };
 
     loadStudents();
-  }, [filters.school, filters.grade]);
+  }, [filters.school, filters.currentAcademicYear, filters.currentGrade]);
 
   useEffect(() => {
     const loadRecords = async () => {
@@ -114,7 +119,7 @@ const StudentReports = () => {
 
         // Directly get array of reports after unwrap
         const recordsData = await studentReportHelpers.getByStudent(filters.student, {
-          academicYear: filters.academicYear,
+          currentAcademicYear: filters.currentAcademicYear,
           page: 1,
           limit: 100,
         });
@@ -136,7 +141,7 @@ const StudentReports = () => {
     };
 
     loadRecords();
-  }, [filters.student, filters.academicYear]);
+  }, [filters.student, filters.currentAcademicYear]);
 
   // Filter records based on search term
   useEffect(() => {
@@ -185,8 +190,8 @@ const StudentReports = () => {
 
       const response = await studentReportHelpers.getAll({
         school: filters.school,
-        academicYear: filters.academicYear,
-        grade: filters.grade,
+        currentAcademicYear: filters.currentAcademicYear,
+        currentGrade: filters.currentGrade,
         page: 1,
         limit: 100,
       });
@@ -209,7 +214,7 @@ const StudentReports = () => {
 
       const response = await studentReportHelpers.getMyReports({
         school: filters.school,
-        academicYear: filters.academicYear,
+        currentAcademicYear: filters.currentAcademicYear,
         subject: filters.subject,
         page: 1,
         limit: 100,
@@ -232,7 +237,7 @@ const StudentReports = () => {
     try {
       const response = await studentReportHelpers.getStats({
         school: filters.school,
-        academicYear: filters.academicYear,
+        currentAcademicYear: filters.currentAcademicYear,
       });
 
       console.log('Report Statistics:', response.data);
@@ -254,10 +259,10 @@ const StudentReports = () => {
 
     try {
       const response = await fetch(
-        `/api/student-records/student/${filters.student}?academicYear=${filters.academicYear}`,
+        `/api/student-records/student/${filters.student}?academicYear=${filters.currentAcademicYear}`,
         {
           method: 'GET',
-          headers: getAuthHeaders(), // Using utility function with fallback
+          headers: getAuthHeaders(),
         }
       );
 
@@ -316,7 +321,7 @@ const StudentReports = () => {
       good: { text: '良好', color: '#3498db' },
       satisfactory: { text: '一般', color: '#f39c12' },
       needs_improvement: { text: '需改進', color: '#e74c3c' },
-      fair: { text: '一般', color: '#f39c12' }, // for participation field
+      fair: { text: '一般', color: '#f39c12' },
       poor: { text: '差', color: '#95a5a6' },
     };
     return ratingMap[rating] || { text: rating, color: '#95a5a6' };
@@ -475,13 +480,13 @@ const StudentReports = () => {
               <h3 className="student-card__name">{selectedStudent.name}</h3>
               <div className="student-card__details">
                 <span className="student-card__grade">
-                  {getGradeChinese(selectedStudent.grade)}
-                  {selectedStudent.class && ` ${selectedStudent.class}班`}
+                  {getGradeChinese(selectedStudent.currentGrade)}
+                  {selectedStudent.currentClass && ` ${selectedStudent.currentClass}班`}
                 </span>
                 <span className="student-card__school">
                   {schools.find(s => s._id === selectedStudent.school)?.name}
                 </span>
-                <span className="student-card__year">{filters.academicYear}學年</span>
+                <span className="student-card__year">{filters.currentAcademicYear}學年</span>
               </div>
             </div>
             <div className="student-card__stats">

@@ -1,0 +1,315 @@
+/* Form Input Styles */
+
+/* ========================================
+   BASE INPUT STYLES
+======================================== */
+
+.form-input {
+  width: 100%;
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background-color: var(--color-white);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-3) var(--spacing-10);
+  min-height: 48px;
+  transition: all var(--transition-normal);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.form-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ========================================
+   INPUT STATES
+======================================== */
+
+.form-input:hover:not(:disabled) {
+  border-color: var(--color-border-hover);
+}
+
+.form-input:focus:not(:disabled) {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+  background-color: var(--color-white);
+}
+
+.form-input:disabled {
+  background-color: var(--color-background-light);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ========================================
+   INPUT VARIANTS
+======================================== */
+
+/* Success State */
+.form-input--success {
+  border-color: var(--color-success);
+  background-color: rgba(39, 174, 96, 0.05);
+}
+
+.form-input--success:focus {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 3px var(--color-success-light);
+}
+
+/* Error State */
+.form-input--error {
+  border-color: var(--color-error);
+  background-color: var(--color-error-light);
+}
+
+.form-input--error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+}
+
+/* ========================================
+   INPUT SIZES
+======================================== */
+
+.form-input--small {
+  padding: var(--spacing-2) var(--spacing-3);
+  min-height: 36px;
+  font-size: var(--font-size-sm);
+}
+
+.form-input--large {
+  padding: var(--spacing-4) var(--spacing-5);
+  min-height: 56px;
+  font-size: var(--font-size-lg);
+}
+
+/* ========================================
+   TEXTAREA
+======================================== */
+
+.form-textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background-color: var(--color-white);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-4);
+  min-height: 120px;
+  resize: vertical;
+  transition: all var(--transition-normal);
+  outline: none;
+  box-sizing: border-box;
+  line-height: var(--line-height-relaxed);
+}
+
+.form-textarea--large {
+  min-height: 150px;
+}
+
+.form-textarea--small {
+  min-height: 60px;
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-sm);
+}
+
+/* ========================================
+   SELECT INPUTS
+======================================== */
+
+.form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right var(--spacing-3) center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: var(--spacing-10);
+  appearance: none;
+  cursor: pointer;
+}
+
+.form-select:disabled {
+  cursor: not-allowed;
+}
+
+/* ========================================
+   INPUT WITH ICON
+======================================== */
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: var(--spacing-4);
+  color: var(--color-text-muted);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.input-with-icon .form-input,
+.input-with-icon .form-textarea {
+  padding-left: var(--spacing-10);
+}
+
+/* ========================================
+   PASSWORD TOGGLE
+======================================== */
+
+.password-toggle {
+  position: absolute;
+  right: var(--spacing-3);
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: var(--spacing-2);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-fast);
+  z-index: 2;
+}
+
+.password-toggle:hover {
+  color: var(--color-primary);
+  background-color: var(--color-background-light);
+}
+
+.password-toggle:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.password-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   SEARCH INPUT
+======================================== */
+
+.search-input {
+  padding-left: var(--spacing-10);
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3e%3c/svg%3e");
+  background-position: left var(--spacing-3) center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+}
+
+.search-clear {
+  position: absolute;
+  right: var(--spacing-3);
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: var(--spacing-1);
+  border-radius: var(--border-radius-full);
+  transition: all var(--transition-fast);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-clear:hover {
+  color: var(--color-text-secondary);
+  background-color: var(--color-background-light);
+}
+
+/* ========================================
+   CHECKBOX AND RADIO
+======================================== */
+
+.form-checkbox,
+.form-radio {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.form-checkbox:disabled,
+.form-radio:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ========================================
+   FILE INPUT
+======================================== */
+
+.form-file,
+file-selector-button{
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--border-radius-md);
+    margin-right: var(--spacing-3);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+  }
+
+
+.form-file::-webkit-file-upload-button {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--border-radius-md);
+  margin-right: var(--spacing-3);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+}
+
+/* ========================================
+   RESPONSIVE INPUTS
+======================================== */
+
+@media (max-width: 768px) {
+  .form-input,
+  .form-textarea,
+  .form-select {
+    font-size: var(--font-size-base);
+    min-height: 44px; /* Better touch targets */
+  }
+  
+  .form-input--small {
+    min-height: 40px;
+  }
+  
+  .form-input--large {
+    min-height: 52px;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+@media (prefers-contrast: high) {
+  .form-input,
+  .form-textarea,
+  .form-select {
+    border-width: 3px;
+  }
+  
+  .form-input--error {
+    border-width: 3px;
+  }
+}
+
+.form-textarea:focus,
+.form-select:focus {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}

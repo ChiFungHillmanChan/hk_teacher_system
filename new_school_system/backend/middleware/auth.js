@@ -145,7 +145,7 @@ const checkSchoolAccess = async (req, res, next) => {
 const checkStudentAccess = async (req, res, next) => {
   try {
     const Student = require('../models/Student');
-    const studentId = req.params.studentId || req.body.student;
+    const studentId = req.params.studentId || req.params.id || req.body.student;
 
     if (!studentId) {
       return res.status(400).json({

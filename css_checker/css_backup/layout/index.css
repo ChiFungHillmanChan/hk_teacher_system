@@ -1,0 +1,9 @@
+/* Layout Components Index - Import all layout styles */
+
+/* Core layout structure */
+@import './grid.css';
+
+/* Layout sections */
+@import './header.css';
+@import './sidebar.css';
+@import './main.css';

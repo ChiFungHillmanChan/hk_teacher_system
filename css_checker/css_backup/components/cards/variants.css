@@ -1,0 +1,341 @@
+/* Card Variants */
+
+/* ========================================
+   STAT CARDS
+======================================== */
+
+.stat-card {
+  background-color: var(--color-white);
+  padding: var(--spacing-6);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  transition: all var(--transition-fast);
+  border: 1px solid var(--color-border-light);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-card__icon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  flex-shrink: 0;
+}
+
+.stat-card__icon--primary {
+  background-color: var(--color-primary);
+}
+
+.stat-card__icon--success {
+  background-color: var(--color-success);
+}
+
+.stat-card__icon--warning {
+  background-color: var(--color-warning);
+}
+
+.stat-card__icon--error {
+  background-color: var(--color-error);
+}
+
+.stat-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-card__value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-1);
+  line-height: 1;
+}
+
+.stat-card__label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-1);
+}
+
+.stat-card__trend {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-xs);
+  color: var(--color-success);
+}
+
+.stat-card--small {
+  padding: var(--spacing-4);
+}
+
+.stat-card--small .stat-card__icon {
+  width: 40px;
+  height: 40px;
+}
+
+.stat-card--small .stat-card__value {
+  font-size: var(--font-size-xl);
+}
+
+.stat-card--small .stat-card__label {
+  font-size: var(--font-size-xs);
+}
+
+/* ========================================
+   PROFILE CARDS
+======================================== */
+
+.profile-card {
+  text-align: center;
+  padding: var(--spacing-8);
+}
+
+.profile-card__avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--border-radius-full);
+  margin: 0 auto var(--spacing-4);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-md);
+}
+
+.profile-card__name {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-2);
+}
+
+.profile-card__role {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-4);
+}
+
+.profile-card__stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: var(--spacing-6);
+}
+
+.profile-card__stat {
+  text-align: center;
+}
+
+.profile-card__stat-value {
+  display: block;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-1);
+}
+
+.profile-card__stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ========================================
+   FEATURE CARDS
+======================================== */
+
+.feature-card {
+  text-align: center;
+  padding: var(--spacing-8);
+  border: 1px solid var(--color-border);
+  transition: all var(--transition-normal);
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary-light);
+}
+
+.feature-card__icon {
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-4);
+  display: flex;
+  justify-content: center;
+}
+
+.feature-card__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-3);
+}
+
+.feature-card__description {
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+/* ========================================
+   STATUS CARDS
+======================================== */
+
+.card--success {
+  border-left: 4px solid var(--color-success);
+}
+
+.card--success .card__header {
+  background-color: var(--color-success-light);
+}
+
+.card--warning {
+  border-left: 4px solid var(--color-warning);
+}
+
+.card--warning .card__header {
+  background-color: var(--color-warning-light);
+}
+
+.card--error {
+  border-left: 4px solid var(--color-error);
+}
+
+.card--error .card__header {
+  background-color: var(--color-error-light);
+}
+
+.card--info {
+  border-left: 4px solid var(--color-info);
+}
+
+.card--info .card__header {
+  background-color: var(--color-info-light);
+}
+
+/* ========================================
+   ELEVATED CARDS
+======================================== */
+
+.card--elevated {
+  box-shadow: var(--shadow-lg);
+  border: none;
+}
+
+.card--elevated:hover {
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-4px);
+}
+
+/* ========================================
+   OUTLINED CARDS
+======================================== */
+
+.card--outlined {
+  border: 2px solid var(--color-border);
+  box-shadow: none;
+}
+
+.card--outlined:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ========================================
+   GRADIENT CARDS
+======================================== */
+
+.card--gradient {
+  background: linear-gradient(135deg, var(--color-primary-light), rgba(52, 152, 219, 0.05));
+  border: 1px solid var(--color-primary-light);
+}
+
+.card--gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  color: var(--color-white);
+  border: none;
+}
+
+.card--gradient-primary .card__title,
+.card--gradient-primary .card__description {
+  color: var(--color-white);
+}
+
+.card--gradient-success {
+  background: linear-gradient(135deg, var(--color-success), #229954);
+  color: var(--color-white);
+  border: none;
+}
+
+.card--gradient-success .card__title,
+.card--gradient-success .card__description {
+  color: var(--color-white);
+}
+
+/* ========================================
+   INTERACTIVE CARDS
+======================================== */
+
+.card--selectable {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.card--selectable:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.card--selected {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+  background-color: var(--color-primary-light);
+}
+
+/* ========================================
+   RESPONSIVE CARDS
+======================================== */
+
+@media (max-width: 768px) {
+  .card--horizontal {
+    flex-direction: column;
+  }
+  
+  .card--horizontal .card__image {
+    width: 100%;
+    height: 200px;
+  }
+  
+  .profile-card {
+    padding: var(--spacing-6);
+  }
+  
+  .profile-card__stats {
+    flex-direction: column;
+    gap: var(--spacing-4);
+  }
+  
+  .feature-card {
+    padding: var(--spacing-6);
+  }
+  
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--spacing-4);
+  }
+}

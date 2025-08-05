@@ -1,0 +1,4 @@
+/* Table Component Index - Import all table styles */
+
+@import './base.css';
+@import './responsive.css';

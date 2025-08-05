@@ -1,0 +1,269 @@
+/* Management Pages Layout */
+
+/* ========================================
+   MANAGEMENT PAGES LAYOUT
+======================================== */
+
+.schools-management,
+.students-management {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--spacing-6);
+  min-height: calc(100vh - 80px);
+}
+
+/* ========================================
+   MANAGEMENT HEADER SECTIONS
+======================================== */
+
+.schools-management__header,
+.students-management__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-8);
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+}
+
+.schools-management__title-section,
+.students-management__title-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.schools-management__title,
+.students-management__title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-2);
+}
+
+.students-management__title svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.schools-management__subtitle,
+.students-management__subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.schools-management__actions,
+.students-management__actions {
+  display: flex;
+  gap: var(--spacing-4);
+  align-items: center;
+}
+
+/* ========================================
+   SELECTION PANELS
+======================================== */
+
+.students-management__selection {
+  margin-bottom: var(--spacing-6);
+}
+
+.selection-panel {
+  background-color: var(--color-white);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.selection-panel:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.selection-panel__title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-6);
+}
+
+.selection-panel__title::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background-color: var(--color-primary);
+  border-radius: var(--border-radius-sm);
+}
+
+.selection-panel__content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-4);
+}
+
+/* ========================================
+   EMPTY STATES
+======================================== */
+
+.schools-management__empty,
+.students-management__empty,
+.students-management__no-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-16);
+  background-color: var(--color-white);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--border-radius-lg);
+  margin: var(--spacing-8) 0;
+}
+
+.schools-management__empty svg,
+.students-management__empty svg,
+.students-management__no-selection svg {
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-6);
+}
+
+.schools-management__empty h3,
+.students-management__empty h3,
+.students-management__no-selection h3 {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-4);
+}
+
+.schools-management__empty p,
+.students-management__empty p,
+.students-management__no-selection p {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-6);
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ========================================
+   LOADING STATES
+======================================== */
+
+.schools-management__loading,
+.students-management__loading {
+  text-align: center;
+  padding: var(--spacing-12);
+}
+
+.schools-management__loading .loading-message,
+.students-management__loading .loading-message {
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-4);
+}
+
+/* ========================================
+   ERROR STATES
+======================================== */
+
+.schools-management__error,
+.students-management__error {
+  text-align: center;
+  padding: var(--spacing-12);
+  background-color: var(--color-error-light);
+  border: 1px solid var(--color-error-border);
+  border-radius: var(--border-radius-lg);
+  margin: var(--spacing-8) 0;
+}
+
+.schools-management__error svg,
+.students-management__error svg {
+  color: var(--color-error);
+  margin-bottom: var(--spacing-6);
+}
+
+.schools-management__error h2,
+.students-management__error h2 {
+  color: var(--color-error);
+  margin-bottom: var(--spacing-4);
+}
+
+.schools-management__error p,
+.students-management__error p {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-6);
+}
+
+/* ========================================
+   ANIMATIONS
+======================================== */
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.students-table tr {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+@media (max-width: 768px) {
+  .schools-management,
+  .students-management {
+    padding: var(--spacing-4);
+  }
+
+  .schools-management__header,
+  .students-management__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .schools-management__title-section,
+  .students-management__title-section {
+    min-width: auto;
+  }
+
+  .selection-panel__content {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+  }
+}
+
+@media (max-width: 480px) {
+  .schools-management,
+  .students-management {
+    padding: var(--spacing-3);
+  }
+
+  .selection-panel {
+    padding: var(--spacing-4);
+  }
+
+  .schools-management__title,
+  .students-management__title {
+    font-size: var(--font-size-xl);
+  }
+
+  .schools-management__empty,
+  .students-management__empty,
+  .students-management__no-selection {
+    padding: var(--spacing-8);
+  }
+}

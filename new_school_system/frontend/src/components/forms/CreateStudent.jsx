@@ -17,6 +17,7 @@ import { studentHelpers, schoolHelpers, handleApiError } from '../../services/ap
 import { HK_GRADES, GENDER_OPTIONS, getCurrentAcademicYear, getGradeChinese, getGenderChinese } from '../../utils/constants';
 import { useAuth } from '../../context/AuthContext';
 
+
 const CreateStudent = () => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
@@ -125,7 +126,7 @@ const CreateStudent = () => {
         nameCh: data.nameCh || undefined,
         studentId: data.studentId || undefined,
         school: data.school,
-        academicYear: data.academicYear,
+        academicYear: data.academicYear?.trim(),
         grade: data.grade,
         class: data.class || undefined,
         classNumber: data.classNumber ? parseInt(data.classNumber) : undefined,
@@ -148,6 +149,9 @@ const CreateStudent = () => {
       });
 
       const createPromise = studentHelpers.create(studentData);
+
+      console.log('studentData payload', studentData);
+
       await toast.promise(createPromise, {
         loading: '正在新增學生...',
         success: '學生新增成功！',

@@ -1,0 +1,85 @@
+/* Master CSS Import File - HK Teacher Management System */
+
+/* ========================================
+   1. BASE STYLES
+   CSS Reset, Variables, Typography
+======================================== */
+
+@import './base/index.css';
+
+/* ========================================
+   2. UTILITIES
+   Helper classes and utility functions
+======================================== */
+
+@import './utilities/index.css';
+
+/* ========================================
+   3. COMPONENTS
+   Reusable UI components
+======================================== */
+
+@import './components/index.css';
+
+/* ========================================
+   4. LAYOUT
+   Site structure and layout components
+======================================== */
+
+@import './layout/index.css';
+
+/* ========================================
+   5. PAGES
+   Page-specific styles
+======================================== */
+
+@import './pages/index.css';
+
+/* ========================================
+   6. FEATURES
+   Feature-specific component styles
+======================================== */
+
+@import './features/index.css';
+
+/* ========================================
+   GLOBAL OVERRIDES
+   Last-resort global styles
+======================================== */
+
+/* Smooth scroll behavior for the entire application */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Print optimizations */
+@media print {
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+  
+  @page {
+    margin: 0.5in;
+  }
+}
+
+/* Accessibility enhancements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto !important;
+  }
+}

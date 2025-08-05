@@ -206,27 +206,6 @@ const SchoolsManagement = () => {
             )}
           </div>
         </div>
-
-        {/* Filter Toggle */}
-        <div className="filter-controls">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`btn btn--secondary filter-toggle ${showFilters ? 'filter-toggle--active' : ''}`}
-          >
-            <Filter size={16} />
-            篩選
-            <ChevronDown size={16} className={`filter-toggle__icon ${showFilters ? 'filter-toggle__icon--rotated' : ''}`} />
-          </button>
-
-          {(selectedType || selectedDistrict) && (
-            <button
-              onClick={clearFilters}
-              className="btn btn--ghost btn--small"
-            >
-              清除篩選
-            </button>
-          )}
-        </div>
       </div>
 
       {/* Filter Panel */}

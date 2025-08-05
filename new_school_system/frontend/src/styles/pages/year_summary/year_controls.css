@@ -1,0 +1,264 @@
+/* Year Summary Controls and Summary */
+
+/* ========================================
+   CONTROLS SECTION
+======================================== */
+
+.year-summary__controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-6);
+  margin-bottom: var(--spacing-8);
+  background-color: var(--color-white);
+  padding: var(--spacing-6);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
+}
+
+/* ========================================
+   FILTERS SECTION
+======================================== */
+
+.year-summary__filters {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  flex: 1;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  position: relative;
+}
+
+.filter-group svg {
+  position: absolute;
+  left: var(--spacing-3);
+  top: var(--spacing-2-5);
+  color: var(--color-text-muted);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.filter-group .form-input {
+  padding-left: var(--spacing-10);
+  min-width: 250px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-fast);
+}
+
+.checkbox-label:hover {
+  background-color: var(--color-background-light);
+  color: var(--color-text-primary);
+}
+
+.checkbox-label input[type='checkbox'] {
+  margin: 0;
+  accent-color: var(--color-primary);
+}
+
+/* ========================================
+   SUMMARY SECTION
+======================================== */
+
+.year-summary__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-6);
+  flex-shrink: 0;
+}
+
+.summary-stats {
+  display: flex;
+  gap: var(--spacing-4);
+  align-items: center;
+}
+
+.summary-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing-3) var(--spacing-4);
+  background-color: var(--color-background-light);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-border-light);
+  min-width: 70px;
+  transition: all var(--transition-fast);
+}
+
+.summary-stat:hover {
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.summary-stat__value {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1;
+  margin-bottom: var(--spacing-1);
+}
+
+.summary-stat__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+/* Summary Stat Variants */
+.summary-stat--success {
+  background-color: var(--color-success-light);
+  border-color: var(--color-success-border);
+}
+
+.summary-stat--success .summary-stat__value {
+  color: var(--color-success);
+}
+
+.summary-stat--warning {
+  background-color: var(--color-warning-light);
+  border-color: var(--color-warning-border);
+}
+
+.summary-stat--warning .summary-stat__value {
+  color: var(--color-warning);
+}
+
+.summary-stat--info {
+  background-color: var(--color-info-light);
+  border-color: rgba(52, 152, 219, 0.2);
+}
+
+.summary-stat--info .summary-stat__value {
+  color: var(--color-info);
+}
+
+.summary-stat--danger {
+  background-color: var(--color-error-light);
+  border-color: var(--color-error-border);
+}
+
+.summary-stat--danger .summary-stat__value {
+  color: var(--color-error);
+}
+
+/* ========================================
+   RESPONSIVE CONTROLS
+======================================== */
+
+@media (max-width: 1024px) {
+  .year-summary__controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-4);
+  }
+
+  .year-summary__summary {
+    justify-content: center;
+  }
+
+  .summary-stats {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .year-summary__filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-3);
+  }
+
+  .filter-group .form-input {
+    min-width: auto;
+  }
+
+  .summary-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-3);
+    display: grid;
+  }
+
+  .summary-stat {
+    padding: var(--spacing-2) var(--spacing-3);
+    min-width: auto;
+  }
+
+  .summary-stat__value {
+    font-size: var(--font-size-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .year-summary__controls {
+    padding: var(--spacing-4);
+  }
+
+  .summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .summary-stat__value {
+    font-size: var(--font-size-base);
+  }
+
+  .summary-stat__label {
+    font-size: 10px;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .summary-stat,
+  .checkbox-label {
+    transition: none;
+  }
+
+  .summary-stat:hover {
+    transform: none;
+  }
+}
+
+.checkbox-label:focus-within {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   HIGH CONTRAST MODE
+======================================== */
+
+@media (prefers-contrast: high) {
+  .summary-stat {
+    border-width: 2px;
+  }
+
+  .summary-stat__value,
+  .summary-stat__label {
+    font-weight: var(--font-weight-bold);
+  }
+}

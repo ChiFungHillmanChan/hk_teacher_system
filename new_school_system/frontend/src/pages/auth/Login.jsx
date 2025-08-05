@@ -285,65 +285,7 @@ const Login = () => {
               </div>
             )}
           </form>
-
-          {/* Demo Credentials */}
-          {import.meta.env.DEV && (
-            <div className="demo-credentials">
-              <h4>示範帳戶</h4>
-              <p>管理員：admin@hkteacher.dev / Admin123!@#</p>
-              <p>教師：teacher@hkteacher.dev / Teacher123!@#</p>
-              <button
-                type="button"
-                onClick={fillDemoCredentials}
-                className="btn btn--secondary btn--small"
-                disabled={isSubmitting}
-                style={{ marginTop: '8px' }}
-              >
-                填入示範資料
-              </button>
-
-              {/* Error Testing Section */}
-              <div className="error-testing" style={{ marginTop: '1rem', padding: '1rem', border: '1px dashed #ccc', borderRadius: '4px' }}>
-                <h4 style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>測試錯誤訊息:</h4>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    onClick={() => setLoginError('電郵地址或密碼錯誤，請檢查後重試')}
-                    className="btn btn--secondary btn--small"
-                    style={{ fontSize: '0.75rem', padding: '4px 8px' }}
-                  >
-                    錯誤憑證
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setLoginError('帳戶因多次登入失敗而被暫時鎖定，請稍後再試')}
-                    className="btn btn--secondary btn--small"
-                    style={{ fontSize: '0.75rem', padding: '4px 8px' }}
-                  >
-                    帳戶鎖定
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setLoginError('帳戶已被停用，請聯繫管理員')}
-                    className="btn btn--secondary btn--small"
-                    style={{ fontSize: '0.75rem', padding: '4px 8px' }}
-                  >
-                    帳戶停用
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleClearErrors}
-                    className="btn btn--secondary btn--small"
-                    style={{ fontSize: '0.75rem', padding: '4px 8px' }}
-                  >
-                    清除錯誤
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="auth-page__footer">
+          {/* <div className="auth-page__footer">
             <p className="auth-page__signup-prompt">
               還沒有帳戶？{' '}
               <Link
@@ -353,7 +295,7 @@ const Login = () => {
                 立即註冊
               </Link>
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
     </>

@@ -1,0 +1,191 @@
+/* Form Label Styles */
+
+/* ========================================
+   BASE LABEL STYLES
+======================================== */
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-2);
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.form-label svg {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+/* ========================================
+   LABEL VARIANTS
+======================================== */
+
+.form-label--required::after {
+  content: '*';
+  color: var(--color-error);
+  margin-left: var(--spacing-1);
+  font-weight: var(--font-weight-bold);
+}
+
+.form-label--optional::after {
+  content: '(選填)';
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-normal);
+  margin-left: var(--spacing-2);
+  font-size: var(--font-size-xs);
+}
+
+/* ========================================
+   CHECKBOX/RADIO LABELS
+======================================== */
+
+.checkbox-label,
+.radio-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  user-select: none;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-3);
+  padding: var(--spacing-2);
+  border-radius: var(--border-radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.checkbox-label:hover,
+.radio-label:hover {
+  background-color: var(--color-background-light);
+}
+
+.checkbox-label input,
+.radio-label input {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   FIELDSET AND LEGEND
+======================================== */
+
+.form-fieldset {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+}
+
+.form-legend {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  padding: 0 var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+}
+
+/* ========================================
+   LABEL SIZES
+======================================== */
+
+.form-label--small {
+  font-size: var(--font-size-xs);
+  gap: var(--spacing-1);
+}
+
+.form-label--large {
+  font-size: var(--font-size-base);
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-3);
+}
+
+/* ========================================
+   LABEL STATES
+======================================== */
+
+.form-label--disabled {
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-label--error {
+  color: var(--color-error);
+}
+
+.form-label--success {
+  color: var(--color-success);
+}
+
+/* ========================================
+   HELP TEXT
+======================================== */
+
+.form-help {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  line-height: 1.4;
+  margin-top: var(--spacing-1);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-1);
+}
+
+.form-help svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ========================================
+   DESCRIPTION TEXT
+======================================== */
+
+.form-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: var(--spacing-4);
+}
+
+/* ========================================
+   RESPONSIVE LABELS
+======================================== */
+
+@media (max-width: 768px) {
+  .form-label {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-1);
+  }
+  
+  .checkbox-label,
+  .radio-label {
+    padding: var(--spacing-3);
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+.form-label:focus-within {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--border-radius-sm);
+}
+
+@media (prefers-contrast: high) {
+  .form-label {
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  .checkbox-label,
+  .radio-label {
+    border: 1px solid var(--color-border);
+  }
+}

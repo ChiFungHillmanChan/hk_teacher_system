@@ -54,7 +54,7 @@ export const HK_GRADES_CHINESE = {
 export const SCHOOL_TYPES = [
   { value: 'primary', label: '小學', labelEn: 'Primary School', grades: HK_GRADES.PRIMARY },
   { value: 'secondary', label: '中學', labelEn: 'Secondary School', grades: HK_GRADES.SECONDARY },
-  { value: 'both', label: '小學及中學', labelEn: 'Primary & Secondary', grades: HK_GRADES.ALL },
+  { value: 'both', label: '特殊', labelEn: 'Primary & Secondary', grades: HK_GRADES.ALL },
 ];
 
 export const USER_ROLES = [

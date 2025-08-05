@@ -2,10 +2,14 @@ import {
   AlertCircle,
   Calendar,
   CheckCircle,
+  ChevronDown,
   Download,
   FileText,
   Filter,
+  GraduationCap,
   Loader,
+  RefreshCw,
+  School,
   User,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -25,13 +29,15 @@ const Integration = () => {
   const [generating, setGenerating] = useState(false);
   const [schools, setSchools] = useState([]);
   const [students, setStudents] = useState([]);
+  const [academicYears, setAcademicYears] = useState([]);
+  const [loadingAcademicYears, setLoadingAcademicYears] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
 
-  // Filter state
+  // Updated filter state to match ReportFilters
   const [filters, setFilters] = useState({
-    academicYear: generateAcademicYears()[0],
     school: '',
-    grade: '',
+    currentAcademicYear: '',
+    currentGrade: '',
     student: '',
     month: new Date().getMonth() + 1, // Current month (1-12)
     year: new Date().getFullYear(),
@@ -50,21 +56,6 @@ const Integration = () => {
     return translations[level] || level;
   };
 
-  // Generate academic years (current year and next 3 years)
-  function generateAcademicYears() {
-    const currentYear = new Date().getFullYear();
-    const years = [];
-
-    for (let i = 0; i < 4; i++) {
-      const year = currentYear + i;
-      const nextYear = year + 1;
-      years.push(`${year}/${nextYear.toString().slice(-2)}`);
-    }
-
-    return years;
-  }
-
-  const academicYears = generateAcademicYears();
   const months = [
     { value: 1, label: '1月' },
     { value: 2, label: '2月' },
@@ -84,42 +75,106 @@ const Integration = () => {
   useEffect(() => {
     const loadSchools = async () => {
       try {
+        setLoading(true);
         const schoolsData = await schoolHelpers.getAll({ limit: 200 });
         const schools = Array.isArray(schoolsData) ? schoolsData : [];
         setSchools(schools);
       } catch (error) {
         console.error('Failed to load schools:', error);
         toast.error('載入學校列表失敗');
+      } finally {
+        setLoading(false);
       }
     };
 
     loadSchools();
   }, []);
 
-  // Load students when school/grade changes
+  // Load academic years when school changes
+  useEffect(() => {
+    const loadAcademicYears = async () => {
+      if (!filters.school) {
+        setAcademicYears([]);
+        return;
+      }
+
+      try {
+        setLoadingAcademicYears(true);
+        const academicYearsData = await schoolHelpers.getAvailableAcademicYears(filters.school);
+        setAcademicYears(academicYearsData.academicYears || []);
+      } catch (error) {
+        console.error('❌ Failed to load academic years:', error);
+        // Fallback to generated years if API fails
+        const currentYear = new Date().getFullYear();
+        const fallbackYears = [];
+        for (let i = 0; i < 4; i++) {
+          const year = currentYear + i;
+          const nextYear = year + 1;
+          fallbackYears.push(`${year}/${nextYear.toString().slice(-2)}`);
+        }
+        setAcademicYears(fallbackYears);
+      } finally {
+        setLoadingAcademicYears(false);
+      }
+    };
+
+    loadAcademicYears();
+  }, [filters.school]);
+
+  // Load students when school/academic year/grade changes
   useEffect(() => {
     const loadStudents = async () => {
-      if (!filters.school) {
+      if (!filters.school || !filters.currentAcademicYear) {
         setStudents([]);
         return;
       }
 
       try {
-        const params = { school: filters.school, limit: 200 };
-        if (filters.grade) {
-          params.grade = filters.grade;
+        setLoading(true);
+        const params = {
+          school: filters.school,
+          currentAcademicYear: filters.currentAcademicYear,
+          limit: 200,
+        };
+
+        // Only add grade filter if a specific grade is selected
+        if (filters.currentGrade) {
+          params.currentGrade = filters.currentGrade;
         }
 
+        console.log('🔍 Loading students with params:', params);
+
         const studentsData = await studentHelpers.getAll(params);
-        setStudents(Array.isArray(studentsData) ? studentsData : []);
+        let students = Array.isArray(studentsData) ? studentsData : [];
+
+        console.log('📊 Raw students from API:', students.length);
+
+        // Additional client-side filtering to ensure grade matching
+        if (filters.currentGrade) {
+          students = students.filter(student => {
+            const matches = student.currentGrade === filters.currentGrade;
+            if (!matches) {
+              console.log(
+                `❌ Student ${student.name} grade mismatch: ${student.currentGrade} !== ${filters.currentGrade}`
+              );
+            }
+            return matches;
+          });
+          console.log('✅ Filtered students by grade:', students.length);
+        }
+
+        setStudents(students);
       } catch (error) {
         console.error('Failed to load students:', error);
         toast.error('載入學生列表失敗');
+        setStudents([]);
+      } finally {
+        setLoading(false);
       }
     };
 
     loadStudents();
-  }, [filters.school, filters.grade]);
+  }, [filters.school, filters.currentAcademicYear, filters.currentGrade]);
 
   // Get available grades based on selected school
   const getAvailableGrades = () => {
@@ -143,6 +198,45 @@ const Integration = () => {
     setFilters(prev => ({ ...prev, ...newFilters }));
   };
 
+  const handleSchoolChange = school => {
+    handleFilterChange({
+      school,
+      currentAcademicYear: '',
+      currentGrade: '',
+      student: '',
+    });
+  };
+
+  const handleAcademicYearChange = currentAcademicYear => {
+    handleFilterChange({
+      currentAcademicYear,
+      currentGrade: '',
+      student: '',
+    });
+  };
+
+  const handleGradeChange = currentGrade => {
+    handleFilterChange({
+      currentGrade,
+      student: '',
+    });
+  };
+
+  const handleStudentChange = student => {
+    handleFilterChange({ student });
+  };
+
+  const resetFilters = () => {
+    handleFilterChange({
+      school: '',
+      currentAcademicYear: '',
+      currentGrade: '',
+      student: '',
+      month: new Date().getMonth() + 1,
+      year: new Date().getFullYear(),
+    });
+  };
+
   const generateMonthlyPDF = async () => {
     if (!filters.student) {
       toast.error('請選擇學生');
@@ -161,22 +255,11 @@ const Integration = () => {
       }
 
       const records = await studentReportHelpers.getByStudent(filters.student, {
-        academicYear: filters.academicYear,
+        currentAcademicYear: filters.currentAcademicYear,
         page: 1,
         limit: 100,
       });
-      const translatePerformanceLevel = level => {
-        const translations = {
-          excellent: '優秀',
-          good: '良好',
-          satisfactory: '一般',
-          fair: '一般',
-          average: '一般',
-          needs_improvement: '需改進',
-          poor: '差',
-        };
-        return translations[level] || level;
-      };
+
       const monthlyRecords = records.filter(record => {
         const recordDate = new Date(record.reportDate || record.createdAt);
         const recordMonth = recordDate.getMonth() + 1;
@@ -186,7 +269,7 @@ const Integration = () => {
       });
 
       if (monthlyRecords.length === 0) {
-        toast.error(`${filters.year}年${filters.month}月沒有找到任何記錄`);
+        toast.error(`這學生 ${filters.year}年${filters.month}月沒有報告`);
         return;
       }
 
@@ -359,10 +442,10 @@ const Integration = () => {
             <div class="info-grid">
                 <div class="info-item"><strong>學生姓名：</strong>${student.name}</div>
                 <div class="info-item"><strong>學校：</strong>${school?.name || '未知'}</div>
-                <div class="info-item"><strong>年級：</strong>${getGradeChinese(student.grade)}${
-      student.class ? ` ${student.class}班` : ''
-    }</div>
-                <div class="info-item"><strong>學年：</strong>${filters.academicYear}</div>
+                <div class="info-item"><strong>年級：</strong>${getGradeChinese(
+                  student.currentGrade
+                )}${student.currentClass ? ` ${student.currentClass}班` : ''}</div>
+                <div class="info-item"><strong>學年：</strong>${filters.currentAcademicYear}</div>
                 <div class="info-item"><strong>月份：</strong>${year}年${monthNames[month]}</div>
                 <div class="info-item"><strong>總記錄數：</strong>${records.length}</div>
             </div>
@@ -526,6 +609,7 @@ const Integration = () => {
 
   const selectedStudent = students.find(s => s._id === filters.student);
   const selectedSchool = schools.find(s => s._id === filters.school);
+  const availableGrades = getAvailableGrades();
 
   return (
     <div className="integration-page">
@@ -549,142 +633,220 @@ const Integration = () => {
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Updated Filters to match ReportFilters */}
       {showFilters && (
         <div className="reports-filters-section">
           <div className="report-filters">
             <div className="filter-grid">
-              {/* Academic Year */}
+              {/* School Filter */}
+              <div className="filter-group">
+                <label className="filter-label">
+                  <School size={16} />
+                  學校
+                </label>
+                <div className="filter-select-wrapper">
+                  <select
+                    value={filters.school}
+                    onChange={e => handleSchoolChange(e.target.value)}
+                    className="filter-select"
+                    disabled={loading || schools.length === 0}
+                  >
+                    <option value="">請選擇學校</option>
+                    {schools.map(school => (
+                      <option key={school._id} value={school._id}>
+                        {school.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="filter-select-icon" />
+                </div>
+                {schools.length === 0 && <div className="filter-help">沒有可用的學校</div>}
+              </div>
+
+              {/* Academic Year Filter */}
               <div className="filter-group">
                 <label className="filter-label">
                   <Calendar size={16} />
                   學年
                 </label>
-                <select
-                  value={filters.academicYear}
-                  onChange={e =>
-                    handleFilterChange({
-                      academicYear: e.target.value,
-                      school: '',
-                      grade: '',
-                      student: '',
-                    })
-                  }
-                  className="filter-select"
-                  disabled={loading}
-                >
-                  {academicYears.map(year => (
-                    <option key={year} value={year}>
-                      {year}學年
-                    </option>
-                  ))}
-                </select>
+                <div className="filter-select-wrapper">
+                  <select
+                    value={filters.currentAcademicYear}
+                    onChange={e => handleAcademicYearChange(e.target.value)}
+                    className="filter-select"
+                    disabled={loading || loadingAcademicYears || !filters.school}
+                  >
+                    <option value="">請選擇學年</option>
+                    {academicYears.map(year => (
+                      <option key={year} value={year}>
+                        {year}學年
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="filter-select-icon" />
+                </div>
+                {!filters.school && <div className="filter-help">請先選擇學校</div>}
+                {filters.school && academicYears.length === 0 && !loadingAcademicYears && (
+                  <div className="filter-help">該學校沒有學年記錄</div>
+                )}
+                {loadingAcademicYears && <div className="filter-help">載入學年中...</div>}
               </div>
 
-              {/* School */}
+              {/* Grade Filter */}
               <div className="filter-group">
                 <label className="filter-label">
-                  <Calendar size={16} />
-                  學校
-                </label>
-                <select
-                  value={filters.school}
-                  onChange={e =>
-                    handleFilterChange({ school: e.target.value, grade: '', student: '' })
-                  }
-                  className="filter-select"
-                  disabled={loading}
-                >
-                  <option value="">選擇學校</option>
-                  {schools.map(school => (
-                    <option key={school._id} value={school._id}>
-                      {school.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Grade */}
-              <div className="filter-group">
-                <label className="filter-label">
-                  <Calendar size={16} />
+                  <GraduationCap size={16} />
                   年級
                 </label>
-                <select
-                  value={filters.grade}
-                  onChange={e => handleFilterChange({ grade: e.target.value, student: '' })}
-                  className="filter-select"
-                  disabled={loading || !filters.school}
-                >
-                  <option value="">選擇年級</option>
-                  {getAvailableGrades().map(grade => (
-                    <option key={grade} value={grade}>
-                      {getGradeChinese(grade)}
-                    </option>
-                  ))}
-                </select>
+                <div className="filter-select-wrapper">
+                  <select
+                    value={filters.currentGrade}
+                    onChange={e => handleGradeChange(e.target.value)}
+                    className="filter-select"
+                    disabled={loading || !filters.school || !filters.currentAcademicYear}
+                  >
+                    <option value="">所有年級</option>
+                    {availableGrades.map(currentGrade => (
+                      <option key={currentGrade} value={currentGrade}>
+                        {getGradeChinese(currentGrade)}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="filter-select-icon" />
+                </div>
+                {!filters.school && <div className="filter-help">請先選擇學校</div>}
+                {!filters.currentAcademicYear && filters.school && (
+                  <div className="filter-help">請先選擇學年</div>
+                )}
               </div>
 
-              {/* Student */}
+              {/* Student Filter */}
               <div className="filter-group">
                 <label className="filter-label">
                   <User size={16} />
                   學生
                 </label>
-                <select
-                  value={filters.student}
-                  onChange={e => handleFilterChange({ student: e.target.value })}
-                  className="filter-select"
-                  disabled={loading || !filters.school}
-                >
-                  <option value="">選擇學生</option>
-                  {students.map(student => (
-                    <option key={student._id} value={student._id}>
-                      {student.name}（{getGradeChinese(student.grade)}
-                      {student.class ? ` ${student.class}班` : ''} - {student._id.slice(-4)}）
-                    </option>
-                  ))}
-                </select>
+                <div className="filter-select-wrapper">
+                  <select
+                    value={filters.student}
+                    onChange={e => handleStudentChange(e.target.value)}
+                    className="filter-select"
+                    disabled={
+                      loading ||
+                      !filters.school ||
+                      !filters.currentAcademicYear ||
+                      students.length === 0
+                    }
+                  >
+                    <option value="">請選擇學生</option>
+                    {students.map(student => (
+                      <option key={student._id} value={student._id}>
+                        {student.name}
+                        {student.studentId && ` (${student.studentId})`}
+                        {student.currentGrade && ` - ${getGradeChinese(student.currentGrade)}`}
+                        {student.currentClass && `${student.currentClass}班`}
+                        {/* Debug info - remove in production */}
+                        {process.env.NODE_ENV === 'development' && ` [${student.currentGrade}]`}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="filter-select-icon" />
+                </div>
+                {!filters.school && <div className="filter-help">請先選擇學校</div>}
+                {!filters.currentAcademicYear && filters.school && (
+                  <div className="filter-help">請先選擇學年</div>
+                )}
+                {filters.school &&
+                  filters.currentAcademicYear &&
+                  students.length === 0 &&
+                  !loading && (
+                    <div className="filter-help">
+                      {filters.currentGrade
+                        ? `該學校/學年/${getGradeChinese(filters.currentGrade)}沒有學生記錄`
+                        : '該學校/學年沒有學生記錄'}
+                    </div>
+                  )}
+                {loading && filters.school && filters.currentAcademicYear && (
+                  <div className="filter-help">載入學生列表中...</div>
+                )}
+                {/* Debug info - remove in production */}
+                {process.env.NODE_ENV === 'development' && students.length > 0 && (
+                  <div className="filter-help" style={{ fontSize: '12px', color: '#666' }}>
+                    找到 {students.length} 位學生
+                    {filters.currentGrade && ` (年級: ${filters.currentGrade})`}
+                  </div>
+                )}
               </div>
 
-              {/* Year */}
+              {/* Year Filter */}
               <div className="filter-group">
                 <label className="filter-label">
                   <Calendar size={16} />
                   年份
                 </label>
-                <select
-                  value={filters.year}
-                  onChange={e => handleFilterChange({ year: parseInt(e.target.value) })}
-                  className="filter-select"
-                >
-                  <option value={new Date().getFullYear()}>{new Date().getFullYear()}年</option>
-                  <option value={new Date().getFullYear() - 1}>
-                    {new Date().getFullYear() - 1}年
-                  </option>
-                  <option value={new Date().getFullYear() + 1}>
-                    {new Date().getFullYear() + 1}年
-                  </option>
-                </select>
+                <div className="filter-select-wrapper">
+                  <select
+                    value={filters.year}
+                    onChange={e => handleFilterChange({ year: parseInt(e.target.value) })}
+                    className="filter-select"
+                  >
+                    <option value={new Date().getFullYear()}>{new Date().getFullYear()}年</option>
+                    <option value={new Date().getFullYear() - 1}>
+                      {new Date().getFullYear() - 1}年
+                    </option>
+                    <option value={new Date().getFullYear() + 1}>
+                      {new Date().getFullYear() + 1}年
+                    </option>
+                  </select>
+                  <ChevronDown size={16} className="filter-select-icon" />
+                </div>
               </div>
 
-              {/* Month */}
+              {/* Month Filter */}
               <div className="filter-group">
                 <label className="filter-label">
                   <Calendar size={16} />
                   月份
                 </label>
-                <select
-                  value={filters.month}
-                  onChange={e => handleFilterChange({ month: parseInt(e.target.value) })}
-                  className="filter-select"
-                >
-                  {months.map(month => (
-                    <option key={month.value} value={month.value}>
-                      {month.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="filter-select-wrapper">
+                  <select
+                    value={filters.month}
+                    onChange={e => handleFilterChange({ month: parseInt(e.target.value) })}
+                    className="filter-select"
+                  >
+                    {months.map(month => (
+                      <option key={month.value} value={month.value}>
+                        {month.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="filter-select-icon" />
+                </div>
+              </div>
+            </div>
+
+            {/* Filter Actions */}
+            <div className="filter-actions">
+              <button
+                onClick={resetFilters}
+                className="btn btn--small btn--secondary"
+                disabled={loading}
+              >
+                <RefreshCw size={16} />
+                重置篩選
+              </button>
+
+              <div className="filter-summary">
+                {filters.student ? (
+                  <span className="filter-summary__text">
+                    已選擇學生：
+                    <strong>{students.find(s => s._id === filters.student)?.name}</strong>
+                  </span>
+                ) : (
+                  <span className="filter-summary__text filter-summary__text--muted">
+                    請選擇學生以生成報告
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -702,11 +864,11 @@ const Integration = () => {
               <h3 className="student-card__name">{selectedStudent.name}</h3>
               <div className="student-card__details">
                 <span className="student-card__grade">
-                  {getGradeChinese(selectedStudent.grade)}
-                  {selectedStudent.class && ` ${selectedStudent.class}班`}
+                  {getGradeChinese(selectedStudent.currentGrade)}
+                  {selectedStudent.currentClass && ` ${selectedStudent.currentClass}班`}
                 </span>
                 <span className="student-card__school">{selectedSchool?.name}</span>
-                <span className="student-card__year">{filters.academicYear}學年</span>
+                <span className="student-card__year">{filters.currentAcademicYear}學年</span>
                 <span className="student-card__month">
                   {filters.year}年{filters.month}月
                 </span>
@@ -735,6 +897,18 @@ const Integration = () => {
         </div>
       )}
 
+      {/* No Reports Message */}
+      {selectedStudent && !generating && (
+        <div className="no-reports-check">
+          <NoReportsMessage
+            student={selectedStudent}
+            filters={filters}
+            onGeneratePDF={generateMonthlyPDF}
+            generating={generating}
+          />
+        </div>
+      )}
+
       {/* Instructions */}
       {!selectedStudent && (
         <div className="integration-instructions">
@@ -747,7 +921,7 @@ const Integration = () => {
               <div className="instruction-card__steps">
                 <div className="instruction-step">
                   <CheckCircle size={20} />
-                  <span>選擇學年和學校</span>
+                  <span>選擇學校和學年</span>
                 </div>
                 <div className="instruction-step">
                   <CheckCircle size={20} />
@@ -772,6 +946,108 @@ const Integration = () => {
       )}
     </div>
   );
+};
+
+// Component to check and display no reports message
+const NoReportsMessage = ({ student, filters, onGeneratePDF, generating }) => {
+  const [checkingReports, setCheckingReports] = useState(false);
+  const [hasReports, setHasReports] = useState(null);
+
+  useEffect(() => {
+    const checkForReports = async () => {
+      if (!student || !filters.currentAcademicYear) {
+        setHasReports(null);
+        return;
+      }
+
+      try {
+        setCheckingReports(true);
+        const records = await studentReportHelpers.getByStudent(student._id, {
+          currentAcademicYear: filters.currentAcademicYear,
+          page: 1,
+          limit: 100,
+        });
+
+        const monthlyRecords = records.filter(record => {
+          const recordDate = new Date(record.reportDate || record.createdAt);
+          const recordMonth = recordDate.getMonth() + 1;
+          const recordYear = recordDate.getFullYear();
+
+          return recordMonth === filters.month && recordYear === filters.year;
+        });
+
+        setHasReports(monthlyRecords.length > 0);
+      } catch (error) {
+        console.error('Error checking for reports:', error);
+        setHasReports(false);
+      } finally {
+        setCheckingReports(false);
+      }
+    };
+
+    checkForReports();
+  }, [student._id, filters.currentAcademicYear, filters.month, filters.year]);
+
+  if (checkingReports) {
+    return (
+      <div className="reports-status-card">
+        <div className="reports-status-card__content">
+          <Loader size={20} className="animate-spin" />
+          <span>檢查報告中...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasReports === false) {
+    return (
+      <div className="reports-status-card reports-status-card--warning">
+        <div className="reports-status-card__icon">
+          <AlertCircle size={24} />
+        </div>
+        <div className="reports-status-card__content">
+          <h4 className="reports-status-card__title">沒有找到報告</h4>
+          <p className="reports-status-card__message">
+            這學生 {filters.year}年{filters.month}月沒有報告
+          </p>
+          <p className="reports-status-card__suggestion">
+            請選擇其他月份，或確認該學生在此期間是否有學習記錄。
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasReports === true) {
+    return (
+      <div className="reports-status-card reports-status-card--success">
+        <div className="reports-status-card__icon">
+          <CheckCircle size={24} />
+        </div>
+        <div className="reports-status-card__content">
+          <h4 className="reports-status-card__title">找到報告</h4>
+          <p className="reports-status-card__message">
+            {student.name} 在 {filters.year}年{filters.month}月有學習記錄
+          </p>
+          <button onClick={onGeneratePDF} disabled={generating} className="btn btn--primary">
+            {generating ? (
+              <>
+                <Loader size={20} className="animate-spin" />
+                生成中...
+              </>
+            ) : (
+              <>
+                <Download size={20} />
+                生成 PDF
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 };
 
 export default Integration;

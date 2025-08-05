@@ -1,0 +1,4 @@
+/* Badge Component Index - Import all badge styles */
+
+@import './base.css';
+@import './variants.css';

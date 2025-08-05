@@ -1,0 +1,4 @@
+/* Card Component Index - Import all card styles */
+
+@import './base.css';
+@import './variants.css';

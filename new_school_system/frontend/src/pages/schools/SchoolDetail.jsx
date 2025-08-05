@@ -1,28 +1,12 @@
-// File: src/pages/schools/SchoolDetail.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  School, 
-  Edit, 
-  Save, 
-  X, 
-  Trash2, 
-  Users, 
-  Filter, 
-  Search,
-  MapPin,
-  Phone,
-  Mail,
-  AlertTriangle
+  School, Edit, Save, X, Trash2, Users, Search, MapPin, Phone, Mail, AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { schoolHelpers, studentHelpers, handleApiError } from '../../services/api';
+import { schoolHelpers, studentHelpers } from '../../services/api';
 import { 
-  HK_DISTRICTS_CHINESE, 
-  SCHOOL_TYPES, 
-  HK_GRADES,
-  getGradeChinese,
-  getCurrentAcademicYear 
+  HK_DISTRICTS_CHINESE, SCHOOL_TYPES, HK_GRADES, getGradeChinese
 } from '../../utils/constants';
 import Loading from '../../components/common/Loading';
 import { toast } from 'react-hot-toast';
@@ -32,78 +16,48 @@ const SchoolDetail = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   
-  // School data
   const [school, setSchool] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  
-  // Edit mode
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
   const [saving, setSaving] = useState(false);
-  
-  // Students data
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
-  
-  // Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedGrade, setSelectedGrade] = useState('');
-  
-  // Delete modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Load school data
   useEffect(() => {
-    const loadSchool = async () => {
+    const loadData = async () => {
+      if (!id) return;
+      
       try {
         setLoading(true);
         const schoolData = await schoolHelpers.getById(id);
         setSchool(schoolData);
         setEditData(schoolData);
-      } catch (err) {
-        console.error('Failed to load school:', err);
-        setError(handleApiError(err));
-        toast.error('載入學校資料失敗');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      loadSchool();
-    }
-  }, [id]);
-
-  // Load students data
-  useEffect(() => {
-    const loadStudents = async () => {
-      if (!school) return;
-      
-      try {
+        
         setStudentsLoading(true);
         const studentsData = await studentHelpers.getAll({ 
-          school: school._id,
-          limit: 1000 
+          school: schoolData._id, limit: 1000 
         });
-        const students = Array.isArray(studentsData) ? studentsData : [];
-        setStudents(students);
-        setFilteredStudents(students);
+        const studentsList = Array.isArray(studentsData) ? studentsData : [];
+        setStudents(studentsList);
+        setFilteredStudents(studentsList);
       } catch (err) {
-        console.error('Failed to load students:', err);
-        toast.error('載入學生資料失敗');
+        toast.error('載入資料失敗');
       } finally {
+        setLoading(false);
         setStudentsLoading(false);
       }
     };
 
-    loadStudents();
-  }, [school]);
+    loadData();
+  }, [id]);
 
-  // Apply filters
   useEffect(() => {
     let filtered = students;
 
@@ -111,49 +65,34 @@ const SchoolDetail = () => {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(student =>
         student.name.toLowerCase().includes(term) ||
-        (student.nameEn && student.nameEn.toLowerCase().includes(term)) ||
-        (student.nameCh && student.nameCh.toLowerCase().includes(term)) ||
-        (student.studentId && student.studentId.toLowerCase().includes(term))
+        student.nameEn?.toLowerCase().includes(term) ||
+        student.nameCh?.toLowerCase().includes(term) ||
+        student.studentId?.toLowerCase().includes(term)
       );
     }
 
-    if (selectedGrade) {
-      filtered = filtered.filter(student => student.grade === selectedGrade);
-    }
-
-    if (selectedClass) {
-      filtered = filtered.filter(student => student.class === selectedClass);
-    }
+    if (selectedGrade) filtered = filtered.filter(s => s.currentGrade === selectedGrade);
+    if (selectedClass) filtered = filtered.filter(s => s.currentClass === selectedClass);
 
     setFilteredStudents(filtered);
   }, [students, searchTerm, selectedGrade, selectedClass]);
 
-  // Get unique classes
-  const getUniqueClasses = () => {
-    const classes = students
-      .map(student => student.class)
-      .filter(cls => cls && cls.trim())
-      .filter((value, index, self) => self.indexOf(value) === index)
-      .sort();
-    return classes;
-  };
-
-  // Get available grades based on school type
-  const getAvailableGrades = () => {
-    if (!school) return [];
+  const canDeleteSchool = () => {
+    if (!user?.id || !school) return false;
+    if (user.role === 'admin') return true;
     
-    switch (school.schoolType) {
-      case 'primary':
-        return HK_GRADES.PRIMARY;
-      case 'secondary':
-        return HK_GRADES.SECONDARY;
-      case 'both':
-      default:
-        return HK_GRADES.ALL;
-    }
+    return school.teachers?.some(teacher => {
+      const teacherId = teacher.user._id || teacher.user;
+      return teacherId === user.id && 
+             ['teacher', 'head_teacher'].includes(teacher.role) && 
+             teacher.isActive !== false;
+    });
   };
 
-  // Handle edit
+  const handleInputChange = (field, value) => {
+    setEditData(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleEdit = () => {
     setIsEditing(true);
     setEditData({ ...school });
@@ -167,20 +106,48 @@ const SchoolDetail = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
-      const updatedSchool = await schoolHelpers.update(id, editData);
+      
+      if (!editData.name?.trim()) {
+        toast.error('學校名稱為必填項目');
+        return;
+      }
+      
+      const updateData = {
+        name: editData.name.trim(),
+        nameEn: editData.nameEn?.trim() || '',
+        district: editData.district,
+        address: editData.address?.trim() || '',
+        contactPerson: editData.contactPerson?.trim() || '',
+        email: editData.email?.trim() || '',
+        phone: editData.phone?.trim() || '',
+        description: editData.description?.trim() || ''
+      };
+      
+      Object.keys(updateData).forEach(key => {
+        if (!updateData[key]) delete updateData[key];
+      });
+      
+      if (updateData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updateData.email)) {
+        toast.error('請輸入有效的電子郵件地址');
+        return;
+      }
+      
+      const updatedSchool = await schoolHelpers.update(id, updateData);
       setSchool(updatedSchool);
+      setEditData(updatedSchool);
       setIsEditing(false);
       toast.success('學校資料已更新');
     } catch (err) {
-      console.error('Failed to update school:', err);
-      const errorInfo = handleApiError(err);
-      toast.error(errorInfo.message || '更新失敗');
+      if (err.response?.status === 403) {
+        toast.error('您沒有權限修改此學校資料');
+      } else {
+        toast.error('更新失敗，請稍後再試');
+      }
     } finally {
       setSaving(false);
     }
   };
 
-  // Handle delete
   const handleDelete = async () => {
     try {
       setDeleting(true);
@@ -188,46 +155,48 @@ const SchoolDetail = () => {
       toast.success('學校已刪除');
       navigate('/schools');
     } catch (err) {
-      console.error('Failed to delete school:', err);
-      const errorInfo = handleApiError(err);
-      toast.error(errorInfo.message || '刪除失敗');
+      if (err.response?.status === 400 && err.response.data?.studentCount) {
+        toast.error(`無法刪除學校：還有 ${err.response.data.studentCount} 位學生。`);
+      } else if (err.response?.status === 403) {
+        toast.error('只有管理員和授權教師可以刪除學校');
+      } else {
+        toast.error('刪除失敗');
+      }
     } finally {
       setDeleting(false);
       setShowDeleteModal(false);
     }
   };
 
-  // Clear filters
+  const getAvailableGrades = () => {
+    if (!school) return [];
+    switch (school.schoolType) {
+      case 'primary': return HK_GRADES.PRIMARY;
+      case 'secondary': return HK_GRADES.SECONDARY;
+      default: return HK_GRADES.ALL;
+    }
+  };
+
+  const getUniqueClasses = () => {
+    return [...new Set(students
+      .map(s => s.currentClass)
+      .filter(cls => cls?.trim())
+    )].sort();
+  };
+
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedClass('');
     setSelectedGrade('');
   };
 
-  if (loading) {
-    return <Loading message="載入學校資料中..." />;
-  }
-
-  if (error) {
-    return (
-      <div className="error-container">
-        <div className="error-message">
-          <h2>載入失敗</h2>
-          <p>{error.message}</p>
-          <button onClick={() => navigate('/schools')} className="btn btn--primary">
-            返回學校列表
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+  if (loading) return <Loading message="載入學校資料中..." />;
+  
   if (!school) {
     return (
       <div className="error-container">
         <div className="error-message">
           <h2>找不到學校</h2>
-          <p>請檢查網址是否正確</p>
           <button onClick={() => navigate('/schools')} className="btn btn--primary">
             返回學校列表
           </button>
@@ -251,26 +220,22 @@ const SchoolDetail = () => {
                   <input
                     type="text"
                     value={editData.name || ''}
-                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
                     className="form-input"
                     placeholder="學校名稱"
                   />
-                ) : (
-                  school.name
-                )}
+                ) : school.name}
               </h1>
               <p className="school-detail__subtitle">
                 {isEditing ? (
                   <input
                     type="text"
                     value={editData.nameEn || ''}
-                    onChange={(e) => setEditData({ ...editData, nameEn: e.target.value })}
+                    onChange={(e) => handleInputChange('nameEn', e.target.value)}
                     className="form-input"
                     placeholder="英文名稱"
                   />
-                ) : (
-                  school.nameEn
-                )}
+                ) : school.nameEn}
               </p>
             </div>
           </div>
@@ -278,38 +243,27 @@ const SchoolDetail = () => {
           <div className="school-detail__actions">
             {isEditing ? (
               <>
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="btn btn--primary"
-                >
+                <button onClick={handleSave} disabled={saving} className="btn btn--primary">
                   {saving ? <Loading size="small" /> : <Save size={20} />}
                   保存
                 </button>
-                <button
-                  onClick={handleCancelEdit}
-                  className="btn btn--secondary"
-                >
-                  <X size={20} />
-                  取消
+                <button onClick={handleCancelEdit} className="btn btn--secondary">
+                  <X size={20} /> 取消
                 </button>
               </>
             ) : (
               <>
-                <button
-                  onClick={handleEdit}
-                  className="btn btn--primary"
-                >
-                  <Edit size={20} />
-                  編輯
+                <button onClick={handleEdit} className="btn btn--primary">
+                  <Edit size={20} /> 編輯
                 </button>
-                <button
-                  onClick={() => setShowDeleteModal(true)}
-                  className="btn btn--danger"
-                >
-                  <Trash2 size={20} />
-                  刪除
-                </button>
+                {canDeleteSchool() && (
+                  <button 
+                    onClick={() => setShowDeleteModal(true)}
+                    className="btn btn--danger"
+                  >
+                    <Trash2 size={20} /> 刪除
+                  </button>
+                )}
               </>
             )}
           </div>
@@ -324,21 +278,8 @@ const SchoolDetail = () => {
           <div className="school-detail__info-grid">
             <div className="school-detail__info-item">
               <label>學校類型</label>
-              {isEditing ? (
-                <select
-                  value={editData.schoolType || ''}
-                  onChange={(e) => setEditData({ ...editData, schoolType: e.target.value })}
-                  className="form-input"
-                >
-                  {SCHOOL_TYPES.map(type => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <span>{SCHOOL_TYPES.find(t => t.value === school.schoolType)?.label}</span>
-              )}
+              <span>{SCHOOL_TYPES.find(t => t.value === school.schoolType)?.label}</span>
+              {isEditing && <small className="form-help">學校類型不可修改</small>}
             </div>
 
             <div className="school-detail__info-item">
@@ -346,14 +287,12 @@ const SchoolDetail = () => {
               {isEditing ? (
                 <select
                   value={editData.district || ''}
-                  onChange={(e) => setEditData({ ...editData, district: e.target.value })}
+                  onChange={(e) => handleInputChange('district', e.target.value)}
                   className="form-input"
                 >
                   <option value="">選擇地區</option>
                   {Object.entries(HK_DISTRICTS_CHINESE).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
+                    <option key={value} value={value}>{label}</option>
                   ))}
                 </select>
               ) : (
@@ -370,15 +309,12 @@ const SchoolDetail = () => {
                 <input
                   type="text"
                   value={editData.phone || ''}
-                  onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
                   className="form-input"
                   placeholder="電話號碼"
                 />
               ) : (
-                <span>
-                  <Phone size={16} />
-                  {school.phone || '未設定'}
-                </span>
+                <span><Phone size={16} /> {school.phone || '未設定'}</span>
               )}
             </div>
 
@@ -388,15 +324,12 @@ const SchoolDetail = () => {
                 <input
                   type="email"
                   value={editData.email || ''}
-                  onChange={(e) => setEditData({ ...editData, email: e.target.value })}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
                   className="form-input"
                   placeholder="電子郵件"
                 />
               ) : (
-                <span>
-                  <Mail size={16} />
-                  {school.email || '未設定'}
-                </span>
+                <span><Mail size={16} /> {school.email || '未設定'}</span>
               )}
             </div>
 
@@ -405,13 +338,35 @@ const SchoolDetail = () => {
               {isEditing ? (
                 <textarea
                   value={editData.address || ''}
-                  onChange={(e) => setEditData({ ...editData, address: e.target.value })}
-                  className="form-input"
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  className="form-textarea"
                   placeholder="學校地址"
                   rows={2}
+                  maxLength={500}
                 />
               ) : (
                 <span>{school.address || '未設定'}</span>
+              )}
+            </div>
+
+            <div className="school-detail__info-item school-detail__info-item--full">
+              <label>學校描述</label>
+              {isEditing ? (
+                <div>
+                  <textarea
+                    value={editData.description || ''}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    className="form-textarea"
+                    placeholder="學校描述、辦學理念等"
+                    rows={4}
+                    maxLength={1000}
+                  />
+                  <small className="form-help">
+                    {(editData.description || '').length}/1000
+                  </small>
+                </div>
+              ) : (
+                <span>{school.description || '未設定'}</span>
               )}
             </div>
           </div>
@@ -421,8 +376,7 @@ const SchoolDetail = () => {
         <div className="school-detail__students-section">
           <div className="section-header">
             <h2 className="section-title">
-              <Users size={24} />
-              學生列表 ({filteredStudents.length})
+              <Users size={24} /> 學生列表 ({filteredStudents.length})
             </h2>
           </div>
 
@@ -433,50 +387,40 @@ const SchoolDetail = () => {
                 <Search size={16} />
                 <input
                   type="text"
-                  placeholder="搜尋學生姓名或學號..."
+                  placeholder="搜尋學生..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="form-input form-input--small"
                 />
               </div>
 
-              <div className="filter-group">
-                <select
-                  value={selectedGrade}
-                  onChange={(e) => setSelectedGrade(e.target.value)}
-                  className="form-input form-input--small"
-                >
-                  <option value="">所有年級</option>
-                  {getAvailableGrades().map(grade => (
-                    <option key={grade} value={grade}>
-                      {getGradeChinese(grade)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <select
+                value={selectedGrade}
+                onChange={(e) => setSelectedGrade(e.target.value)}
+                className="form-input form-input--small"
+              >
+                <option value="">所有年級</option>
+                {getAvailableGrades().map(grade => (
+                  <option key={grade} value={grade}>
+                    {getGradeChinese(grade)}
+                  </option>
+                ))}
+              </select>
 
-              <div className="filter-group">
-                <select
-                  value={selectedClass}
-                  onChange={(e) => setSelectedClass(e.target.value)}
-                  className="form-input form-input--small"
-                >
-                  <option value="">所有班級</option>
-                  {getUniqueClasses().map(cls => (
-                    <option key={cls} value={cls}>
-                      {cls}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <select
+                value={selectedClass}
+                onChange={(e) => setSelectedClass(e.target.value)}
+                className="form-input form-input--small"
+              >
+                <option value="">所有班級</option>
+                {getUniqueClasses().map(cls => (
+                  <option key={cls} value={cls}>{cls}</option>
+                ))}
+              </select>
 
               {(searchTerm || selectedGrade || selectedClass) && (
-                <button
-                  onClick={clearFilters}
-                  className="btn btn--secondary btn--small"
-                >
-                  <X size={16} />
-                  清除篩選
+                <button onClick={clearFilters} className="btn btn--secondary btn--small">
+                  <X size={16} /> 清除
                 </button>
               )}
             </div>
@@ -491,10 +435,10 @@ const SchoolDetail = () => {
                 <thead>
                   <tr>
                     <th>學生</th>
-                    <th>學號</th>
+                    <th>學年</th>
                     <th>年級</th>
                     <th>班級</th>
-                    <th>學年</th>
+                    <th>學號</th>
                     <th>操作</th>
                   </tr>
                 </thead>
@@ -514,10 +458,10 @@ const SchoolDetail = () => {
                           </div>
                         </div>
                       </td>
-                      <td>{student.studentId || '-'}</td>
-                      <td>{getGradeChinese(student.grade)}</td>
-                      <td>{student.class || '-'}</td>
-                      <td>{student.academicYear}</td>
+                      <td>{student.currentAcademicYear}</td>
+                      <td>{getGradeChinese(student.currentGrade)}</td>
+                      <td>{student.currentClassNumber || '-'}</td>
+                      <td>{student.currentClass || '-'}</td>
                       <td>
                         <button
                           onClick={() => navigate(`/students/${student._id}`)}
@@ -546,41 +490,101 @@ const SchoolDetail = () => {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal - Visible Debug Version */}
       {showDeleteModal && (
-        <div className="modal-overlay">
-          <div className="modal-content modal-content--danger">
-            <div className="modal-header">
-              <AlertTriangle size={24} />
-              <h3>確認刪除學校</h3>
-            </div>
-            <div className="modal-body">
-              <p>
-                您確定要刪除學校 <strong>「{school.name}」</strong> 嗎？
-              </p>
-              <div className="warning-box">
-                <AlertTriangle size={20} />
-                <div>
-                  <strong>警告：此操作無法復原！</strong>
-                  <p>刪除學校將會同時刪除該學校的所有學生資料（共 {students.length} 名學生）。</p>
-                </div>
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 999999,
+            fontFamily: 'Arial, sans-serif'
+          }}
+          onClick={() => setShowDeleteModal(false)}
+        >
+          <div 
+            style={{
+              backgroundColor: 'white',
+              padding: '30px',
+              borderRadius: '8px',
+              maxWidth: '500px',
+              width: '90%',
+              border: '2px solid #dc3545',
+              boxShadow: '0 0 30px rgba(0,0,0,0.5)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{color: '#dc3545', marginBottom: '20px', textAlign: 'center'}}>
+              ⚠️ 確認刪除學校
+            </h2>
+            
+            <p style={{fontSize: '16px', marginBottom: '10px', textAlign: 'center'}}>
+              您確定要刪除學校：
+            </p>
+            <p style={{fontSize: '18px', fontWeight: 'bold', marginBottom: '20px', textAlign: 'center'}}>
+              「{school?.name}」
+            </p>
+            
+            <p style={{color: '#dc3545', fontWeight: 'bold', marginBottom: '20px', textAlign: 'center'}}>
+              此操作無法復原！
+            </p>
+            
+            {students.length > 0 && (
+              <div style={{
+                background: '#fff3cd',
+                border: '2px solid #ffc107',
+                padding: '15px',
+                borderRadius: '5px',
+                marginBottom: '20px',
+                textAlign: 'center'
+              }}>
+                <p style={{color: '#856404', margin: 0, fontWeight: 'bold'}}>
+                  ⚠️ 警告：此學校有 {students.length} 名學生！
+                </p>
+                <p style={{color: '#856404', margin: '5px 0 0 0', fontSize: '14px'}}>
+                  請先轉移或刪除所有學生才能刪除學校
+                </p>
               </div>
-            </div>
-            <div className="modal-actions">
-              <button
+            )}
+            
+            <div style={{textAlign: 'center'}}>
+              <button 
                 onClick={() => setShowDeleteModal(false)}
-                className="btn btn--secondary"
                 disabled={deleting}
+                style={{
+                  marginRight: '15px',
+                  padding: '12px 24px',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  fontSize: '16px',
+                  cursor: deleting ? 'not-allowed' : 'pointer'
+                }}
               >
                 取消
               </button>
-              <button
+              
+              <button 
                 onClick={handleDelete}
-                className="btn btn--danger"
-                disabled={deleting}
+                disabled={students.length > 0 || deleting}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: (students.length > 0 || deleting) ? '#ccc' : '#dc3545',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  fontSize: '16px',
+                  cursor: (students.length > 0 || deleting) ? 'not-allowed' : 'pointer'
+                }}
               >
-                {deleting ? <Loading size="small" /> : <Trash2 size={16} />}
-                確認刪除
+                {deleting ? '刪除中...' : students.length > 0 ? '無法刪除' : '確認刪除'}
               </button>
             </div>
           </div>

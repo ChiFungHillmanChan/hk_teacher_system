@@ -23,7 +23,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   const navigationItems = [
     {
       id: 'dashboard',
-      label: '控制台',
+      label: '主頁',
       icon: <Home size={20} />,
       path: '/dashboard',
       available: true,
@@ -43,12 +43,23 @@ const Sidebar = ({ isOpen, onClose }) => {
       path: '/students',
       available: true,
     },
+  ];
+
+  const reportItems = [
     {
       id: 'reports',
       label: '學生報告記錄',
       icon: <BookOpen size={20} />,
       path: '/reports',
       available: true,
+    },
+    {
+      id: 'meetings',
+      label: '會議紀錄',
+      icon: <FileText size={20} />,
+      path: '/meetings',
+      available: true,
+      badge: 'new',
     },
     {
       id: 'year_summary',
@@ -59,7 +70,6 @@ const Sidebar = ({ isOpen, onClose }) => {
       badge: 'new',
     },
   ];
-
   // Integration items - NEW section for integration features
   const integrationItems = [
     {
@@ -157,6 +167,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   const allItems = [
     ...navigationItems,
+    ...reportItems,
     ...integrationItems,
     ...analyticsItems,
     ...adminItems,

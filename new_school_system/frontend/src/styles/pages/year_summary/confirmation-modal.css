@@ -1,0 +1,231 @@
+/* Year Summary Confirmation Modal */
+
+/* ========================================
+   UPGRADE SUMMARY DETAILS
+======================================== */
+
+.upgrade-summary-details {
+  margin: var(--spacing-6) 0;
+  background-color: var(--color-background-light);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-4);
+  border: 1px solid var(--color-border-light);
+}
+
+.summary-detail {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  margin-bottom: var(--spacing-3);
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border-light);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  transition: all var(--transition-fast);
+}
+
+.summary-detail:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-border);
+}
+
+.summary-detail:last-child {
+  margin-bottom: 0;
+}
+
+.summary-detail svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.summary-detail span {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Text color utilities for summary details */
+.text-success {
+  color: var(--color-success);
+}
+
+.text-warning {
+  color: var(--color-warning);
+}
+
+.text-info {
+  color: var(--color-info);
+}
+
+.text-danger {
+  color: var(--color-error);
+}
+
+/* ========================================
+   WARNING BOX
+======================================== */
+
+.warning-box {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  padding: var(--spacing-5);
+  background-color: var(--color-warning-light);
+  border: 1px solid var(--color-warning-border);
+  border-radius: var(--border-radius-lg);
+  margin-top: var(--spacing-6);
+  border-left: 4px solid var(--color-warning);
+}
+
+.warning-box svg {
+  color: var(--color-warning);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.warning-box strong {
+  color: var(--color-warning);
+  display: block;
+  margin-bottom: var(--spacing-3);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.warning-box ul {
+  margin: 0;
+  padding-left: var(--spacing-4);
+  list-style-type: disc;
+}
+
+.warning-box li {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-2);
+}
+
+.warning-box li:last-child {
+  margin-bottom: 0;
+}
+
+/* ========================================
+   MODAL LARGE VARIANT
+======================================== */
+
+.modal-content--large {
+  max-width: 700px;
+}
+
+/* ========================================
+   MODAL ACTIONS ENHANCEMENTS
+======================================== */
+
+.modal-actions .btn {
+  min-width: 140px;
+  justify-content: center;
+}
+
+.modal-actions .btn svg {
+  margin-right: var(--spacing-2);
+}
+
+/* ========================================
+   RESPONSIVE MODAL
+======================================== */
+
+@media (max-width: 768px) {
+  .modal-content--large {
+    max-width: 95vw;
+    margin: var(--spacing-4);
+  }
+
+  .summary-detail {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-2);
+    text-align: left;
+  }
+
+  .summary-detail svg {
+    align-self: flex-start;
+  }
+
+  .warning-box {
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .warning-box svg {
+    align-self: flex-start;
+    margin-top: 0;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: var(--spacing-3);
+  }
+
+  .modal-actions .btn {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .upgrade-summary-details {
+    padding: var(--spacing-3);
+  }
+
+  .summary-detail {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-xs);
+  }
+
+  .warning-box {
+    padding: var(--spacing-4);
+  }
+
+  .warning-box strong {
+    font-size: var(--font-size-sm);
+  }
+
+  .warning-box li {
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .summary-detail {
+    transition: none;
+  }
+
+  .summary-detail:hover {
+    transform: none;
+  }
+}
+
+/* ========================================
+   HIGH CONTRAST MODE
+======================================== */
+
+@media (prefers-contrast: high) {
+  .summary-detail,
+  .warning-box {
+    border-width: 2px;
+  }
+
+  .warning-box {
+    border-left-width: 6px;
+  }
+
+  .summary-detail span,
+  .warning-box strong {
+    font-weight: var(--font-weight-bold);
+  }
+}

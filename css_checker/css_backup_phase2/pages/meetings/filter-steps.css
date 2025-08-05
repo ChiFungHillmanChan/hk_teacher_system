@@ -1,0 +1,343 @@
+/* Meeting Filter Steps */
+
+/* ========================================
+   FILTER GRID
+======================================== */
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: var(--grid-auto-250);
+  gap: var(--spacing-6);
+}
+
+/* ========================================
+   FILTER STEPS
+======================================== */
+
+.filter-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  opacity: 1;
+  transition: all var(--transition-normal);
+}
+
+.filter-step--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.filter-step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  flex-shrink: 0;
+}
+
+.filter-step--disabled .filter-step-number {
+  background-color: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+/* ========================================
+   MEETING TYPE SELECTOR
+======================================== */
+
+.meeting-type-selector {
+  display: grid;
+  grid-template-columns: var(--grid-auto-200);
+  gap: var(--spacing-3);
+}
+
+.meeting-type-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-5);
+  background-color: var(--color-background-light);
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.meeting-type-card:hover {
+  background-color: var(--color-white);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.meeting-type-card--selected {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-lg);
+}
+
+.meeting-type-card--selected:hover {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.meeting-type-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
+  transform: scaleX(0);
+  transition: transform var(--transition-normal);
+}
+
+.meeting-type-card:hover::before,
+.meeting-type-card--selected::before {
+  transform: scaleX(1);
+}
+
+.meeting-type-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: var(--color-info-light-bg);
+  border-radius: var(--border-radius-lg);
+  color: var(--color-primary);
+  transition: all var(--transition-normal);
+}
+
+.meeting-type-card:hover .meeting-type-card__icon,
+.meeting-type-card--selected .meeting-type-card__icon {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  transform: scale(1.1);
+}
+
+.meeting-type-card__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+  line-height: 1.3;
+  margin: 0;
+}
+
+/* ========================================
+   FILTER SELECT WRAPPER
+======================================== */
+
+.filter-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.filter-select {
+  width: 100%;
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background-color: var(--color-white);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-3) var(--spacing-10) var(--spacing-3) var(--spacing-4);
+  min-height: 48px;
+  transition: all var(--transition-normal);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right var(--spacing-3) center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+}
+
+.filter-select:hover:not(:disabled) {
+  border-color: var(--color-border-hover);
+}
+
+.filter-select:focus:not(:disabled) {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.filter-select:disabled {
+  background-color: var(--color-background-light);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.filter-select-icon {
+  position: absolute;
+  left: var(--spacing-3);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.filter-select-wrapper .filter-select {
+  padding-left: var(--spacing-10);
+}
+
+/* ========================================
+   RESPONSIVE FILTER STEPS
+======================================== */
+
+@media (max-width: 768px) {
+  .filter-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+  }
+
+  .meeting-type-selector {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-2);
+  }
+
+  .meeting-type-card {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: var(--spacing-4);
+    text-align: left;
+  }
+
+  .meeting-type-card__icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .meeting-type-card__label {
+    text-align: left;
+    font-size: var(--font-size-sm);
+  }
+
+  .filter-select {
+    font-size: var(--font-size-sm);
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .meeting-type-card {
+    padding: var(--spacing-3);
+  }
+
+  .meeting-type-card__icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .meeting-type-card__label {
+    font-size: var(--font-size-xs);
+  }
+
+  .filter-label {
+    font-size: var(--font-size-xs);
+  }
+
+  .filter-step-number {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+
+  .filter-select {
+    padding: var(--spacing-2) var(--spacing-8) var(--spacing-2) var(--spacing-3);
+    min-height: 40px;
+  }
+
+  .filter-select-wrapper .filter-select {
+    padding-left: var(--spacing-8);
+  }
+
+  .filter-select-icon {
+    left: var(--spacing-2);
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-step,
+  .meeting-type-card {
+    transition: none;
+  }
+
+  .meeting-type-card:hover,
+  .meeting-type-card--selected {
+    transform: none;
+  }
+
+  .meeting-type-card::before {
+    transition: none;
+  }
+
+  .meeting-type-card__icon {
+    transition: none;
+  }
+
+  .meeting-type-card:hover .meeting-type-card__icon,
+  .meeting-type-card--selected .meeting-type-card__icon {
+    transform: none;
+  }
+}
+
+.meeting-type-card:focus {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.filter-select:focus {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   HIGH CONTRAST MODE
+======================================== */
+
+@media (prefers-contrast: high) {
+  .meeting-type-card {
+    border-width: 3px;
+  }
+
+  .meeting-type-card--selected {
+    border-width: 3px;
+    font-weight: var(--font-weight-bold);
+  }
+
+  .filter-select {
+    border-width: 3px;
+  }
+
+  .filter-step-number {
+    font-weight: var(--font-weight-bold);
+  }
+}

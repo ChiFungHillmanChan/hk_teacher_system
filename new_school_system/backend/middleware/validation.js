@@ -237,10 +237,7 @@ const validateInviteCode = [
     .withMessage('Invite code can only contain letters and numbers'),
 ];
 
-// UPDATED: Validation rules for NEW school schema
 const validateSchool = [
-  // 基本資料 - Basic Information
-
   // 1. 學校名稱 - REQUIRED ✅
   body('name')
     .trim()
@@ -266,8 +263,8 @@ const validateSchool = [
   body('schoolType')
     .notEmpty()
     .withMessage('School type is required')
-    .isIn(['primary', 'secondary', 'both'])
-    .withMessage('School type must be primary, secondary, or both'),
+    .isIn(['primary', 'secondary', 'special'])
+    .withMessage('School type must be primary, secondary, or special'),
 
   // 4. 地區 - OPTIONAL ✅
   body('district')
@@ -345,7 +342,6 @@ const validateSchool = [
     .withMessage('School description cannot exceed 1000 characters'),
 ];
 
-// Update school validation (stricter - only allow certain fields to be updated)
 const validateUpdateSchool = [
   // Allow updating school name
   body('name')
@@ -445,18 +441,14 @@ const validateUpdateSchool = [
 ];
 
 const validateSchoolChange = [
-  body('newSchoolId')
-    .isMongoId()
-    .withMessage('Valid new school ID is required'),
-  
-  body('studentId')
-    .isMongoId()
-    .withMessage('Valid student ID is required'),
-    
+  body('newSchoolId').isMongoId().withMessage('Valid new school ID is required'),
+
+  body('studentId').isMongoId().withMessage('Valid student ID is required'),
+
   body('confirmTransfer')
     .isBoolean()
     .withMessage('Transfer confirmation is required')
-    .custom((value) => {
+    .custom(value => {
       if (!value) {
         throw new Error('School transfer must be confirmed');
       }
@@ -527,6 +519,84 @@ const validateStudent = [
     .optional()
     .isIn(['male', 'female', 'other'])
     .withMessage('Gender must be male, female, or other'),
+];
+
+const validateStudentUpdate = [
+  // 1. 學生姓名 - OPTIONAL
+  body('name')
+    .optional({ nullable: true, checkFalsy: true })
+    .trim()
+    .isLength({ min: 2, max: 50 })
+    .withMessage('Student name must be between 2 and 50 characters'),
+
+  // 2. 學生ID - CANNOT be modified
+  body('studentId')
+    .custom(() => {
+      throw new Error('Student ID cannot be modified');
+    })
+    .optional(),
+
+  // 3. 學年 - OPTIONAL
+  body('currentAcademicYear')
+    .optional({ nullable: true, checkFalsy: true })
+    .matches(/^\d{4}\/\d{2}$/)
+    .withMessage('Academic year must be in the format YYYY/YY'),
+
+  // 4. 年級 - OPTIONAL
+  body('currentGrade')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn([
+      'primary_1',
+      'primary_2',
+      'primary_3',
+      'primary_4',
+      'primary_5',
+      'primary_6',
+      'secondary_1',
+      'secondary_2',
+      'secondary_3',
+      'secondary_4',
+      'secondary_5',
+      'secondary_6',
+    ])
+    .withMessage('Please select a valid grade'),
+
+  // 5. 班別 (1A–3E etc.) - OPTIONAL
+  body('currentClass')
+    .optional({ nullable: true, checkFalsy: true })
+    .matches(/^[1-6][A-E]$/)
+    .withMessage('Class must be in the format like 1A–6E'),
+
+  // 6. 班號 - OPTIONAL
+  body('currentClassNumber')
+    .optional({ nullable: true, checkFalsy: true })
+    .isInt({ min: 1, max: 50 })
+    .withMessage('Class number must be between 1 and 50'),
+
+  // 7. 學校 - OPTIONAL but must be Mongo ID if present
+  body('school')
+    .optional({ nullable: true, checkFalsy: true })
+    .isMongoId()
+    .withMessage('Invalid school ID'),
+
+  // 8. 其他不能修改的欄位
+  body('createdBy')
+    .custom(() => {
+      throw new Error('CreatedBy field cannot be modified');
+    })
+    .optional(),
+
+  body('teachers')
+    .custom(() => {
+      throw new Error('Use the dedicated teacher management endpoints');
+    })
+    .optional(),
+
+  body('reports')
+    .custom(() => {
+      throw new Error('Use the dedicated report endpoints to modify reports');
+    })
+    .optional(),
 ];
 
 // Validation rules for student reports
@@ -605,6 +675,263 @@ const validateStudentReport = [
     .withMessage('Status must be draft, submitted, reviewed, approved, or archived'),
 ];
 
+const validateUpdateStudentReport = [
+  // Basic fields - all optional for updates
+  body('subjectDetails.topic')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ min: 1, max: 200 })
+    .withMessage('Topic must be between 1-200 characters'),
+
+  body('subjectDetails.duration')
+    .optional({ nullable: true, checkFalsy: true })
+    .isInt({ min: 1 })
+    .withMessage('Duration must be at least 1 minute'),
+
+  body('subjectDetails.learningObjectives')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Learning objectives must be an array'),
+
+  body('subjectDetails.materials')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Materials must be an array'),
+
+  body('subjectDetails.activities')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Activities must be an array'),
+
+  body('content')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 1000 })
+    .withMessage('Content cannot exceed 1000 characters'),
+
+  // Performance fields - all optional
+  body('performance.attendance.status')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['present', 'absent', 'late', 'early_leave'])
+    .withMessage('Attendance status must be present, absent, late, or early_leave'),
+
+  body('performance.attendance.punctuality')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['excellent', 'good', 'fair', 'poor'])
+    .withMessage('Punctuality must be excellent, good, fair, or poor'),
+
+  body('performance.participation.level')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['excellent', 'good', 'fair', 'poor', 'not_applicable'])
+    .withMessage('Participation level must be excellent, good, fair, poor, or not_applicable'),
+
+  body('performance.participation.engagement')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['very_active', 'active', 'moderate', 'passive', 'disengaged'])
+    .withMessage('Engagement must be very_active, active, moderate, passive, or disengaged'),
+
+  body('performance.participation.contribution')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 500 })
+    .withMessage('Participation contribution cannot exceed 500 characters'),
+
+  body('performance.understanding.level')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['excellent', 'good', 'satisfactory', 'needs_improvement', 'poor'])
+    .withMessage(
+      'Understanding level must be excellent, good, satisfactory, needs_improvement, or poor'
+    ),
+
+  body('performance.understanding.concepts_mastered')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Concepts mastered must be an array'),
+
+  body('performance.understanding.concepts_struggling')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Concepts struggling must be an array'),
+
+  body('performance.understanding.comprehension_notes')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 500 })
+    .withMessage('Comprehension notes cannot exceed 500 characters'),
+
+  body('performance.assessment.type')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn([
+      'quiz',
+      'test',
+      'assignment',
+      'project',
+      'presentation',
+      'observation',
+      'peer_assessment',
+      'self_assessment',
+    ])
+    .withMessage('Assessment type must be valid'),
+
+  body('performance.assessment.score')
+    .optional({ nullable: true, checkFalsy: true })
+    .isFloat({ min: 0, max: 100 })
+    .withMessage('Assessment score must be between 0 and 100'),
+
+  // FIXED: Make grade validation properly optional
+  body('performance.assessment.grade')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'F', 'P'])
+    .withMessage('Grade must be valid'),
+
+  body('performance.assessment.feedback')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 500 })
+    .withMessage('Assessment feedback cannot exceed 500 characters'),
+
+  body('performance.assessment.rubric_scores')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Rubric scores must be an array'),
+
+  // Homework fields - all optional
+  body('homework.assigned')
+    .optional({ nullable: true, checkFalsy: true })
+    .isBoolean()
+    .withMessage('Homework assigned must be boolean'),
+
+  body('homework.details.description')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 500 })
+    .withMessage('Homework description cannot exceed 500 characters'),
+
+  // FIXED: Make due_date properly optional
+  body('homework.details.due_date')
+    .optional({ nullable: true, checkFalsy: true })
+    .isISO8601()
+    .toDate()
+    .withMessage('Due date must be valid'),
+
+  // FIXED: Make estimated_time properly optional
+  body('homework.details.estimated_time')
+    .optional({ nullable: true, checkFalsy: true })
+    .isInt({ min: 1 })
+    .withMessage('Estimated time must be positive integer'),
+
+  body('homework.details.materials_needed')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Materials needed must be an array'),
+
+  body('homework.details.instructions')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Instructions must be an array'),
+
+  body('homework.completion.status')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['completed', 'partial', 'not_completed', 'not_applicable', 'pending'])
+    .withMessage('Homework status must be valid'),
+
+  // FIXED: Make quality properly optional
+  body('homework.completion.quality')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['excellent', 'good', 'satisfactory', 'needs_improvement', 'poor', 'not_applicable'])
+    .withMessage('Homework quality must be valid'),
+
+  // FIXED: Make timeliness properly optional
+  body('homework.completion.timeliness')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['on_time', 'late', 'very_late', 'not_submitted', 'not_applicable'])
+    .withMessage('Timeliness must be valid'),
+
+  body('homework.completion.effort')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['excellent', 'good', 'satisfactory', 'minimal', 'none'])
+    .withMessage('Effort must be valid'),
+
+  // Behavior fields - all optional
+  body('behavior.conduct')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['excellent', 'good', 'satisfactory', 'needs_improvement', 'poor'])
+    .withMessage('Conduct must be excellent, good, satisfactory, needs_improvement, or poor'),
+
+  body('behavior.cooperation')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['excellent', 'good', 'satisfactory', 'needs_improvement', 'poor'])
+    .withMessage('Cooperation must be excellent, good, satisfactory, needs_improvement, or poor'),
+
+  body('behavior.respect')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['excellent', 'good', 'satisfactory', 'needs_improvement', 'poor'])
+    .withMessage('Respect must be excellent, good, satisfactory, needs_improvement, or poor'),
+
+  body('behavior.following_instructions')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['excellent', 'good', 'satisfactory', 'needs_improvement', 'poor'])
+    .withMessage(
+      'Following instructions must be excellent, good, satisfactory, needs_improvement, or poor'
+    ),
+
+  body('behavior.notes')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 500 })
+    .withMessage('Behavior notes cannot exceed 500 characters'),
+
+  body('behavior.incidents')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Incidents must be an array'),
+
+  // Remarks fields - all optional
+  body('remarks.teacher_comments')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 1000 })
+    .withMessage('Teacher comments cannot exceed 1000 characters'),
+
+  body('remarks.strengths')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Strengths must be an array'),
+
+  body('remarks.areas_for_improvement')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Areas for improvement must be an array'),
+
+  body('remarks.recommendations')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Recommendations must be an array'),
+
+  body('remarks.next_steps')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Next steps must be an array'),
+
+  body('remarks.parent_feedback_requested')
+    .optional({ nullable: true, checkFalsy: true })
+    .isBoolean()
+    .withMessage('Parent feedback requested must be boolean'),
+
+  body('remarks.follow_up_meeting')
+    .optional({ nullable: true, checkFalsy: true })
+    .isObject()
+    .withMessage('Follow up meeting must be an object'),
+
+  // Other fields
+  body('tags')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Tags must be an array'),
+
+  body('isPrivate')
+    .optional({ nullable: true, checkFalsy: true })
+    .isBoolean()
+    .withMessage('isPrivate must be a boolean'),
+
+  body('attachments')
+    .optional({ nullable: true, checkFalsy: true })
+    .isArray()
+    .withMessage('Attachments must be an array'),
+];
+
 // Sanitization middleware to clean input data
 const sanitizeInput = (req, res, next) => {
   // Remove any potential HTML/script tags from string inputs
@@ -654,7 +981,9 @@ const exports_ = {
   validateSchool,
   validateUpdateSchool,
   validateStudent,
+  validateStudentUpdate,
   validateStudentReport,
+  validateUpdateStudentReport,
   sanitizeInput,
 };
 

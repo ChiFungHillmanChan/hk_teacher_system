@@ -27,7 +27,11 @@ const {
   checkUserRateLimit,
 } = require('../middleware/auth');
 
-const { validateStudent, sanitizeInput } = require('../middleware/validation');
+const {
+  validateStudent,
+  sanitizeInput,
+  validateStudentUpdate,
+} = require('../middleware/validation');
 
 const { body, validationResult, param, query } = require('express-validator');
 
@@ -37,7 +41,7 @@ const StudentReport = require('../models/StudentReport');
 // Rate limiting
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 5000,
   message: {
     success: false,
     message: 'Too many requests, please try again later.',
@@ -144,6 +148,7 @@ router.post(
         });
       }
 
+      req.user;
       // Check if user has access to this student
       if (req.user.role !== 'admin') {
         const hasSchoolAccess = req.user.schools.some(
@@ -555,7 +560,7 @@ router.put(
   '/:id',
   generalLimiter,
   checkStudentAccess,
-  validateStudent,
+  validateStudentUpdate,
   logActivity('update_student'),
   updateStudent
 );

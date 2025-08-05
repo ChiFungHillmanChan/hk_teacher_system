@@ -1,0 +1,19 @@
+/* Pages Index - Import all page styles */
+
+/* Authentication pages */
+@import './auth.css';
+
+/* Dashboard page */
+@import './dashboard.css';
+
+/* Reports page */
+@import './reports.css';
+
+/* Home page */
+@import './home.css';
+
+@import './schools_students/index.css';
+@import './meetings/index.css';
+@import './year_summary/index.css';
+@import './integration/index.css';
+@import './ai_analysis/index.css';

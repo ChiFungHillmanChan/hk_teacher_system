@@ -1,0 +1,405 @@
+/* Responsive Table Styles */
+
+/* ========================================
+   RESPONSIVE TABLE PATTERNS
+======================================== */
+
+/* Card-based layout for mobile */
+.table-responsive {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .table-responsive .table {
+    min-width: 100%;
+    font-size: var(--font-size-xs);
+  }
+  
+  .table-responsive .table th,
+  .table-responsive .table td {
+    padding: var(--spacing-2) var(--spacing-3);
+  }
+}
+
+/* ========================================
+   MOBILE CARD LAYOUT
+======================================== */
+
+@media (max-width: 768px) {
+  .table-cards {
+    display: block;
+  }
+  
+  .table-cards thead {
+    display: none;
+  }
+  
+  .table-cards tbody {
+    display: block;
+  }
+  
+  .table-cards tr {
+    display: block;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-4);
+    padding: var(--spacing-4);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .table-cards td {
+    display: block;
+    border: none;
+    padding: var(--spacing-2) 0;
+    text-align: left;
+    position: relative;
+    padding-left: 40%;
+  }
+  
+  .table-cards td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    top: var(--spacing-2);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    width: 35%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .table-cards td:last-child {
+    border-bottom: none;
+  }
+  
+  /* Actions in mobile cards */
+  .table-cards .col-actions {
+    text-align: left;
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--color-border-light);
+    margin-top: var(--spacing-3);
+  }
+  
+  .table-cards .col-actions::before {
+    content: 'Actions';
+  }
+}
+
+/* ========================================
+   STACK LAYOUT
+======================================== */
+
+@media (max-width: 480px) {
+  .table-stack thead {
+    display: none;
+  }
+  
+  .table-stack tbody {
+    display: block;
+  }
+  
+  .table-stack tr {
+    display: block;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-3);
+    background-color: var(--color-white);
+  }
+  
+  .table-stack td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-3);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  
+  .table-stack td:last-child {
+    border-bottom: none;
+  }
+  
+  .table-stack td::before {
+    content: attr(data-label);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+    margin-right: var(--spacing-3);
+  }
+}
+
+/* ========================================
+   HORIZONTAL SCROLL
+======================================== */
+
+.table-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 0 calc(-1 * var(--spacing-4));
+}
+
+.table-scroll .table {
+  margin: 0;
+  min-width: 800px;
+}
+
+@media (max-width: 768px) {
+  .table-scroll {
+    margin: 0 calc(-1 * var(--spacing-3));
+  }
+  
+  .table-scroll .table {
+    min-width: 600px;
+  }
+}
+
+/* ========================================
+   COLUMN PRIORITY SYSTEM
+======================================== */
+
+/* Priority 1: Always visible */
+.col-priority-1 {
+  display: table-cell !important;
+}
+
+/* Priority 2: Hide on mobile */
+@media (max-width: 768px) {
+  .col-priority-2 {
+    display: none;
+  }
+}
+
+/* Priority 3: Hide on small tablets and below */
+@media (max-width: 1024px) {
+  .col-priority-3 {
+    display: none;
+  }
+}
+
+/* Priority 4: Hide on large tablets and below */
+@media (max-width: 1200px) {
+  .col-priority-4 {
+    display: none;
+  }
+}
+
+/* ========================================
+   RESPONSIVE UTILITIES
+======================================== */
+
+/* Mobile-only columns */
+@media (min-width: 769px) {
+  .col-mobile-only {
+    display: none;
+  }
+}
+
+/* Desktop-only columns */
+@media (max-width: 768px) {
+  .col-desktop-only {
+    display: none;
+  }
+}
+
+/* ========================================
+   PAGINATION RESPONSIVE
+======================================== */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-6);
+  background-color: var(--color-white);
+  border-top: 1px solid var(--color-border);
+  gap: var(--spacing-4);
+  flex-wrap: wrap;
+  border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+}
+
+.pagination__controls {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+.pagination__btn {
+  background-color: var(--color-white);
+  border: 2px solid var(--color-border);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  min-width: 80px;
+}
+
+.pagination__btn:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.pagination__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination__info {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-3) var(--spacing-4);
+  font-weight: var(--font-weight-medium);
+  background-color: var(--color-background-light);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border);
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    flex-direction: column;
+    gap: var(--spacing-3);
+  }
+  
+  .pagination__info {
+    order: -1;
+  }
+  
+  .pagination__controls {
+    gap: var(--spacing-1);
+  }
+  
+  .pagination__btn {
+    min-width: 60px;
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* ========================================
+   TABLE FILTERS RESPONSIVE
+======================================== */
+
+.table-filters {
+  background-color: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing-4);
+}
+
+.table-filters__row {
+  display: flex;
+  gap: var(--spacing-4);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.table-filters__search {
+  flex: 1;
+  min-width: 200px;
+}
+
+.table-filters__actions {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .table-filters__row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-3);
+  }
+  
+  .table-filters__search {
+    min-width: auto;
+  }
+  
+  .table-filters__actions {
+    justify-content: center;
+  }
+}
+
+/* ========================================
+   STUDENT INFO RESPONSIVE
+======================================== */
+
+.student-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  min-width: 0;
+}
+
+.student-info__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--border-radius-full);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
+}
+
+.student-info__details {
+  flex: 1;
+  min-width: 0;
+}
+
+.student-info__name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+  font-size: var(--font-size-sm);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-info__name-en {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-info__meta {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+  .student-info {
+    gap: var(--spacing-2);
+  }
+  
+  .student-info__avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
+  }
+  
+  .student-info__name {
+    font-size: var(--font-size-xs);
+  }
+  
+  .student-info__name-en {
+    display: none; /* Hide English name on mobile */
+  }
+}

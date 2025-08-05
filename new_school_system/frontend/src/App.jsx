@@ -27,27 +27,21 @@ import YearSummary from './pages/year-summary/YearSummary';
 // Import student reports components
 import CreateStudentRecord from './pages/reports/CreateStudentRecord';
 import StudentReports from './pages/reports/StudentReports';
+import StudentReportDetails from './pages/reports/StudentReportDetails'; // NEW IMPORT
 
+// Import new Meeting Records components
+import MeetingRecordForm from './pages/meetings/MeetingRecordForm';
+import MeetingRecords from './pages/meetings/MeetingRecords';
+import MeetingRecordDetail from './pages/meetings/MeetingRecordDetail';
 // Import integration component
-import Integration from './pages/integration/Integration';
 import AI_Analysis from './pages/analysation/AI_Analysis';
+import Integration from './pages/integration/Integration';
 
 // Import layout
 import Layout from './components/layout/Layout';
 
-// Import CSS in correct order
-import './index.css';
-import './styles/components.css';
-import './styles/dashboard.css';
-import './styles/forms.css';
-import './styles/globals.css';
-import './styles/integration.css';
-import './styles/ai-analysis.css';
-import './styles/layout.css';
-import './styles/management.css';
-import './styles/rate-limit-error.css';
-import './styles/reports.css';
-import './styles/themes.css';
+// Import style
+import './styles/main.css';
 
 function App() {
   return (
@@ -145,6 +139,58 @@ function App() {
               }
             />
 
+            {/* Meeting Records Routes */}
+            <Route
+              path="/meetings"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <MeetingRecords />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/meetings/create"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <MeetingRecordForm />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/meetings/:id"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <MeetingRecordDetail />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/meetings/:id/edit"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <MeetingRecordDetail />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/meetings/:id/view"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <MeetingRecordDetail />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
             {/* Year Summary - 年度整理 */}
             <Route
               path="/year-summary"
@@ -157,7 +203,7 @@ function App() {
               }
             />
 
-            {/* Student Reports */}
+            {/* Student Reports Routes - UPDATED SECTION */}
             <Route
               path="/reports"
               element={
@@ -180,28 +226,47 @@ function App() {
               }
             />
 
-            {/* Individual Record Management (placeholders for future implementation) */}
+            <Route
+              path="/reports/student/:studentId/create"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <CreateStudentRecord />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* NEW: Student Report Details Routes */}
+            <Route
+              path="/student-reports"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <StudentReports />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/student-reports/:id"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <StudentReportDetails />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Legacy Record Management Routes - Updated to use new component */}
             <Route
               path="/reports/record/:recordId"
               element={
                 <ProtectedRoute>
                   <Layout>
-                    <div
-                      style={{
-                        padding: '2rem',
-                        textAlign: 'center',
-                        background: 'var(--color-background-light)',
-                        borderRadius: 'var(--border-radius-lg)',
-                        margin: '2rem',
-                      }}
-                    >
-                      <h2 style={{ color: 'var(--color-primary)', marginBottom: '1rem' }}>
-                        📋 記錄詳情
-                      </h2>
-                      <p style={{ color: 'var(--color-text-secondary)' }}>
-                        即將推出 - 查看詳細記錄內容
-                      </p>
-                    </div>
+                    <StudentReportDetails />
                   </Layout>
                 </ProtectedRoute>
               }
@@ -212,22 +277,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout>
-                    <div
-                      style={{
-                        padding: '2rem',
-                        textAlign: 'center',
-                        background: 'var(--color-background-light)',
-                        borderRadius: 'var(--border-radius-lg)',
-                        margin: '2rem',
-                      }}
-                    >
-                      <h2 style={{ color: 'var(--color-primary)', marginBottom: '1rem' }}>
-                        ✏️ 編輯記錄
-                      </h2>
-                      <p style={{ color: 'var(--color-text-secondary)' }}>
-                        即將推出 - 編輯現有記錄
-                      </p>
-                    </div>
+                    <StudentReportDetails />
                   </Layout>
                 </ProtectedRoute>
               }

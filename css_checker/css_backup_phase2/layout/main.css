@@ -1,0 +1,70 @@
+/* Main Content Area Layout Styles */
+
+/* ========================================
+   MAIN CONTENT CONTAINER
+======================================== */
+
+.layout__main {
+  grid-area: main;
+  background-color: var(--color-background);
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  min-width: 0; /* Prevent grid blowout */
+}
+
+.layout__content {
+  padding: var(--spacing-8);
+  width: 100%;
+  min-height: calc(100vh - var(--header-height));
+  box-sizing: border-box;
+  /* Remove max-width constraint for full-screen utilization */
+}
+
+/* ========================================
+   SMOOTH SCROLLING
+======================================== */
+
+.layout__main {
+  scroll-behavior: smooth;
+}
+
+/* ========================================
+   RESPONSIVE MAIN CONTENT
+======================================== */
+
+/* Large screens (1200px+) */
+@media (min-width: 1200px) {
+  .layout__content {
+    padding: var(--spacing-10);
+  }
+}
+
+/* Desktop (1024px - 1199px) */
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .layout__content {
+    padding: var(--spacing-8);
+    max-width: none; /* Remove max-width constraint */
+  }
+}
+
+/* Tablet and mobile */
+@media (max-width: 1023px) {
+  .layout__content {
+    padding: var(--spacing-6);
+  }
+}
+
+/* Mobile (480px - 767px) */
+@media (max-width: 767px) {
+  .layout__content {
+    padding: var(--spacing-4);
+  }
+}
+
+/* Small mobile (320px - 479px) */
+@media (max-width: 479px) {
+  .layout__content {
+    padding: var(--spacing-3);
+  }
+}

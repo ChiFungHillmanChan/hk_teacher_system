@@ -216,22 +216,6 @@ const LoginForm = () => {
             '登入'
           )}
         </button>
-
-        {/* Demo Credentials for Development */}
-        {import.meta.env.DEV && (
-          <div className="demo-credentials">
-            <h4>測試帳號：</h4>
-            <p><strong>管理員:</strong> admin@hkteacher.dev / Admin123!@#</p>
-            <button
-              type="button"
-              onClick={fillDemoCredentials}
-              className="btn btn--secondary btn--small"
-              disabled={isSubmitting}
-            >
-              填入管理員帳號
-            </button>
-          </div>
-        )}
       </form>
     </>
   );

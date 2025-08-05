@@ -232,10 +232,18 @@ const createStudentReport = async (req, res) => {
 // @desc    Update student report
 // @route   PUT /api/student-reports/:id
 // @access  Private
+// Final Fixed updateStudentReport function in studentReportController.js
+// Based on the successful pattern from SchoolDetail
+
 const updateStudentReport = async (req, res) => {
   try {
+    console.log('📝 Received update request for report:', req.params.id);
+    console.log('📥 Request body:', JSON.stringify(req.body, null, 2));
+
+    // Validate request data
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -243,13 +251,32 @@ const updateStudentReport = async (req, res) => {
       });
     }
 
+    // Find the existing report
     const report = await StudentReport.findById(req.params.id);
-
     if (!report) {
       return res.status(404).json({
         success: false,
         message: 'Student report not found',
       });
+    }
+
+    console.log('📋 Found existing report:', {
+      id: report._id,
+      topic: report.subjectDetails?.topic,
+      content: report.content
+    });
+
+    // Check permissions
+    if (req.user.role !== 'admin') {
+      const isCreator = report.createdBy.toString() === req.user._id.toString();
+      const isSubjectTeacher = report.subject?.teacher?.toString() === req.user._id.toString();
+      
+      if (!isCreator && !isSubjectTeacher) {
+        return res.status(403).json({
+          success: false,
+          message: 'Not authorized to update this report',
+        });
+      }
     }
 
     // Check if report can be modified
@@ -260,34 +287,172 @@ const updateStudentReport = async (req, res) => {
       });
     }
 
-    // Update fields
-    const updateData = { ...req.body };
+    // Prepare clean update data - similar to SchoolDetail pattern
+    const updateData = {};
+
+    // Update subjectDetails if provided
+    if (req.body.subjectDetails) {
+      updateData.subjectDetails = {
+        topic: req.body.subjectDetails.topic || report.subjectDetails?.topic || '',
+        duration: req.body.subjectDetails.duration || report.subjectDetails?.duration || 60,
+        learningObjectives: req.body.subjectDetails.learningObjectives || report.subjectDetails?.learningObjectives || [],
+        materials: req.body.subjectDetails.materials || report.subjectDetails?.materials || [],
+        activities: req.body.subjectDetails.activities || report.subjectDetails?.activities || []
+      };
+    }
+
+    // Update content if provided
+    if (req.body.content !== undefined) {
+      updateData.content = req.body.content;
+    }
+
+    // Update performance if provided
+    if (req.body.performance) {
+      updateData.performance = {
+        attendance: {
+          status: req.body.performance.attendance?.status || report.performance?.attendance?.status || 'present',
+          punctuality: req.body.performance.attendance?.punctuality || report.performance?.attendance?.punctuality || 'good'
+        },
+        participation: {
+          level: req.body.performance.participation?.level || report.performance?.participation?.level || 'good',
+          engagement: req.body.performance.participation?.engagement || report.performance?.participation?.engagement || 'active',
+          contribution: req.body.performance.participation?.contribution || report.performance?.participation?.contribution || ''
+        },
+        understanding: {
+          level: req.body.performance.understanding?.level || report.performance?.understanding?.level || 'satisfactory',
+          concepts_mastered: req.body.performance.understanding?.concepts_mastered || report.performance?.understanding?.concepts_mastered || [],
+          concepts_struggling: req.body.performance.understanding?.concepts_struggling || report.performance?.understanding?.concepts_struggling || [],
+          comprehension_notes: req.body.performance.understanding?.comprehension_notes || report.performance?.understanding?.comprehension_notes || ''
+        },
+        skills: {
+          academic_skills: req.body.performance.skills?.academic_skills || report.performance?.skills?.academic_skills || [],
+          social_skills: req.body.performance.skills?.social_skills || report.performance?.skills?.social_skills || [],
+          communication: req.body.performance.skills?.communication || report.performance?.skills?.communication || {}
+        },
+        assessment: {
+          type: req.body.performance.assessment?.type || report.performance?.assessment?.type || 'observation',
+          score: req.body.performance.assessment?.score !== undefined ? req.body.performance.assessment.score : report.performance?.assessment?.score,
+          grade: req.body.performance.assessment?.grade || report.performance?.assessment?.grade || undefined,
+          feedback: req.body.performance.assessment?.feedback || report.performance?.assessment?.feedback || '',
+          rubric_scores: req.body.performance.assessment?.rubric_scores || report.performance?.assessment?.rubric_scores || []
+        }
+      };
+    }
+
+    // Update homework if provided
+    if (req.body.homework) {
+      updateData.homework = {
+        assigned: req.body.homework.assigned !== undefined ? req.body.homework.assigned : (report.homework?.assigned || false),
+        details: {
+          description: req.body.homework.details?.description || report.homework?.details?.description || '',
+          due_date: req.body.homework.details?.due_date || report.homework?.details?.due_date || undefined,
+          estimated_time: req.body.homework.details?.estimated_time || report.homework?.details?.estimated_time || undefined,
+          materials_needed: req.body.homework.details?.materials_needed || report.homework?.details?.materials_needed || [],
+          instructions: req.body.homework.details?.instructions || report.homework?.details?.instructions || []
+        },
+        completion: {
+          status: req.body.homework.completion?.status || report.homework?.completion?.status || 'pending',
+          quality: req.body.homework.completion?.quality || report.homework?.completion?.quality || undefined,
+          timeliness: req.body.homework.completion?.timeliness || report.homework?.completion?.timeliness || undefined,
+          effort: req.body.homework.completion?.effort || report.homework?.completion?.effort || 'satisfactory'
+        }
+      };
+    }
+
+    // Update behavior if provided
+    if (req.body.behavior) {
+      updateData.behavior = {
+        conduct: req.body.behavior.conduct || report.behavior?.conduct || 'satisfactory',
+        cooperation: req.body.behavior.cooperation || report.behavior?.cooperation || 'satisfactory',
+        respect: req.body.behavior.respect || report.behavior?.respect || 'satisfactory',
+        following_instructions: req.body.behavior.following_instructions || report.behavior?.following_instructions || 'satisfactory',
+        notes: req.body.behavior.notes || report.behavior?.notes || '',
+        incidents: req.body.behavior.incidents || report.behavior?.incidents || []
+      };
+    }
+
+    // Update remarks if provided
+    if (req.body.remarks) {
+      updateData.remarks = {
+        strengths: req.body.remarks.strengths || report.remarks?.strengths || [],
+        areas_for_improvement: req.body.remarks.areas_for_improvement || report.remarks?.areas_for_improvement || [],
+        recommendations: req.body.remarks.recommendations || report.remarks?.recommendations || [],
+        next_steps: req.body.remarks.next_steps || report.remarks?.next_steps || [],
+        teacher_comments: req.body.remarks.teacher_comments || report.remarks?.teacher_comments || '',
+        parent_feedback_requested: req.body.remarks.parent_feedback_requested !== undefined ? req.body.remarks.parent_feedback_requested : (report.remarks?.parent_feedback_requested || false),
+        follow_up_meeting: req.body.remarks.follow_up_meeting || report.remarks?.follow_up_meeting || undefined
+      };
+    }
+
+    // Update other fields if provided
+    if (req.body.tags !== undefined) updateData.tags = req.body.tags;
+    if (req.body.isPrivate !== undefined) updateData.isPrivate = req.body.isPrivate;
+
+    // Set lastModifiedBy
     updateData.lastModifiedBy = req.user._id;
 
-    const updatedReport = await StudentReport.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-      runValidators: true,
-    })
-      .populate('student', 'name nameEn nameCh studentId grade class')
-      .populate('school', 'name nameEn nameCh')
-      .populate('subject.teacher', 'name email')
-      .populate('createdBy', 'name email')
-      .populate('lastModifiedBy', 'name email');
+    console.log('💾 Prepared update data:', JSON.stringify(updateData, null, 2));
+
+    // Use findByIdAndUpdate with proper options - like SchoolDetail
+    const updatedReport = await StudentReport.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      {
+        new: true, // Return updated document
+        runValidators: false, // Skip validation since we're doing manual validation
+        lean: false // Return mongoose document, not plain object
+      }
+    ).populate('student', 'name nameEn nameCh studentId grade class')
+     .populate('school', 'name nameEn nameCh')
+     .populate('subject.teacher', 'name email')
+     .populate('createdBy', 'name email')
+     .populate('lastModifiedBy', 'name email');
+
+    if (!updatedReport) {
+      return res.status(404).json({
+        success: false,
+        message: 'Report not found after update',
+      });
+    }
+
+    console.log('✅ Successfully updated report:', {
+      id: updatedReport._id,
+      topic: updatedReport.subjectDetails?.topic,
+      content: updatedReport.content,
+      updatedAt: updatedReport.updatedAt
+    });
 
     res.status(200).json({
       success: true,
       message: 'Student report updated successfully',
       data: updatedReport,
     });
+
   } catch (error) {
-    console.error('Update student report error:', error);
+    console.error('❌ Update student report error:', error);
+    
+    // Handle validation errors specifically
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => ({
+        field: err.path,
+        message: err.message,
+        value: err.value
+      }));
+      
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: validationErrors,
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: 'Server error updating student report',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
-
 // @desc    Delete student report
 // @route   DELETE /api/student-reports/:id
 // @access  Private

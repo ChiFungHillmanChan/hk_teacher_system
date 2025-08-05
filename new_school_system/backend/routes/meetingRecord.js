@@ -19,13 +19,13 @@ const { body, param, query } = require('express-validator');
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 5000,
   message: { success: false, message: 'Too many requests, please try again later.' },
 });
 
 const createLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 20, // Limit meeting creation to 20 per 5 minutes
+  max: 50, // Limit meeting creation to 20 per 5 minutes
   message: {
     success: false,
     message: 'Too many meeting record creations, please try again later.',
@@ -221,8 +221,8 @@ router.get(
     query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
     query('limit')
       .optional()
-      .isInt({ min: 1, max: 100 })
-      .withMessage('Limit must be between 1 and 100'),
+      .isInt({ min: 1, max: 5000 })
+      .withMessage('Limit must be between 1 and 5000'),
   ],
   logActivity('get_meetings_by_student'),
   getMeetingsByStudent
@@ -252,8 +252,8 @@ router.get(
     query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
     query('limit')
       .optional()
-      .isInt({ min: 1, max: 100 })
-      .withMessage('Limit must be between 1 and 100'),
+      .isInt({ min: 1, max: 5000 })
+      .withMessage('Limit must be between 1 and 5000'),
   ],
   logActivity('get_meeting_records'),
   getMeetingRecords

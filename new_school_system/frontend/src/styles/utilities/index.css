@@ -1,0 +1,6 @@
+/* Utilities Index - Import all utility styles */
+
+@import './layout.css';
+@import './spacing.css';
+@import './colors.css';
+@import './animations.css';

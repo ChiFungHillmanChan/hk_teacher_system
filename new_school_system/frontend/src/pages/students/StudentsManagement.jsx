@@ -11,9 +11,11 @@ import {
   User,
   Users,
   X,
+  Trash2,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-hot-toast'; 
 import { useAuth } from '../../context/AuthContext';
 import { handleApiError, schoolHelpers, studentHelpers } from '../../services/api';
 import {
@@ -22,6 +24,40 @@ import {
   getGradeChinese,
   getStudentStatusChinese,
 } from '../../utils/constants';
+
+const sortStudents = students => {
+  const gradeOrder = {
+    primary_1: 1,
+    primary_2: 2,
+    primary_3: 3,
+    primary_4: 4,
+    primary_5: 5,
+    primary_6: 6,
+    secondary_1: 7,
+    secondary_2: 8,
+    secondary_3: 9,
+    secondary_4: 10,
+    secondary_5: 11,
+    secondary_6: 12,
+  };
+
+  return [...students].sort((a, b) => {
+    // Sort by grade/year
+    const gradeA = gradeOrder[a.currentGrade] || 99;
+    const gradeB = gradeOrder[b.currentGrade] || 99;
+    if (gradeA !== gradeB) return gradeA - gradeB;
+
+    // Sort by class letter (e.g., '1A' => 'A')
+    const classA = a.currentClass?.match(/[A-Z]/)?.[0] || '';
+    const classB = b.currentClass?.match(/[A-Z]/)?.[0] || '';
+    if (classA !== classB) return classA.localeCompare(classB);
+
+    // Sort by class number
+    const numA = a.currentClassNumber || 0;
+    const numB = b.currentClassNumber || 0;
+    return numA - numB;
+  });
+};
 
 const StudentsManagement = () => {
   const { user, isAdmin } = useAuth();
@@ -44,11 +80,9 @@ const StudentsManagement = () => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  // Load schools data
   useEffect(() => {
     const loadSchools = async () => {
       try {
@@ -70,33 +104,44 @@ const StudentsManagement = () => {
     loadSchools();
   }, [user, isAdmin]);
 
-  // Update available academic years when school is selected
   useEffect(() => {
-    if (selectedSchool) {
-      const school = schools.find(s => s._id === selectedSchool);
-      if (school && school.academicYears) {
-        const years = school.academicYears
-          .map(ay => ay.year)
-          .sort()
-          .reverse();
-        setAvailableAcademicYears(years);
-
-        // Auto-select current academic year if available
-        const currentYear = getCurrentAcademicYear();
-        if (years.includes(currentYear)) {
-          setSelectedAcademicYear(currentYear);
-        } else if (years.length > 0) {
-          setSelectedAcademicYear(years[0]); // Select most recent year
-        }
-      } else {
+    const loadAcademicYears = async () => {
+      if (!selectedSchool) {
         setAvailableAcademicYears([]);
         setSelectedAcademicYear('');
+        return;
       }
-    } else {
-      setAvailableAcademicYears([]);
-      setSelectedAcademicYear('');
-    }
-  }, [selectedSchool, schools]);
+
+      try {
+
+        const allStudents = await studentHelpers.getAll({
+          school: selectedSchool,
+          limit: 1000, 
+        });
+
+        const uniqueYears = [...new Set(
+          allStudents
+            .map(student => student.currentAcademicYear)
+            .filter(year => year) 
+        )].sort().reverse();
+
+        setAvailableAcademicYears(uniqueYears);
+
+        // Set default year
+        const currentYear = getCurrentAcademicYear();
+        if (uniqueYears.includes(currentYear)) {
+          setSelectedAcademicYear(currentYear);
+        } else if (uniqueYears.length > 0) {
+          setSelectedAcademicYear(uniqueYears[0]);
+        }
+      } catch (error) {
+        console.error('❌ Failed to load academic years:', error);
+        setAvailableAcademicYears([]);
+      }
+    };
+
+    loadAcademicYears();
+  }, [selectedSchool]);
 
   useEffect(() => {
     const loadStudents = async () => {
@@ -112,11 +157,11 @@ const StudentsManagement = () => {
 
         const studentsData = await studentHelpers.getAll({
           school: selectedSchool,
-          academicYear: selectedAcademicYear,
+          academicYear: selectedAcademicYear, 
           limit: 500,
         });
 
-        const students = Array.isArray(studentsData) ? studentsData : [];
+        const students = Array.isArray(studentsData) ? sortStudents(studentsData) : [];
         setStudents(students);
         setFilteredStudents(students);
       } catch (err) {
@@ -132,7 +177,6 @@ const StudentsManagement = () => {
     loadStudents();
   }, [selectedSchool, selectedAcademicYear]);
 
-  // Apply filters to students
   useEffect(() => {
     let filtered = Array.isArray(students) ? students : [];
 
@@ -147,7 +191,7 @@ const StudentsManagement = () => {
     }
 
     if (selectedGrade) {
-      filtered = filtered.filter(student => student.grade === selectedGrade);
+      filtered = filtered.filter(student => student.currentGrade === selectedGrade);
     }
 
     if (selectedStatus) {
@@ -169,6 +213,81 @@ const StudentsManagement = () => {
     setSearchTerm('');
     setSelectedGrade('');
     setSelectedStatus('');
+  };
+
+  // ✅ Delete function with proper error handling
+  const handleDeleteStudent = async (studentId, studentName) => {
+    console.log('🗑️ Delete initiated for student:', {
+      id: studentId,
+      name: studentName,
+      userRole: user?.role,
+      userId: user?._id
+    });
+
+    // Find the student to check teacher relationships
+    const studentToDelete = students.find(s => s._id === studentId);
+    console.log('👨‍🏫 Student teachers:', studentToDelete?.teachers);
+    
+    // Check if current user is associated with this student
+    const isAssociatedTeacher = studentToDelete?.teachers?.some(
+      teacher => teacher.user === user._id || teacher.user._id === user._id
+    );
+    console.log('🔐 User can delete?', { 
+      isAdmin: user?.role === 'admin',
+      isAssociatedTeacher,
+      canDelete: user?.role === 'admin' || isAssociatedTeacher
+    });
+
+    if (!window.confirm(`確定要刪除學生 ${studentName} 嗎？此操作無法復原。`)) {
+      console.log('❌ User cancelled deletion');
+      return;
+    }
+
+    try {
+      console.log('🚀 Calling delete API for student:', studentId);
+      
+      const result = await studentHelpers.delete(studentId);
+      console.log('✅ Delete API response:', result);
+      
+      toast.success('學生已刪除');
+      
+      // Refresh the students list
+      console.log('🔄 Refreshing student list...');
+      const updatedStudents = students.filter(s => s._id !== studentId);
+      setStudents(updatedStudents);
+      
+      // Reapply current filters
+      let filtered = updatedStudents;
+      if (searchTerm.trim()) {
+        const term = searchTerm.toLowerCase().trim();
+        filtered = filtered.filter(
+          student =>
+            student.name.toLowerCase().includes(term) ||
+            (student.nameEn && student.nameEn.toLowerCase().includes(term)) ||
+            (student.nameCh && student.nameCh.toLowerCase().includes(term))
+        );
+      }
+      if (selectedGrade) {
+        filtered = filtered.filter(student => student.currentGrade === selectedGrade);
+      }
+      if (selectedStatus) {
+        filtered = filtered.filter(student => student.status === selectedStatus);
+      }
+      
+      setFilteredStudents(filtered);
+      console.log('✅ Student list updated, new count:', filtered.length);
+      
+    } catch (error) {
+      console.error('❌ Failed to delete student:', error);
+      console.error('Error details:', {
+        status: error.status,
+        message: error.message,
+        data: error.data
+      });
+      
+      const errorInfo = handleApiError(error);
+      toast.error(errorInfo.message || '刪除失敗');
+    }
   };
 
   // Get available grades for selected school
@@ -401,54 +520,68 @@ const StudentsManagement = () => {
                 <thead>
                   <tr>
                     <th>學生姓名</th>
-                    <th>學號</th>
                     <th>年級班別</th>
+                    <th>學號</th>
                     <th>操作</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {currentStudents.map(student => (
-                    <tr key={student._id}>
-                      <td>
-                        <div className="student-info">
-                          <div className="student-info__avatar">
-                            <User size={20} />
+                  {currentStudents.map((student) => {
+
+                    if (!student._id) {
+                      return null;
+                    }
+                    return (
+                      <tr key={`student-${student._id}-${selectedAcademicYear}`}>
+                        <td>
+                          <div className="student-info">
+                            <div className="student-info__avatar">
+                              <User size={20} />
+                            </div>
+                            <div className="student-info__details">
+                              <div className="student-info__name">{student.name}</div>
+                              {student.nameEn && (
+                                <div className="student-info__name-en">{student.nameEn}</div>
+                              )}
+                            </div>
                           </div>
-                          <div className="student-info__details">
-                            <div className="student-info__name">{student.name}</div>
-                            {student.nameEn && (
-                              <div className="student-info__name-en">{student.nameEn}</div>
+                        </td>
+                        <td>
+                          <div className="grade-class">
+                            <span className="grade">{getGradeChinese(student.currentGrade)}</span>
+                            {student.currentClass && (
+                              <span className="class">{student.currentClass}</span>
                             )}
                           </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="grade-class">
-                          <span className="grade">{getGradeChinese(student.grade)}</span>
-                          {student.class && <span className="class">{student.class}</span>}
-                        </div>
-                      </td>
-                      <td>
-                        <span className="student-id">{student.classNumber}</span>
-                      </td>
-                      <td>
-                        <div className="student-actions">
-                          <Link
-                            to={`/students/${student._id}`}
-                            className="btn btn--secondary btn--small"
-                          >
-                            查看
-                          </Link>
-                          <Link
-                            to={`/students/${student._id}/edit`}
-                            className="btn btn--primary btn--small"
-                          >
-                            編輯
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td>
+                          <span className="student-id">{student.currentClassNumber}</span>
+                        </td>
+                        <td>
+                          <div className="student-actions">
+                            <Link
+                              to={`/students/${student._id}`}
+                              className="btn btn--secondary btn--small"
+                              onClick={() => console.log('👁️ View clicked for student ID:', student._id)}
+                            >
+                              查看
+                            </Link>
+                            <button 
+                              onClick={() => {
+                                console.log('🗑️ Delete button clicked for student:', student._id);
+                                handleDeleteStudent(student._id, student.name);
+                              }}
+                              className="btn btn--danger btn--small"
+                              title="刪除學生"
+                            >
+                              <Trash2 size={16} />
+                              刪除
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
