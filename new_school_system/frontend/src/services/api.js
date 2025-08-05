@@ -7,7 +7,7 @@ export const setGlobalRateLimitHandler = handler => {
 };
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api',
   timeout: 15000,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
@@ -94,7 +94,7 @@ api.interceptors.response.use(
         const refreshToken = tokenManager.getRefreshToken();
         if (!refreshToken) throw new Error('No refresh token available');
         const refreshResponse = await axios.post(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/refresh`,
+          `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/auth/refresh`,
           { refreshToken },
           { withCredentials: true, timeout: 10000 }
         );
@@ -156,7 +156,7 @@ export const apiRequest = {
 export const schoolHelpers = {
   getAll: async (params = {}) => {
     try {
-      const result = await apiRequest.get('/api/schools', { params });
+      const result = await apiRequest.get('/schools', { params });
       return result;
     } catch (error) {
       console.error('❌ Failed to fetch schools:', error);
@@ -167,7 +167,7 @@ export const schoolHelpers = {
   getById: async id => {
     try {
       console.log('🔍 Fetching school by ID:', id);
-      const result = await apiRequest.get(`/api/schools/${id}`);
+      const result = await apiRequest.get(`/schools/${id}`);
       console.log('✅ School fetched successfully:', result?.name);
       return result;
     } catch (error) {
@@ -179,7 +179,7 @@ export const schoolHelpers = {
   create: async schoolData => {
     try {
       console.log('➕ Creating school:', schoolData?.name);
-      const result = await apiRequest.post('/api/schools', schoolData);
+      const result = await apiRequest.post('/schools', schoolData);
       console.log('✅ School created successfully:', result?.name);
       return result;
     } catch (error) {
@@ -195,7 +195,7 @@ export const schoolHelpers = {
       // Log the exact data being sent
       console.log('Update payload:', JSON.stringify(schoolData, null, 2));
 
-      const result = await apiRequest.put(`/api/schools/${id}`, schoolData);
+      const result = await apiRequest.put(`/schools/${id}`, schoolData);
       console.log('✅ School updated successfully:', result?.name);
       return result;
     } catch (error) {
@@ -221,10 +221,10 @@ export const schoolHelpers = {
       console.log('🗑️ Deleting school:', id);
 
       // First check if school exists and get details
-      const schoolToDelete = await apiRequest.get(`/api/schools/${id}`);
+      const schoolToDelete = await apiRequest.get(`/schools/${id}`);
       console.log('School to delete:', schoolToDelete?.name);
 
-      const result = await apiRequest.delete(`/api/schools/${id}`);
+      const result = await apiRequest.delete(`/schools/${id}`);
       console.log('✅ School deleted successfully');
       return result;
     } catch (error) {
@@ -245,7 +245,7 @@ export const schoolHelpers = {
 
   getStats: async id => {
     try {
-      const result = await apiRequest.get(`/api/schools/${id}/stats`);
+      const result = await apiRequest.get(`/schools/${id}/stats`);
       return result;
     } catch (error) {
       console.error(`❌ Failed to fetch school stats for ${id}:`, error);
@@ -255,7 +255,7 @@ export const schoolHelpers = {
 
   getAvailableAcademicYears: async schoolId => {
     try {
-      const result = await apiRequest.get(`/api/schools/${schoolId}/academic-years-available`);
+      const result = await apiRequest.get(`/schools/${schoolId}/academic-years-available`);
       return result;
     } catch (error) {
       console.error(`❌ Failed to fetch academic years for school ${schoolId}:`, error);
@@ -269,7 +269,7 @@ export const studentHelpers = {
   getAll: async (params = {}) => {
     try {
       console.log('🔍 Fetching all students with params:', params);
-      const result = await apiRequest.get('/api/students', { params });
+      const result = await apiRequest.get('/students', { params });
       console.log(`✅ Students fetched successfully: ${result?.length || 0} students`);
       return result;
     } catch (error) {
@@ -281,7 +281,7 @@ export const studentHelpers = {
   getById: async id => {
     try {
       console.log('🔍 Fetching student by ID:', id);
-      const result = await apiRequest.get(`/api/students/${id}`);
+      const result = await apiRequest.get(`/students/${id}`);
       console.log('✅ Student fetched successfully:', result?.name);
       return result;
     } catch (error) {
@@ -310,7 +310,7 @@ export const studentHelpers = {
         )
       );
 
-      const result = await apiRequest.post('/api/students', studentData);
+      const result = await apiRequest.post('/students', studentData);
       console.log('✅ Student created successfully:', result?.name, 'ID:', result?._id);
       return result;
     } catch (error) {
@@ -339,7 +339,7 @@ export const studentHelpers = {
       // Log the exact data being sent for debugging
       console.log('Student update payload:', JSON.stringify(studentData, null, 2));
 
-      const result = await apiRequest.put(`/api/students/${id}`, studentData);
+      const result = await apiRequest.put(`/students/${id}`, studentData);
       console.log('✅ Student updated successfully:', result?.name);
       return result;
     } catch (error) {
@@ -367,10 +367,10 @@ export const studentHelpers = {
       console.log('🗑️ Deleting student:', id);
 
       // First check if student exists and get details
-      const studentToDelete = await apiRequest.get(`/api/students/${id}`);
+      const studentToDelete = await apiRequest.get(`/students/${id}`);
       console.log('Student to delete:', studentToDelete?.name);
 
-      const result = await apiRequest.delete(`/api/students/${id}`);
+      const result = await apiRequest.delete(`/students/${id}`);
       console.log('✅ Student deleted successfully');
       return result;
     } catch (error) {
@@ -392,7 +392,7 @@ export const studentHelpers = {
   getMyStudents: async (params = {}) => {
     try {
       console.log('🔍 Fetching my students');
-      const result = await apiRequest.get('/api/students/my-students', { params });
+      const result = await apiRequest.get('/students/my-students', { params });
       console.log(`✅ My students fetched successfully: ${result?.length || 0} students`);
       return result;
     } catch (error) {
@@ -404,7 +404,7 @@ export const studentHelpers = {
   getStatsBySchool: async schoolId => {
     try {
       console.log('📊 Fetching student stats for school:', schoolId);
-      const result = await apiRequest.get(`/api/students/stats/${schoolId}`);
+      const result = await apiRequest.get(`/students/stats/${schoolId}`);
       console.log('✅ Student stats fetched successfully');
       return result;
     } catch (error) {
@@ -416,7 +416,7 @@ export const studentHelpers = {
   addTeacher: async (studentId, teacherData) => {
     try {
       console.log('👨‍🏫 Adding teacher to student:', studentId);
-      const result = await apiRequest.post(`/api/students/${studentId}/teachers`, teacherData);
+      const result = await apiRequest.post(`/students/${studentId}/teachers`, teacherData);
       console.log('✅ Teacher added to student successfully');
       return result;
     } catch (error) {
@@ -428,7 +428,7 @@ export const studentHelpers = {
   removeTeacher: async (studentId, teacherId) => {
     try {
       console.log('🗑️ Removing teacher from student:', studentId, teacherId);
-      const result = await apiRequest.delete(`/api/students/${studentId}/teachers/${teacherId}`);
+      const result = await apiRequest.delete(`/students/${studentId}/teachers/${teacherId}`);
       console.log('✅ Teacher removed from student successfully');
       return result;
     } catch (error) {
@@ -441,7 +441,7 @@ export const studentHelpers = {
     try {
       console.log('🔍 Searching students by name:', name);
       const allParams = { ...params, search: name };
-      const result = await apiRequest.get('/api/students', { params: allParams });
+      const result = await apiRequest.get('/students', { params: allParams });
       console.log(`✅ Student search completed: ${result?.length || 0} results`);
       return result;
     } catch (error) {
@@ -454,7 +454,7 @@ export const studentHelpers = {
     try {
       console.log('🔍 Searching students by school:', schoolId);
       const allParams = { ...params, school: schoolId };
-      const result = await apiRequest.get('/api/students', { params: allParams });
+      const result = await apiRequest.get('/students', { params: allParams });
       console.log(`✅ School student search completed: ${result?.length || 0} results`);
       return result;
     } catch (error) {
@@ -467,7 +467,7 @@ export const studentHelpers = {
     try {
       console.log('🔍 Searching students by grade:', grade);
       const allParams = { ...params, grade };
-      const result = await apiRequest.get('/api/students', { params: allParams });
+      const result = await apiRequest.get('/students', { params: allParams });
       console.log(`✅ Grade student search completed: ${result?.length || 0} results`);
       return result;
     } catch (error) {
@@ -588,7 +588,7 @@ export const studentReportHelpers = {
   // Get all student reports
   getAll: async (params = {}) => {
     try {
-      return await apiRequest.get('/api/student-reports', { params });
+      return await apiRequest.get('/student-reports', { params });
     } catch (error) {
       console.error('Failed to fetch student reports:', error);
       throw error;
@@ -599,7 +599,7 @@ export const studentReportHelpers = {
   getById: async id => {
     try {
       console.log('🔍 Fetching student report by ID:', id);
-      const response = await api.get(`/api/student-reports/${id}`);
+      const response = await api.get(`/student-reports/${id}`);
 
       // Handle the response structure properly
       const reportData = response.data?.data || response.data;
@@ -615,7 +615,7 @@ export const studentReportHelpers = {
   // Create new student report
   create: async reportData => {
     try {
-      return await apiRequest.post('/api/student-reports', reportData);
+      return await apiRequest.post('/student-reports', reportData);
     } catch (error) {
       console.error('Failed to create student report:', error);
       throw error;
@@ -629,7 +629,7 @@ export const studentReportHelpers = {
       console.log('📤 Update payload:', JSON.stringify(reportData, null, 2));
 
       // Use direct axios call for better control over response handling
-      const response = await api.put(`/api/student-reports/${id}`, reportData);
+      const response = await api.put(`/student-reports/${id}`, reportData);
 
       console.log('📥 Raw update response:', response.data);
 
@@ -659,7 +659,7 @@ export const studentReportHelpers = {
   // Delete student report
   delete: async id => {
     try {
-      return await apiRequest.delete(`/api/student-reports/${id}`);
+      return await apiRequest.delete(`/student-reports/${id}`);
     } catch (error) {
       console.error(`Failed to delete student report ${id}:`, error);
       throw error;
@@ -669,7 +669,7 @@ export const studentReportHelpers = {
   // Get reports by student
   getByStudent: async (studentId, params = {}) => {
     try {
-      return await apiRequest.get(`/api/student-reports/student/${studentId}`, { params });
+      return await apiRequest.get(`/student-reports/student/${studentId}`, { params });
     } catch (error) {
       console.error(`Failed to fetch reports for student ${studentId}:`, error);
       throw error;
@@ -679,7 +679,7 @@ export const studentReportHelpers = {
   // Get my reports (for teachers)
   getMyReports: async (params = {}) => {
     try {
-      return await apiRequest.get('/api/student-reports/my-reports', { params });
+      return await apiRequest.get('/student-reports/my-reports', { params });
     } catch (error) {
       console.error('Failed to fetch my reports:', error);
       throw error;
@@ -689,7 +689,7 @@ export const studentReportHelpers = {
   // Get report statistics
   getStats: async (params = {}) => {
     try {
-      return await apiRequest.get('/api/student-reports/stats', { params });
+      return await apiRequest.get('/student-reports/stats', { params });
     } catch (error) {
       console.error('Failed to fetch report statistics:', error);
       throw error;
@@ -699,7 +699,7 @@ export const studentReportHelpers = {
   // Report status management
   submit: async id => {
     try {
-      return await apiRequest.put(`/api/student-reports/${id}/submit`);
+      return await apiRequest.put(`/student-reports/${id}/submit`);
     } catch (error) {
       console.error(`Failed to submit report ${id}:`, error);
       throw error;
@@ -708,7 +708,7 @@ export const studentReportHelpers = {
 
   review: async id => {
     try {
-      return await apiRequest.put(`/api/student-reports/${id}/review`);
+      return await apiRequest.put(`/student-reports/${id}/review`);
     } catch (error) {
       console.error(`Failed to review report ${id}:`, error);
       throw error;
@@ -717,7 +717,7 @@ export const studentReportHelpers = {
 
   approve: async id => {
     try {
-      return await apiRequest.put(`/api/student-reports/${id}/approve`);
+      return await apiRequest.put(`/student-reports/${id}/approve`);
     } catch (error) {
       console.error(`Failed to approve report ${id}:`, error);
       throw error;
@@ -727,29 +727,29 @@ export const studentReportHelpers = {
 
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: '/api/auth/login',
-    REGISTER: '/api/auth/register',
-    LOGOUT: '/api/auth/logout',
-    ME: '/api/auth/me',
-    REFRESH: '/api/auth/refresh',
+    LOGIN: '/auth/login',
+    REGISTER: '/auth/register',
+    LOGOUT: '/auth/logout',
+    ME: '/auth/me',
+    REFRESH: '/auth/refresh',
   },
   SCHOOLS: {
-    BASE: '/api/schools',
-    STATS: id => `/api/schools/${id}/stats`,
+    BASE: '/schools',
+    STATS: id => `/schools/${id}/stats`,
   },
   STUDENTS: {
-    BASE: '/api/students',
-    MY_STUDENTS: '/api/students/my-students',
-    STATS: schoolId => `/api/students/stats/${schoolId}`,
+    BASE: '/students',
+    MY_STUDENTS: '/students/my-students',
+    STATS: schoolId => `/students/stats/${schoolId}`,
   },
   STUDENT_REPORTS: {
-    BASE: '/api/student-reports',
-    BY_STUDENT: studentId => `/api/student-reports/student/${studentId}`,
-    MY_REPORTS: '/api/student-reports/my-reports',
-    STATS: '/api/student-reports/stats',
-    SUBMIT: id => `/api/student-reports/${id}/submit`,
-    REVIEW: id => `/api/student-reports/${id}/review`,
-    APPROVE: id => `/api/student-reports/${id}/approve`,
+    BASE: '/student-reports',
+    BY_STUDENT: studentId => `/student-reports/student/${studentId}`,
+    MY_REPORTS: '/student-reports/my-reports',
+    STATS: '/student-reports/stats',
+    SUBMIT: id => `/student-reports/${id}/submit`,
+    REVIEW: id => `/student-reports/${id}/review`,
+    APPROVE: id => `/student-reports/${id}/approve`,
   },
 };
 
@@ -857,7 +857,7 @@ export const handleApiError = error => {
 // Health check utility
 export const healthCheck = async () => {
   try {
-    const response = await api.get('/api/health', { timeout: 5000 });
+    const response = await api.get('/health', { timeout: 5000 });
     return response.data;
   } catch (error) {
     throw handleApiError(error);
@@ -868,7 +868,7 @@ export const aiAnalysisHelpers = {
   // Check AI service status
   checkStatus: async () => {
     try {
-      return await apiRequest.get('/api/ai-analysis/status');
+      return await apiRequest.get('/ai-analysis/status');
     } catch (error) {
       console.error('Failed to check AI service status:', error);
       throw error;
@@ -878,7 +878,7 @@ export const aiAnalysisHelpers = {
   // Extract student data from file
   extractData: async formData => {
     try {
-      return await api.post('/api/ai-analysis/extract', formData, {
+      return await api.post('/ai-analysis/extract', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -893,7 +893,7 @@ export const aiAnalysisHelpers = {
   // Import student data
   importData: async importData => {
     try {
-      return await apiRequest.post('/api/ai-analysis/import', importData);
+      return await apiRequest.post('/ai-analysis/import', importData);
     } catch (error) {
       console.error('Failed to import student data:', error);
       throw error;
@@ -903,7 +903,7 @@ export const aiAnalysisHelpers = {
   // Get AI analysis statistics
   getStats: async (params = {}) => {
     try {
-      return await apiRequest.get('/api/ai-analysis/stats', { params });
+      return await apiRequest.get('/ai-analysis/stats', { params });
     } catch (error) {
       console.error('Failed to fetch AI analysis stats:', error);
       throw error;
@@ -915,7 +915,7 @@ export const meetingRecordHelpers = {
   getAll: async (params = {}) => {
     try {
       const queryString = new URLSearchParams(params).toString();
-      const url = queryString ? `/api/meeting-records?${queryString}` : '/api/meeting-records';
+      const url = queryString ? `/meeting-records?${queryString}` : '/meeting-records';
 
       // Use direct axios call to avoid unwrap issues
       const response = await api.get(url);
@@ -932,7 +932,7 @@ export const meetingRecordHelpers = {
 
   getById: async id => {
     try {
-      const response = await api.get(`/api/meeting-records/${id}`);
+      const response = await api.get(`/meeting-records/${id}`);
 
       // Handle response structure
       if (response.data?.success && response.data?.data) {
@@ -946,7 +946,7 @@ export const meetingRecordHelpers = {
 
   create: async data => {
     try {
-      const response = await api.post('/api/meeting-records', data);
+      const response = await api.post('/meeting-records', data);
 
       // Handle response structure
       if (response.data?.success && response.data?.data) {
@@ -960,7 +960,7 @@ export const meetingRecordHelpers = {
 
   update: async (id, data) => {
     try {
-      const response = await api.put(`/api/meeting-records/${id}`, data);
+      const response = await api.put(`/meeting-records/${id}`, data);
 
       // Handle response structure
       if (response.data?.success && response.data?.data) {
@@ -974,7 +974,7 @@ export const meetingRecordHelpers = {
 
   delete: async id => {
     try {
-      const response = await api.delete(`/api/meeting-records/${id}`);
+      const response = await api.delete(`/meeting-records/${id}`);
 
       // Handle response structure
       if (response.data?.success) {
@@ -991,8 +991,8 @@ export const meetingRecordHelpers = {
     try {
       const queryString = new URLSearchParams(params).toString();
       const url = queryString
-        ? `/api/meeting-records/student/${studentId}?${queryString}`
-        : `/api/meeting-records/student/${studentId}`;
+        ? `/meeting-records/student/${studentId}?${queryString}`
+        : `/meeting-records/student/${studentId}`;
 
       console.log('🔍 Making API call to:', url);
       console.log('📤 With params:', params);
@@ -1013,9 +1013,7 @@ export const meetingRecordHelpers = {
   getStats: async (params = {}) => {
     try {
       const queryString = new URLSearchParams(params).toString();
-      const url = queryString
-        ? `/api/meeting-records/stats?${queryString}`
-        : '/api/meeting-records/stats';
+      const url = queryString ? `/meeting-records/stats?${queryString}` : '/meeting-records/stats';
 
       const response = await api.get(url);
 
@@ -1033,8 +1031,8 @@ export const meetingRecordHelpers = {
     try {
       const queryString = new URLSearchParams(params).toString();
       const url = queryString
-        ? `/api/meeting-records/by-year/${schoolId}/${academicYear}?${queryString}`
-        : `/api/meeting-records/by-year/${schoolId}/${academicYear}`;
+        ? `/meeting-records/by-year/${schoolId}/${academicYear}?${queryString}`
+        : `/meeting-records/by-year/${schoolId}/${academicYear}`;
 
       const response = await api.get(url);
 
