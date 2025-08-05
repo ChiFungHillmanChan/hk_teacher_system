@@ -430,35 +430,59 @@ process.on('SIGINT', () => {
     process.exit(0);
   }
 });
-
-// Start server
 const PORT = process.env.PORT || 5001;
 
-const server = app.listen(PORT, async () => {
-  console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-  console.log(`📚 API Documentation available at http://localhost:${PORT}/api`);
-});
+if (require.main === module) {
+  const server = app.listen(PORT, async () => {
+    console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+    console.log(`📚 API Documentation available at http://localhost:${PORT}/api`);
+  });
 
-// Handle server startup errors
-server.on('error', error => {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+  server.on('error', error => {
+    if (error.syscall !== 'listen') throw error;
 
-  const bind = typeof PORT === 'string' ? 'Pipe ' + PORT : 'Port ' + PORT;
+    const bind = typeof PORT === 'string' ? 'Pipe ' + PORT : 'Port ' + PORT;
 
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
+    switch (error.code) {
+      case 'EACCES':
+        console.error(bind + ' requires elevated privileges');
+        process.exit(1);
+        break;
+      case 'EADDRINUSE':
+        console.error(bind + ' is already in use');
+        process.exit(1);
+        break;
+      default:
+        throw error;
+    }
+  });
+} else {
+  const server = app.listen(PORT, async () => {
+    console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+    console.log(`📚 API Documentation available at http://localhost:${PORT}/api`);
+  });
+
+  // Handle server startup errors
+  server.on('error', error => {
+    if (error.syscall !== 'listen') {
       throw error;
-  }
-});
+    }
+
+    const bind = typeof PORT === 'string' ? 'Pipe ' + PORT : 'Port ' + PORT;
+
+    switch (error.code) {
+      case 'EACCES':
+        console.error(bind + ' requires elevated privileges');
+        process.exit(1);
+        break;
+      case 'EADDRINUSE':
+        console.error(bind + ' is already in use');
+        process.exit(1);
+        break;
+      default:
+        throw error;
+    }
+  });
+}
 
 module.exports = app;
