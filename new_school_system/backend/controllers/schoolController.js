@@ -75,6 +75,8 @@ const getSchool = async (req, res) => {
       .populate('teachers.user', 'name email teacherId')
       .populate('createdBy', 'name email');
 
+    console.log('📊 Schools found:', schools.length);
+
     if (!school) {
       return res.status(404).json({
         success: false,
@@ -82,7 +84,6 @@ const getSchool = async (req, res) => {
       });
     }
 
-    // Check if user has access to this school
     if (req.user.role !== 'admin') {
       const hasAccess = req.user.schools.some(
         userSchool => userSchool.toString() === school._id.toString()
