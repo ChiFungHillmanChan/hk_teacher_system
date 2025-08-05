@@ -1,35 +1,44 @@
-// Move your entire server.js content to api/index.js
-// OR replace api/index.js with this:
+// Temporarily replace your api/index.js with this for debugging:
 
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const cookieParser = require('cookie-parser');
-const path = require('path');
-require('dotenv').config();
+console.log('🚀 Starting api/index.js...');
 
-// Import your existing routes
-const authRoutes = require('../routes/auth');
-const schoolRoutes = require('../routes/schools');
-const studentRoutes = require('../routes/students');
-const studentReportRoutes = require('../routes/studentReports');
-const aiAnalysisRoutes = require('../routes/aiAnalysis');
-const meetingRecordRoutes = require('../routes/meetingRecord');
+try {
+  console.log('📦 Attempting to import server.js...');
+  const app = require('../server');
+  console.log('✅ Server.js imported successfully');
 
-const app = express();
-
-// Your existing middleware and configurations...
-// (Copy everything from your server.js)
-
-// Test endpoint
-app.get('/api/test', (req, res) => {
-  res.json({
-    success: true,
-    message: 'API working from api/index.js!',
-    timestamp: new Date().toISOString(),
+  // Add a simple test route directly here
+  app.get('/api/debug', (req, res) => {
+    console.log('🐛 Debug endpoint called');
+    res.json({
+      success: true,
+      message: 'Debug endpoint working',
+      timestamp: new Date().toISOString(),
+      nodeEnv: process.env.NODE_ENV,
+      vercelEnv: process.env.VERCEL,
+    });
   });
-});
 
-// Export for Vercel
-module.exports = app;
+  console.log('✅ Debug route added');
+  console.log('🎯 Exporting app...');
+
+  module.exports = app;
+} catch (error) {
+  console.error('❌ Error in api/index.js:', error);
+  console.error('Stack trace:', error.stack);
+
+  // Fallback simple app
+  const express = require('express');
+  const fallbackApp = express();
+
+  fallbackApp.get('*', (req, res) => {
+    res.json({
+      success: false,
+      message: 'Server failed to start',
+      error: error.message,
+      path: req.path,
+    });
+  });
+
+  module.exports = fallbackApp;
+}
