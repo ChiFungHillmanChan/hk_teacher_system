@@ -21,8 +21,6 @@ import ValidationEngine from './ValidationEngine';
 const GRADES_FALLBACK = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6'];
 const safeHkGrades = Array.isArray(HK_GRADES) ? HK_GRADES : GRADES_FALLBACK;
 
-console.log('[AI_Analysis] 🎯 Loaded with grades:', safeHkGrades);
-
 const AI_Analysis = () => {
   const { user } = useAuth();
 
@@ -54,12 +52,10 @@ const AI_Analysis = () => {
 
     const loadSchools = async () => {
       try {
-        console.log('[AI_Analysis] 📚 Loading existing schools...');
         if (schoolHelpers && typeof schoolHelpers.getAll === 'function') {
           const schoolsData = await schoolHelpers.getAll({ limit: 100 });
           if (!isCancelled) {
             setSchools(Array.isArray(schoolsData) ? schoolsData : []);
-            console.log(`[AI_Analysis] ✅ Loaded ${schoolsData?.length || 0} schools`);
           }
         } else {
           console.warn('[AI_Analysis] ⚠️ schoolHelpers.getAll not available, using empty array');
@@ -89,17 +85,14 @@ const AI_Analysis = () => {
     }
 
     try {
-      console.log('[AI_Analysis] 🔍 Checking AI service status...');
       setAiServiceStatus('checking');
 
       const response = await api.get('/api/ai-analysis/status');
 
       if (response.data.success && response.data.status === 'available') {
-        console.log('[AI_Analysis] ✅ AI service is available');
         setAiServiceStatus('available');
         setRetryAttempts(0);
       } else {
-        console.log('[AI_Analysis] ⚠️ AI service is not available');
         setAiServiceStatus('unavailable');
       }
     } catch (error) {
@@ -115,7 +108,6 @@ const AI_Analysis = () => {
 
   // Handle flow selection
   const handleFlowSelection = flowType => {
-    console.log(`[AI_Analysis] 📍 Selected flow: ${flowType}`);
     setCurrentFlow(flowType);
     setCurrentStep(1);
     setUploadType(flowType);
@@ -138,35 +130,20 @@ const AI_Analysis = () => {
       return;
     }
 
-    console.log('[Excel處理] 🚀 開始處理 Excel/CSV 檔案');
     setExcelProcessing(true);
     setCurrentStep(2);
 
     try {
-      // Step 1: Parse Excel file
-      console.log('[Excel處理] 📊 解析 Excel 檔案');
       const { schools } = await ExcelParser.parseFile(selectedFile);
-
-      console.log(
-        `[Excel解析] 📊 偵測到 ${schools.length} 所學校，共 ${schools.reduce(
-          (total, school) => total + (school.students?.length || 0),
-          0
-        )} 名學生`
-      );
-
-      // Step 2: Store in preview model
       const model = PreviewModelStore.createModel(schools);
       setPreviewModel(model);
 
       // Step 3: Validate data
       const validationResults = ValidationEngine.validateAll(schools);
       if (validationResults.errors.length > 0) {
-        console.log(`[Excel處理] ⚠️ 發現 ${validationResults.errors.length} 個驗證錯誤`);
         toast.warning(`發現 ${validationResults.errors.length} 個資料問題，請檢查後再匯入`);
       }
 
-      // Step 4: Check for duplicates using real API
-      console.log('[Excel處理] 🔍 檢查重複項目...');
       const duplicateResults = await IdentityResolution.checkDuplicates(schools);
       setDuplicateCheckResults(duplicateResults);
 
@@ -174,9 +151,6 @@ const AI_Analysis = () => {
       const duplicateSummary = IdentityResolution.generateDuplicateSummary(duplicateResults);
 
       if (duplicateSummary.requiresUserAction) {
-        console.log(
-          `[Excel處理] ⚠️ 需要使用者決定 - 學校重複: ${duplicateSummary.schoolDuplicates}, 學生重複: ${duplicateSummary.studentDuplicates}`
-        );
         setCurrentStep(3);
 
         // ✅ SAFE: Check if toast.info exists before using
@@ -189,7 +163,6 @@ const AI_Analysis = () => {
           console.log('📢 User Message: 發現重複項目，請確認處理方式');
         }
       } else {
-        console.log('[Excel處理] ✅ 沒有發現重複項目，可以直接匯入');
         setReadyForImport(true);
         setCurrentStep(3);
         toast.success('資料檢查完成，可以開始匯入');
@@ -210,16 +183,13 @@ const AI_Analysis = () => {
       return;
     }
 
-    console.log('[AI處理] 🧠 開始AI文字分析');
     setAiProcessing(true);
     setCurrentStep(2);
 
     try {
-      console.log('[AI處理] 📝 分析文字長度:', textInput.length);
       toast.info('AI文字分析功能開發中');
       setCurrentStep(1);
     } catch (error) {
-      console.error('[AI處理] ❌ AI分析失敗:', error);
       toast.error(`AI分析失敗: ${error.message}`);
       setCurrentStep(1);
     } finally {
@@ -234,15 +204,10 @@ const AI_Analysis = () => {
       return;
     }
 
-    console.log('[匯入流程] 🚀 開始匯入資料到資料庫');
     setCurrentStep(4);
 
     try {
       const allSchools = duplicateCheckResults || previewModel.schools;
-
-      // ✅ CRITICAL: Apply user decisions before filtering
-      console.log('[匯入流程] 📝 應用使用者決定');
-      console.log('[匯入流程] 📋 使用者決定數量:', Object.keys(userDecisions).length);
 
       // Filter schools that are confirmed or don't require confirmation
       const schoolsToImport = allSchools.filter((school, index) => {
@@ -260,34 +225,14 @@ const AI_Analysis = () => {
         return schoolConfirmations[index] === true;
       });
 
-      console.log(`[匯入流程] 📊 準備匯入 ${schoolsToImport.length}/${allSchools.length} 所學校`);
-
       if (schoolsToImport.length === 0) {
         toast.error('沒有學校被確認，無法開始匯入');
         return;
       }
 
-      // ✅ DEBUG: Log school decisions
-      schoolsToImport.forEach(school => {
-        console.log(`[匯入流程] 🏫 學校: ${school.name}`, {
-          hasDuplicates: school.hasDuplicates,
-          useExisting: school.useExistingSchool,
-          existingId: school.existingSchoolId,
-          action: school.identityDecision?.action,
-        });
-      });
-
-      if (Object.keys(userDecisions).length > 0) {
-        console.log('[匯入流程] 📝 應用使用者決定的重複解決方案');
-        // Apply user decisions for duplicates
-      }
-
-      // Start import process using real API
       const importSummary = await ImportOrchestrator.importAll(schoolsToImport, progress => {
         setImportProgress(progress);
       });
-
-      console.log('[匯入流程] ✅ 匯入完成:', importSummary);
 
       if (importSummary.successCount > 0) {
         toast.success(
@@ -324,7 +269,6 @@ const AI_Analysis = () => {
   };
 
   const handleSchoolConfirmation = (schoolIndex, confirmed = true) => {
-    console.log(`[學校確認] 🏫 學校 ${schoolIndex}: ${confirmed ? '已確認' : '取消確認'}`);
     setSchoolConfirmations(prev => ({
       ...prev,
       [schoolIndex]: confirmed,
@@ -332,7 +276,6 @@ const AI_Analysis = () => {
   };
 
   const handleDuplicateDecision = (itemType, itemKey, decision) => {
-    console.log(`[使用者決定] 📝 ${itemType}: ${itemKey} -> ${decision.action}`);
     setUserDecisions(prev => ({
       ...prev,
       [itemKey]: decision,

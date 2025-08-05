@@ -505,15 +505,6 @@ const ExcelWorkflow = ({
           <button
             onClick={() => {
               const validation = IdentityResolution.validateResolutions(duplicateCheckResults);
-              if (validation.isValid) {
-                console.log('[使用者決定] ✅ 所有重複項目已解決');
-              } else {
-                console.log(
-                  `[使用者決定] ⚠️ 尚有 ${
-                    validation.unresolved.schools.length + validation.unresolved.students.length
-                  } 個未解決項目`
-                );
-              }
             }}
             className="ai-analysis__button ai-analysis__button--secondary"
           >
