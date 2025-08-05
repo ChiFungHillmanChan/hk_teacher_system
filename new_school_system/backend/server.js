@@ -169,13 +169,43 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// Add a simple test endpoint too
-app.get('/api/test', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Test endpoint working',
-    timestamp: new Date().toISOString(),
-  });
+// Add to server.js or a new API route
+app.get('/api/test-db', async (req, res) => {
+  try {
+    console.log('🔍 Testing database connection...');
+    console.log('📊 MONGODB_URI exists:', !!process.env.MONGODB_URI);
+    console.log('📊 Connection state:', mongoose.connection.readyState);
+    console.log('📊 Database name:', mongoose.connection.db?.databaseName);
+
+    // Test basic operation
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    console.log(
+      '📊 Collections:',
+      collections.map(c => c.name)
+    );
+
+    // Test school count
+    const School = require('./models/School'); // Adjust path
+    const schoolCount = await School.countDocuments();
+    console.log('📊 School count:', schoolCount);
+
+    res.json({
+      success: true,
+      data: {
+        mongoUri: !!process.env.MONGODB_URI,
+        connectionState: mongoose.connection.readyState,
+        databaseName: mongoose.connection.db?.databaseName,
+        collections: collections.map(c => c.name),
+        schoolCount,
+      },
+    });
+  } catch (error) {
+    console.error('❌ Database test failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
 });
 
 // API routes
