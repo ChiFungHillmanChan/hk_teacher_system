@@ -143,6 +143,8 @@ app.use((req, res, next) => {
 // Health check endpoint
 app.get('/api/health', async (req, res) => {
   try {
+    console.log('Health check requested');
+
     const dbHealth = await checkDBHealth();
 
     res.status(200).json({
@@ -155,6 +157,7 @@ app.get('/api/health', async (req, res) => {
         uptime: process.uptime(),
         memory: process.memoryUsage(),
         version: process.env.npm_package_version || '1.0.0',
+        environment: process.env.NODE_ENV,
       },
     });
   } catch (error) {
@@ -164,6 +167,15 @@ app.get('/api/health', async (req, res) => {
       error: error.message,
     });
   }
+});
+
+// Add a simple test endpoint too
+app.get('/api/test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Test endpoint working',
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // API routes
