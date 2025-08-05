@@ -57,12 +57,13 @@ app.get('*', (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 5001;
+// REMOVE THIS SECTION - NOT NEEDED IN VERCEL SERVERLESS:
+// const PORT = process.env.PORT || 5001;
+// const server = app.listen(PORT, () => {
+//   console.log(`🚀 Minimal server running on port ${PORT}`);
+//   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+//   console.log(`📡 Vercel: ${process.env.VERCEL || 'false'}`);
+// });
 
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Minimal server running on port ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📡 Vercel: ${process.env.VERCEL || 'false'}`);
-});
-
+// Just export the app
 module.exports = app;
