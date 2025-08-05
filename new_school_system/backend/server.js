@@ -54,7 +54,12 @@ const corsOptions = {
 
     const allowedOrigins = process.env.CORS_ORIGINS
       ? process.env.CORS_ORIGINS.split(',')
-      : ['http://localhost:3000', 'http://localhost:5173'];
+      : [
+          'http://localhost:3000',
+          'http://localhost:5173',
+          'https://hk-teacher-system-4gty.vercel.app',
+          'https://hk-teacher-system.vercel.app',
+        ];
 
     // Add production domain when deployed
     if (process.env.CLIENT_URL) {

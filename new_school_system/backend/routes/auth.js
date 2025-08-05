@@ -36,7 +36,7 @@ const {
 // Rate limiting configurations
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5000, // Higher limit for testing
+  max: 5000,
   skip: req =>
     (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') &&
     req.ip === '127.0.0.1',
@@ -52,7 +52,7 @@ const authLimiter = rateLimit({
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 5000, // limit each IP to 100 requests per windowMs
   message: {
     success: false,
     message: 'Too many requests, please try again later.',
@@ -66,7 +66,7 @@ const passwordLimiter =
     ? (req, res, next) => next()
     : rateLimit({
         windowMs: 60 * 60 * 1000, // 1 hour
-        max: 3, // limit each IP to 3 password reset requests per hour
+        max: 10,
         message: {
           success: false,
           message: 'Too many password reset attempts, please try again later.',
