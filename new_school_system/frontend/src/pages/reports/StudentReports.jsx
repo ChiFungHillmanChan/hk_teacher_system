@@ -84,17 +84,16 @@ const StudentReports = () => {
           limit: 1000,
         };
 
-
         const studentsData = await studentHelpers.getAll(params);
         const allStudents = Array.isArray(studentsData) ? studentsData : [];
-        
+
         const filteredStudents = allStudents.filter(student => {
           const academicYearMatch = student.currentAcademicYear === filters.currentAcademicYear;
           const gradeMatch = !filters.currentGrade || student.currentGrade === filters.currentGrade;
-          
+
           return academicYearMatch && gradeMatch;
         });
-  
+
         setStudents(filteredStudents);
       } catch (error) {
         console.error('❌ Failed to load students:', error);
@@ -117,7 +116,6 @@ const StudentReports = () => {
       try {
         setLoading(true);
 
-        // Directly get array of reports after unwrap
         const recordsData = await studentReportHelpers.getByStudent(filters.student, {
           currentAcademicYear: filters.currentAcademicYear,
           page: 1,

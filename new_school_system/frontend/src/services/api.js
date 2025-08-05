@@ -182,9 +182,7 @@ export const schoolHelpers = {
 
   create: async schoolData => {
     try {
-      console.log('➕ Creating school:', schoolData?.name);
       const result = await apiRequest.post('/schools', schoolData);
-      console.log('✅ School created successfully:', result?.name);
       return result;
     } catch (error) {
       console.error('❌ Failed to create school:', error);
@@ -194,13 +192,7 @@ export const schoolHelpers = {
 
   update: async (id, schoolData) => {
     try {
-      console.log('📝 Updating school:', id, schoolData);
-
-      // Log the exact data being sent
-      console.log('Update payload:', JSON.stringify(schoolData, null, 2));
-
       const result = await apiRequest.put(`/schools/${id}`, schoolData);
-      console.log('✅ School updated successfully:', result?.name);
       return result;
     } catch (error) {
       console.error(`❌ Failed to update school ${id}:`, error);
@@ -222,14 +214,9 @@ export const schoolHelpers = {
 
   delete: async id => {
     try {
-      console.log('🗑️ Deleting school:', id);
-
-      // First check if school exists and get details
       const schoolToDelete = await apiRequest.get(`/schools/${id}`);
-      console.log('School to delete:', schoolToDelete?.name);
 
       const result = await apiRequest.delete(`/schools/${id}`);
-      console.log('✅ School deleted successfully');
       return result;
     } catch (error) {
       console.error(`❌ Failed to delete school ${id}:`, error);
@@ -272,9 +259,7 @@ export const schoolHelpers = {
 export const studentHelpers = {
   getAll: async (params = {}) => {
     try {
-      console.log('🔍 Fetching all students with params:', params);
       const result = await apiRequest.get('/students', { params });
-      console.log(`✅ Students fetched successfully: ${result?.length || 0} students`);
       return result;
     } catch (error) {
       console.error('❌ Failed to fetch students:', error);
