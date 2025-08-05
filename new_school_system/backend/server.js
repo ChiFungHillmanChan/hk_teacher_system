@@ -46,7 +46,7 @@ app.use(
   })
 );
 
-// CORS configuration
+// CORS configuration - Updated with better logging
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile apps, curl, etc.)
@@ -66,33 +66,80 @@ const corsOptions = {
       allowedOrigins.push(process.env.CLIENT_URL);
     }
 
+    console.log('🌐 CORS Check:', {
+      origin: origin,
+      allowed: allowedOrigins,
+      isAllowed: allowedOrigins.indexOf(origin) !== -1,
+    });
+
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.log('❌ CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
 
+// Handle OPTIONS requests explicitly
+app.options('*', cors(corsOptions));
+
+// Health check endpoint - BEFORE rate limiting
+app.get('/api/health', async (req, res) => {
+  try {
+    console.log('🏥 Health check requested');
+
+    // Simple health check without database to avoid timeout issues
+    res.status(200).json({
+      success: true,
+      message: 'Server is healthy',
+      data: {
+        server: 'OK',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV || 'development',
+        version: '1.0.0',
+      },
+    });
+  } catch (error) {
+    console.error('❌ Health check error:', error);
+    res.status(503).json({
+      success: false,
+      message: 'Server health check failed',
+      error: error.message,
+    });
+  }
+});
+
+// Test endpoint - BEFORE rate limiting
+app.get('/api/test', (req, res) => {
+  console.log('🧪 Test endpoint called');
+  res.json({
+    success: true,
+    message: 'Test endpoint working',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+  });
+});
+
 // Global rate limiting
 const globalLimiter = rateLimit({
   max: parseInt(process.env.RATE_LIMIT_MAX) || 1000,
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.',
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // Skip rate limiting for health check endpoint
-  skip: req => req.path === '/api/health',
+  // Skip rate limiting for health and test endpoints
+  skip: req => req.path === '/api/health' || req.path === '/api/test',
 });
 
 app.use(globalLimiter);
@@ -125,11 +172,11 @@ app.use(
 // Cookie parser middleware
 app.use(cookieParser());
 
-// Request logging middleware (simple version)
+// Request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
+  console.log(`📡 ${req.method} ${req.originalUrl} from ${req.headers.origin || 'no-origin'}`);
 
-  // Log response when finished
   res.on('finish', () => {
     const duration = Date.now() - start;
     console.log(
@@ -140,44 +187,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health check endpoint
-app.get('/api/health', async (req, res) => {
-  try {
-    console.log('Health check requested');
-
-    const dbHealth = await checkDBHealth();
-
-    res.status(200).json({
-      success: true,
-      message: 'Server is healthy',
-      data: {
-        server: 'OK',
-        database: dbHealth,
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        version: process.env.npm_package_version || '1.0.0',
-        environment: process.env.NODE_ENV,
-      },
-    });
-  } catch (error) {
-    res.status(503).json({
-      success: false,
-      message: 'Server health check failed',
-      error: error.message,
-    });
-  }
-});
-
-// Add a simple test endpoint too
-app.get('/api/test', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Test endpoint working',
-    timestamp: new Date().toISOString(),
-  });
-});
-
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/schools', schoolRoutes);
@@ -186,73 +195,13 @@ app.use('/api/student-reports', studentReportRoutes);
 app.use('/api/ai-analysis', aiAnalysisRoutes);
 app.use('/api/meeting-records', meetingRecordRoutes);
 
-// API overview endpoint
-app.get('/api', (req, res) => {
-  res.json({
-    success: true,
-    message: 'HK Teacher Student Management System API',
-    version: '1.0.0',
-    endpoints: {
-      authentication: {
-        base: '/api/auth',
-        routes: [
-          'POST /api/auth/register - Register new teacher',
-          'POST /api/auth/login - Login user',
-          'POST /api/auth/logout - Logout user',
-          'GET /api/auth/me - Get current user',
-          'PUT /api/auth/updatedetails - Update user details',
-          'PUT /api/auth/updatepassword - Update password',
-          'POST /api/auth/forgotpassword - Forgot password',
-          'PUT /api/auth/resetpassword/:token - Reset password',
-        ],
-      },
-      schools: {
-        base: '/api/schools',
-        routes: [
-          'GET /api/schools - Get all schools',
-          'POST /api/schools - Create new school',
-          'GET /api/schools/:id - Get single school',
-          'PUT /api/schools/:id - Update school',
-          'DELETE /api/schools/:id - Delete school (admin only)',
-          'GET /api/schools/:id/stats - Get school statistics',
-          'POST /api/schools/:id/teachers - Add teacher to school',
-          'DELETE /api/schools/:id/teachers/:teacherId - Remove teacher from school',
-          'POST /api/schools/:id/academic-years - Add academic year',
-          'PUT /api/schools/:id/academic-years/:year/activate - Set active academic year',
-        ],
-      },
-      students: {
-        base: '/api/students',
-        routes: [
-          'GET /api/students - Get all students',
-          'POST /api/students - Create new student',
-          'GET /api/students/:id - Get single student',
-          'PUT /api/students/:id - Update student',
-          'DELETE /api/students/:id - Delete student',
-          'GET /api/students/my-students - Get my students (teacher)',
-          'GET /api/students/stats/:schoolId - Get student statistics by school',
-          'POST /api/students/:id/teachers - Add teacher to student',
-          'DELETE /api/students/:id/teachers/:teacherId - Remove teacher from student',
-        ],
-      },
-      aiAnalysis: {
-        base: '/api/ai-analysis',
-        routes: [
-          'GET /api/ai-analysis/stats - Get AI analysis statistics',
-          'POST /api/ai-analysis/extract - Extract student data from file using AI',
-          'POST /api/ai-analysis/import - Import extracted student data to database',
-        ],
-      },
-    },
-    documentation: 'See /docs for detailed API documentation',
-  });
-});
-
+// API overview endpoint - SINGLE VERSION ONLY
 app.get('/api', (req, res) => {
   res.json({
     success: true,
     message: 'HK Teacher Student Management System API',
     version: '2.0.0',
+    timestamp: new Date().toISOString(),
     endpoints: {
       authentication: {
         base: '/api/auth',
@@ -297,7 +246,6 @@ app.get('/api', (req, res) => {
         ],
       },
       studentReports: {
-        // ADD THIS SECTION
         base: '/api/student-reports',
         routes: [
           'GET /api/student-reports - Get all student reports',
@@ -313,16 +261,29 @@ app.get('/api', (req, res) => {
           'PUT /api/student-reports/:id/approve - Approve report (admin)',
         ],
       },
+      meetingRecords: {
+        base: '/api/meeting-records',
+        routes: [
+          'GET /api/meeting-records - Get all meeting records',
+          'POST /api/meeting-records - Create new meeting record',
+          'GET /api/meeting-records/:id - Get single meeting record',
+          'PUT /api/meeting-records/:id - Update meeting record',
+          'DELETE /api/meeting-records/:id - Delete meeting record',
+          'GET /api/meeting-records/student/:studentId - Get meetings by student',
+          'GET /api/meeting-records/stats - Get meeting statistics',
+          'GET /api/meeting-records/by-year/:schoolId/:academicYear - Get meetings by year',
+        ],
+      },
+      aiAnalysis: {
+        base: '/api/ai-analysis',
+        routes: [
+          'GET /api/ai-analysis/stats - Get AI analysis statistics',
+          'POST /api/ai-analysis/extract - Extract student data from file using AI',
+          'POST /api/ai-analysis/import - Import extracted student data to database',
+          'GET /api/ai-analysis/status - Check AI service status',
+        ],
+      },
     },
-    aiAnalysis: {
-      base: '/api/ai-analysis',
-      routes: [
-        'GET /api/ai-analysis/stats - Get AI analysis statistics',
-        'POST /api/ai-analysis/extract - Extract student data from file using AI',
-        'POST /api/ai-analysis/import - Import extracted student data to database',
-      ],
-    },
-
     documentation: 'See /docs for detailed API documentation',
   });
 });
@@ -340,6 +301,7 @@ app.all('/api/*', (req, res) => {
       '/api/students/*',
       '/api/student-reports/*',
       '/api/ai-analysis/*',
+      '/api/meeting-records/*',
     ],
   });
 });
@@ -355,7 +317,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Global error handling middleware
 app.use((err, req, res, _next) => {
-  console.error('Global error handler:', err);
+  console.error('🚨 Global error handler:', err);
 
   let error = { ...err };
   error.message = err.message;
@@ -401,18 +363,46 @@ app.use((err, req, res, _next) => {
   });
 });
 
+const PORT = process.env.PORT || 5001;
+
+// Start server
+const server = app.listen(PORT, async () => {
+  console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  console.log(`📚 API Documentation available at http://localhost:${PORT}/api`);
+  console.log(`🏥 Health check available at http://localhost:${PORT}/api/health`);
+  console.log(`🧪 Test endpoint available at http://localhost:${PORT}/api/test`);
+});
+
+// Handle server startup errors
+server.on('error', error => {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  const bind = typeof PORT === 'string' ? 'Pipe ' + PORT : 'Port ' + PORT;
+
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+});
+
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, _promise) => {
   console.error('Unhandled Promise Rejection:', err);
 
   // Close server & exit process
-  if (server) {
-    server.close(() => {
-      process.exit(1);
-    });
-  } else {
+  server.close(() => {
     process.exit(1);
-  }
+  });
 });
 
 // Handle uncaught exceptions
@@ -424,82 +414,18 @@ process.on('uncaughtException', err => {
 // Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('SIGTERM received. Shutting down gracefully...');
-
-  if (server) {
-    server.close(() => {
-      console.log('Process terminated');
-      process.exit(0);
-    });
-  } else {
+  server.close(() => {
+    console.log('Process terminated');
     process.exit(0);
-  }
+  });
 });
 
 process.on('SIGINT', () => {
   console.log('SIGINT received. Shutting down gracefully...');
-
-  if (server) {
-    server.close(() => {
-      console.log('Process terminated');
-      process.exit(0);
-    });
-  } else {
+  server.close(() => {
+    console.log('Process terminated');
     process.exit(0);
-  }
+  });
 });
-const PORT = process.env.PORT || 5001;
-
-if (require.main === module) {
-  const server = app.listen(PORT, async () => {
-    console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-    console.log(`📚 API Documentation available at http://localhost:${PORT}/api`);
-  });
-
-  server.on('error', error => {
-    if (error.syscall !== 'listen') throw error;
-
-    const bind = typeof PORT === 'string' ? 'Pipe ' + PORT : 'Port ' + PORT;
-
-    switch (error.code) {
-      case 'EACCES':
-        console.error(bind + ' requires elevated privileges');
-        process.exit(1);
-        break;
-      case 'EADDRINUSE':
-        console.error(bind + ' is already in use');
-        process.exit(1);
-        break;
-      default:
-        throw error;
-    }
-  });
-} else {
-  const server = app.listen(PORT, async () => {
-    console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-    console.log(`📚 API Documentation available at http://localhost:${PORT}/api`);
-  });
-
-  // Handle server startup errors
-  server.on('error', error => {
-    if (error.syscall !== 'listen') {
-      throw error;
-    }
-
-    const bind = typeof PORT === 'string' ? 'Pipe ' + PORT : 'Port ' + PORT;
-
-    switch (error.code) {
-      case 'EACCES':
-        console.error(bind + ' requires elevated privileges');
-        process.exit(1);
-        break;
-      case 'EADDRINUSE':
-        console.error(bind + ' is already in use');
-        process.exit(1);
-        break;
-      default:
-        throw error;
-    }
-  });
-}
 
 module.exports = app;
