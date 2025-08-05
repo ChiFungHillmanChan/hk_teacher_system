@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://hk-teacher-system.vercel.app/api/$1"
+    }
+  ]
+}
