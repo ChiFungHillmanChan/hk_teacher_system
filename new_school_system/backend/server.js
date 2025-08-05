@@ -21,8 +21,40 @@ const meetingRecordRoutes = require('./routes/meetingRecord');
 // Create Express app
 const app = express();
 
+// Add at the very top of server.js after require('dotenv').config();
+console.log('🔍 Environment Variables Check:');
+console.log('📊 NODE_ENV:', process.env.NODE_ENV);
+console.log('📊 PORT:', process.env.PORT);
+console.log('📊 MONGODB_URI exists:', !!process.env.MONGODB_URI);
+console.log('📊 MONGODB_URI starts with:', process.env.MONGODB_URI?.substring(0, 20));
+
 // Connect to database
 connectDB();
+
+// With this:
+const startServer = async () => {
+  try {
+    // Connect to database first
+    await connectDB();
+    console.log('✅ Database connected successfully');
+
+    // Start server after database connection
+    const PORT = process.env.PORT || 5001;
+
+    const server = app.listen(PORT, () => {
+      console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+      console.log(`📚 API Documentation available at http://localhost:${PORT}/api`);
+    });
+
+    // ... rest of your server error handling
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+// Call the async function
+startServer();
 
 // Trust proxy (important for rate limiting behind reverse proxy/load balancer)
 app.set('trust proxy', 1);
@@ -170,34 +202,47 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// Add to server.js or a new API route
 app.get('/api/test-db', async (req, res) => {
   try {
+    const mongoose = require('mongoose');
+
     console.log('🔍 Testing database connection...');
     console.log('📊 MONGODB_URI exists:', !!process.env.MONGODB_URI);
     console.log('📊 Connection state:', mongoose.connection.readyState);
-    console.log('📊 Database name:', mongoose.connection.db?.databaseName);
 
-    // Test basic operation
+    // Connection states: 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+    const connectionStates = {
+      0: 'disconnected',
+      1: 'connected',
+      2: 'connecting',
+      3: 'disconnecting',
+    };
+
+    const connectionState = mongoose.connection.readyState;
+
+    if (connectionState !== 1) {
+      return res.json({
+        success: false,
+        error: `Database not connected. State: ${connectionStates[connectionState]}`,
+        data: {
+          mongoUri: !!process.env.MONGODB_URI,
+          connectionState,
+          connectionStatus: connectionStates[connectionState],
+        },
+      });
+    }
+
+    // Only try to access db if connected
     const collections = await mongoose.connection.db.listCollections().toArray();
-    console.log(
-      '📊 Collections:',
-      collections.map(c => c.name)
-    );
-
-    // Test school count
-    const School = require('./models/School'); // Adjust path
-    const schoolCount = await School.countDocuments();
-    console.log('📊 School count:', schoolCount);
 
     res.json({
       success: true,
       data: {
         mongoUri: !!process.env.MONGODB_URI,
-        connectionState: mongoose.connection.readyState,
-        databaseName: mongoose.connection.db?.databaseName,
+        connectionState,
+        connectionStatus: connectionStates[connectionState],
+        databaseName: mongoose.connection.db.databaseName,
         collections: collections.map(c => c.name),
-        schoolCount,
       },
     });
   } catch (error) {
