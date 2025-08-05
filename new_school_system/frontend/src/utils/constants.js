@@ -139,19 +139,19 @@ export const LOADING_MESSAGES = {
 // API endpoints constants (keep in English for backend compatibility)
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: '/api/auth/login',
-    REGISTER: '/api/auth/register',
-    LOGOUT: '/api/auth/logout',
-    ME: '/api/auth/me',
-    REFRESH: '/api/auth/refresh',
+    LOGIN: '/auth/login',
+    REGISTER: '/auth/register',
+    LOGOUT: '/auth/logout',
+    ME: '/auth/me',
+    REFRESH: '/auth/refresh',
   },
   SCHOOLS: {
-    BASE: '/api/schools',
-    STATS: id => `/api/schools/${id}/stats`,
+    BASE: '/schools',
+    STATS: id => `/schools/${id}/stats`,
   },
   STUDENTS: {
-    BASE: '/api/students',
-    MY_STUDENTS: '/api/students/my-students',
+    BASE: '/students',
+    MY_STUDENTS: '/students/my-students',
   },
 };
 
