@@ -7,10 +7,13 @@ export const setGlobalRateLimitHandler = handler => {
 };
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api',
+  baseURL: 'https://hk-teacher-system.vercel.app/api',
   timeout: 15000,
   withCredentials: true,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
 });
 
 const tokenManager = {
