@@ -26,13 +26,13 @@ import YearSummary from './pages/year-summary/YearSummary';
 
 // Import student reports components
 import CreateStudentRecord from './pages/reports/CreateStudentRecord';
-import StudentReports from './pages/reports/StudentReports';
 import StudentReportDetails from './pages/reports/StudentReportDetails'; // NEW IMPORT
+import StudentReports from './pages/reports/StudentReports';
 
 // Import new Meeting Records components
+import MeetingRecordDetail from './pages/meetings/MeetingRecordDetail';
 import MeetingRecordForm from './pages/meetings/MeetingRecordForm';
 import MeetingRecords from './pages/meetings/MeetingRecords';
-import MeetingRecordDetail from './pages/meetings/MeetingRecordDetail';
 // Import integration component
 import AI_Analysis from './pages/analysation/AI_Analysis';
 import Integration from './pages/integration/Integration';

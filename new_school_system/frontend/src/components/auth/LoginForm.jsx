@@ -1,9 +1,9 @@
 // File: src/components/auth/LoginForm.jsx
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { AlertCircle, Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast, { Toaster } from 'react-hot-toast';
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { VALIDATION_RULES } from '../../utils/constants';
 
@@ -18,12 +18,12 @@ const LoginForm = () => {
     register,
     handleSubmit,
     setValue,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       email: '',
-      password: ''
-    }
+      password: '',
+    },
   });
 
   // Redirect if already authenticated
@@ -47,19 +47,19 @@ const LoginForm = () => {
   }, [location, navigate]);
 
   // Form submission handler
-  const onSubmit = async (data) => {
+  const onSubmit = async data => {
     try {
       clearError();
-      
+
       const loginPromise = login({
         email: data.email.trim().toLowerCase(),
-        password: data.password
+        password: data.password,
       });
 
       await toast.promise(loginPromise, {
         loading: '登入中...',
         success: '歡迎回來！',
-        error: (err) => {
+        error: err => {
           const message = err.message || '登入失敗';
           if (message.includes('Invalid credentials')) {
             return '電子郵件或密碼錯誤';
@@ -74,7 +74,7 @@ const LoginForm = () => {
             return '帳號已被停用，請聯絡管理員';
           }
           return message;
-        }
+        },
       });
     } catch (error) {
       console.error('Login failed:', error);
@@ -105,8 +105,8 @@ const LoginForm = () => {
             color: 'var(--color-text-primary)',
             border: '1px solid var(--color-border)',
             borderRadius: 'var(--border-radius-md)',
-            boxShadow: 'var(--shadow-lg)'
-          }
+            boxShadow: 'var(--shadow-lg)',
+          },
         }}
       />
 
@@ -123,8 +123,8 @@ const LoginForm = () => {
                 required: '請輸入您的電子郵件',
                 pattern: {
                   value: VALIDATION_RULES.EMAIL.PATTERN,
-                  message: '請輸入有效的電子郵件格式'
-                }
+                  message: '請輸入有效的電子郵件格式',
+                },
               })}
               id="email"
               type="email"
@@ -155,8 +155,8 @@ const LoginForm = () => {
                 required: '請輸入您的密碼',
                 minLength: {
                   value: 1,
-                  message: '請輸入密碼'
-                }
+                  message: '請輸入密碼',
+                },
               })}
               id="password"
               type={showPassword ? 'text' : 'password'}
@@ -185,19 +185,11 @@ const LoginForm = () => {
 
         <div className="form-options">
           <label className="checkbox-label">
-            <input
-              type="checkbox"
-              className="checkbox"
-              disabled={isSubmitting}
-            />
+            <input type="checkbox" className="checkbox" disabled={isSubmitting} />
             <span className="checkbox-text">記住我</span>
           </label>
 
-          <Link
-            to="/forgot-password"
-            className="forgot-link"
-            tabIndex={isSubmitting ? -1 : 0}
-          >
+          <Link to="/forgot-password" className="forgot-link" tabIndex={isSubmitting ? -1 : 0}>
             忘記密碼？
           </Link>
         </div>

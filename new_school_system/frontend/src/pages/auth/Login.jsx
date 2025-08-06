@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { AlertCircle, Eye, EyeOff, GraduationCap, Lock, Mail } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast, { Toaster } from 'react-hot-toast';
-import { Mail, Lock, Eye, EyeOff, AlertCircle, GraduationCap } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { VALIDATION_RULES } from '../../utils/constants';
 
@@ -18,12 +18,12 @@ const Login = () => {
     register,
     handleSubmit,
     setValue,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       email: '',
-      password: ''
-    }
+      password: '',
+    },
   });
 
   // Redirect if already authenticated
@@ -43,40 +43,45 @@ const Login = () => {
   };
 
   // Form submission handler
-  const onSubmit = async (data) => {
+  const onSubmit = async data => {
     try {
       setLoginError(''); // Clear any previous errors
       if (clearError && typeof clearError === 'function') {
         clearError();
       }
-      
+
       await login({
         email: data.email.trim().toLowerCase(),
-        password: data.password
+        password: data.password,
       });
 
       // Show success message
       toast.success('登入成功！歡迎回來！');
-      
     } catch (error) {
       console.error('Login failed:', error);
-      
+
       // Handle different types of login errors
       let errorMessage = '登入失敗，請重試';
-      
+
       if (error.response?.data?.message) {
         const serverMessage = error.response.data.message.toLowerCase();
-        
-        if (serverMessage.includes('invalid credentials') || 
-            serverMessage.includes('invalid email') ||
-            serverMessage.includes('user not found') ||
-            serverMessage.includes('incorrect password')) {
+
+        if (
+          serverMessage.includes('invalid credentials') ||
+          serverMessage.includes('invalid email') ||
+          serverMessage.includes('user not found') ||
+          serverMessage.includes('incorrect password')
+        ) {
           errorMessage = '電郵地址或密碼錯誤，請檢查後重試';
-        } else if (serverMessage.includes('account is locked') || 
-                   serverMessage.includes('temporarily locked')) {
+        } else if (
+          serverMessage.includes('account is locked') ||
+          serverMessage.includes('temporarily locked')
+        ) {
           errorMessage = '帳戶因多次登入失敗而被暫時鎖定，請稍後再試';
-        } else if (serverMessage.includes('account is deactivated') || 
-                   serverMessage.includes('not active')) {
+        } else if (
+          serverMessage.includes('account is deactivated') ||
+          serverMessage.includes('not active')
+        ) {
           errorMessage = '帳戶已被停用，請聯繫管理員';
         } else if (serverMessage.includes('email not verified')) {
           errorMessage = '請先驗證您的電子郵件地址';
@@ -86,7 +91,7 @@ const Login = () => {
       } else if (error.message) {
         errorMessage = '電郵地址或密碼錯誤，請檢查後重試';
       }
-      
+
       setLoginError(errorMessage);
       toast.error(errorMessage);
     }
@@ -124,7 +129,7 @@ const Login = () => {
 
   return (
     <>
-      <Toaster 
+      <Toaster
         position="top-right"
         toastOptions={{
           duration: 4000,
@@ -133,11 +138,11 @@ const Login = () => {
             color: 'var(--color-text-primary)',
             border: '1px solid var(--color-border)',
             borderRadius: 'var(--border-radius-md)',
-            boxShadow: 'var(--shadow-lg)'
-          }
+            boxShadow: 'var(--shadow-lg)',
+          },
         }}
       />
-      
+
       <div className="auth-page">
         <div className="auth-page__container">
           <div className="auth-page__header">
@@ -145,9 +150,7 @@ const Login = () => {
               <GraduationCap size={48} color="var(--color-primary)" />
             </div>
             <h1 className="auth-page__title">登入香港教師系統</h1>
-            <p className="auth-page__subtitle">
-              請輸入您的帳戶資料以繼續使用系統
-            </p>
+            <p className="auth-page__subtitle">請輸入您的帳戶資料以繼續使用系統</p>
           </div>
 
           {/* Show login error message */}
@@ -180,8 +183,8 @@ const Login = () => {
                     required: '電郵地址為必填項目',
                     pattern: {
                       value: VALIDATION_RULES.EMAIL.PATTERN,
-                      message: '請輸入有效的電郵地址'
-                    }
+                      message: '請輸入有效的電郵地址',
+                    },
                   })}
                   id="email"
                   type="email"
@@ -211,13 +214,15 @@ const Login = () => {
                     required: '密碼為必填項目',
                     minLength: {
                       value: VALIDATION_RULES.PASSWORD.MIN_LENGTH,
-                      message: `密碼必須至少 ${VALIDATION_RULES.PASSWORD.MIN_LENGTH} 個字符`
-                    }
+                      message: `密碼必須至少 ${VALIDATION_RULES.PASSWORD.MIN_LENGTH} 個字符`,
+                    },
                   })}
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="請輸入您的密碼"
-                  className={`form-input ${errors.password || loginError ? 'form-input--error' : ''}`}
+                  className={`form-input ${
+                    errors.password || loginError ? 'form-input--error' : ''
+                  }`}
                   disabled={isSubmitting}
                   autoComplete="current-password"
                   onChange={handleInputChange}
@@ -242,19 +247,11 @@ const Login = () => {
 
             <div className="form-options">
               <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  className="checkbox"
-                  disabled={isSubmitting}
-                />
+                <input type="checkbox" className="checkbox" disabled={isSubmitting} />
                 <span className="checkbox-text">記住我</span>
               </label>
 
-              <Link
-                to="/forgot-password"
-                className="forgot-link"
-                tabIndex={isSubmitting ? -1 : 0}
-              >
+              <Link to="/forgot-password" className="forgot-link" tabIndex={isSubmitting ? -1 : 0}>
                 忘記密碼？
               </Link>
             </div>
