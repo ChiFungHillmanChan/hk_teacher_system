@@ -1,30 +1,40 @@
-/* AI Analysis Preview Components */
+/* AI Analysis Preview Components
+ * Data preview tables and related interactive elements
+ * Dependencies: CSS variables from base/variables.css
+ */
 
 /* ========================================
-   PREVIEW TABLE
+   PREVIEW TABLE CONTAINER
 ======================================== */
 
-.ai-analysis__preview-table {
+.ai-analysis .preview-table {
   padding: var(--spacing-4);
   max-height: 600px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
-.ai-analysis__table-wrapper {
+.ai-analysis .table-wrapper {
   overflow-x: auto;
   border: 1px solid var(--color-border-light);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-sm);
+  background-color: var(--color-white);
 }
 
-.ai-analysis__table {
+/* ========================================
+   DATA TABLE
+======================================== */
+
+.ai-analysis .data-table {
   width: 100%;
   border-collapse: collapse;
   background-color: var(--color-white);
   min-width: 800px;
+  font-size: var(--font-size-sm);
 }
 
-.ai-analysis__table th {
+.ai-analysis .data-table th {
   background-color: var(--color-background-light);
   padding: var(--spacing-4);
   text-align: left;
@@ -32,62 +42,46 @@
   color: var(--color-text-primary);
   border-bottom: 2px solid var(--color-border);
   white-space: nowrap;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
 }
 
-.ai-analysis__table td {
+.ai-analysis .data-table td {
   padding: var(--spacing-3);
   border-bottom: 1px solid var(--color-border-light);
   vertical-align: middle;
+  color: var(--color-text-secondary);
 }
 
-.ai-analysis__table tr:hover {
+.ai-analysis .data-table tr:hover {
   background-color: var(--color-background-light);
 }
 
-.ai-analysis__row--exists {
+.ai-analysis .data-table tr.row--highlighted {
   background-color: rgba(52, 152, 219, 0.05);
 }
 
-.ai-analysis__row--exists:hover {
+.ai-analysis .data-table tr.row--highlighted:hover {
   background-color: rgba(52, 152, 219, 0.1);
 }
 
-/* ========================================
-   STATUS BADGES
-======================================== */
-
-.ai-analysis__status {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--spacing-1) var(--spacing-2);
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  white-space: nowrap;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.ai-analysis__status--new {
-  background-color: var(--color-success-light);
-  color: var(--color-success);
-  border: 1px solid var(--color-success-border);
-}
-
-.ai-analysis__status--exists {
+.ai-analysis .data-table tr.row--exists {
   background-color: var(--color-primary-light);
-  color: var(--color-primary);
-  border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+.ai-analysis .data-table tr.row--exists:hover {
+  background-color: rgba(52, 152, 219, 0.15);
 }
 
 /* ========================================
    EDITABLE INPUTS
 ======================================== */
 
-.ai-analysis__input {
+.ai-analysis .table-input {
   width: 100%;
   padding: var(--spacing-2) var(--spacing-3);
   border: 1px solid var(--color-border-light);
@@ -97,39 +91,183 @@
   color: var(--color-text-primary);
   transition: all var(--transition-fast);
   min-width: 80px;
+  font-family: inherit;
 }
 
-.ai-analysis__input:focus {
+.ai-analysis .table-input:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px var(--color-primary-light);
   background-color: var(--color-white);
 }
 
-.ai-analysis__input:disabled {
+.ai-analysis .table-input:disabled {
   background-color: var(--color-background-light);
   color: var(--color-text-muted);
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
-.ai-analysis__input::placeholder {
+.ai-analysis .table-input::placeholder {
   color: var(--color-text-muted);
   font-style: italic;
+}
+
+.ai-analysis .table-input--error {
+  border-color: var(--color-error);
+  background-color: var(--color-error-light);
+}
+
+.ai-analysis .table-input--error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
 }
 
 /* ========================================
    TABLE ACTIONS
 ======================================== */
 
-.ai-analysis__table .btn--danger {
+.ai-analysis .table-actions {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-analysis .table-btn {
   padding: var(--spacing-1) var(--spacing-2);
   font-size: var(--font-size-xs);
   min-height: 28px;
   gap: var(--spacing-1);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-fast);
 }
 
-.ai-analysis__table .btn--danger:hover {
+.ai-analysis .table-btn:hover:not(:disabled) {
   transform: scale(1.05);
+}
+
+.ai-analysis .table-btn--danger {
+  background-color: var(--color-error);
+  color: var(--color-white);
+  border-color: var(--color-error);
+}
+
+.ai-analysis .table-btn--danger:hover:not(:disabled) {
+  background-color: var(--color-error-hover);
+  border-color: var(--color-error-hover);
+}
+
+.ai-analysis .table-btn--primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.ai-analysis .table-btn--primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.ai-analysis .table-btn--secondary {
+  background-color: var(--color-white);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+}
+
+.ai-analysis .table-btn--secondary:hover:not(:disabled) {
+  background-color: var(--color-background-light);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-hover);
+}
+
+/* ========================================
+   PROGRESS BAR
+======================================== */
+
+.ai-analysis .progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: var(--color-border-light);
+  border-radius: var(--border-radius-full);
+  overflow: hidden;
+  margin: var(--spacing-4) 0;
+}
+
+.ai-analysis .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
+  border-radius: var(--border-radius-full);
+  transition: width var(--transition-normal);
+  position: relative;
+}
+
+.ai-analysis .progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-image: linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.2) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.2) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 16px 16px;
+  animation: progressStripe 1s linear infinite;
+}
+
+/* ========================================
+   TABLE FILTERS
+======================================== */
+
+.ai-analysis .table-filters {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4) var(--spacing-6);
+  background-color: var(--color-background-light);
+  border-bottom: 1px solid var(--color-border-light);
+  flex-wrap: wrap;
+}
+
+.ai-analysis .filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.ai-analysis .filter-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.ai-analysis .filter-select {
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-white);
+  color: var(--color-text-primary);
+  min-width: 120px;
+}
+
+.ai-analysis .filter-search {
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-white);
+  color: var(--color-text-primary);
+  min-width: 200px;
 }
 
 /* ========================================
@@ -137,46 +275,120 @@
 ======================================== */
 
 @media (max-width: 1024px) {
-  .ai-analysis__table {
+  .ai-analysis .data-table {
     font-size: var(--font-size-xs);
     min-width: 700px;
   }
 
-  .ai-analysis__table th,
-  .ai-analysis__table td {
+  .ai-analysis .data-table th,
+  .ai-analysis .data-table td {
     padding: var(--spacing-2);
   }
 
-  .ai-analysis__input {
+  .ai-analysis .table-input {
     font-size: var(--font-size-xs);
     padding: var(--spacing-1) var(--spacing-2);
+  }
+
+  .ai-analysis .table-filters {
+    padding: var(--spacing-3) var(--spacing-4);
+    gap: var(--spacing-3);
   }
 }
 
 @media (max-width: 768px) {
-  .ai-analysis__preview-table {
+  .ai-analysis .preview-table {
     padding: var(--spacing-3);
     max-height: 500px;
   }
 
-  .ai-analysis__table {
+  .ai-analysis .data-table {
     min-width: 600px;
+  }
+
+  .ai-analysis .table-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-3);
+  }
+
+  .ai-analysis .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-2);
+  }
+
+  .ai-analysis .filter-select,
+  .ai-analysis .filter-search {
+    min-width: unset;
+    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .ai-analysis__preview-table {
+  .ai-analysis .preview-table {
     padding: var(--spacing-2);
     max-height: 400px;
   }
 
-  .ai-analysis__table th,
-  .ai-analysis__table td {
+  .ai-analysis .data-table th,
+  .ai-analysis .data-table td {
     padding: var(--spacing-1);
   }
 
-  .ai-analysis__status {
+  .ai-analysis .table-actions {
+    flex-direction: column;
+    gap: var(--spacing-1);
+  }
+
+  .ai-analysis .table-btn {
     font-size: 10px;
     padding: 2px var(--spacing-1);
+    min-height: 24px;
+  }
+}
+
+/* ========================================
+   ANIMATIONS
+======================================== */
+
+@keyframes progressStripe {
+  0% {
+    background-position: 16px 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-analysis .progress-fill::after {
+    animation: none;
+  }
+
+  .ai-analysis .section-card:hover {
+    transform: none;
+  }
+
+  .ai-analysis .table-btn:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .ai-analysis .data-table {
+    border: 2px solid var(--color-border);
+  }
+
+  .ai-analysis .data-table th {
+    border-bottom-width: 3px;
+  }
+
+  .ai-analysis .table-input {
+    border-width: 2px;
   }
 }

@@ -1,9 +1,3 @@
-/* Integration Main Layout */
-
-/* ========================================
-   INTEGRATION PAGE CONTAINER
-======================================== */
-
 .integration-page {
   width: 100%;
   max-width: none;
@@ -12,10 +6,6 @@
   box-sizing: border-box;
   min-height: calc(100vh - 80px);
 }
-
-/* ========================================
-   LOADING STATES
-======================================== */
 
 .integration-loading {
   display: flex;
@@ -38,10 +28,6 @@
   margin: 0;
   font-size: var(--font-size-base);
 }
-
-/* ========================================
-   ERROR STATES
-======================================== */
 
 .integration-error {
   display: flex;
@@ -76,14 +62,6 @@
   line-height: 1.5;
 }
 
-/* ========================================
-   ANIMATIONS FOR SPIN
-======================================== */
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -92,10 +70,6 @@
     transform: rotate(360deg);
   }
 }
-
-/* ========================================
-   RESPONSIVE DESIGN
-======================================== */
 
 @media (max-width: 768px) {
   .integration-page {
@@ -114,19 +88,11 @@
   }
 }
 
-/* ========================================
-   ACCESSIBILITY
-======================================== */
-
 @media (prefers-reduced-motion: reduce) {
   .animate-spin {
     animation: none;
   }
 }
-
-/* ========================================
-   HIGH CONTRAST MODE
-======================================== */
 
 @media (prefers-contrast: high) {
   .integration-error {

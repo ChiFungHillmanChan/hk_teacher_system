@@ -1,19 +1,9 @@
-/* Year Summary Main Layout */
-
-/* ========================================
-   YEAR SUMMARY PAGE CONTAINER
-======================================== */
-
 .year-summary {
   max-width: var(--container-max-width);
   margin: 0 auto;
   padding: var(--spacing-6);
   min-height: calc(100vh - 80px);
 }
-
-/* ========================================
-   YEAR SUMMARY HEADER
-======================================== */
 
 .year-summary__header {
   display: flex;
@@ -62,10 +52,6 @@
   line-height: 1.4;
 }
 
-/* ========================================
-   SCHOOL SELECTION SECTION
-======================================== */
-
 .year-summary__school-section {
   background-color: var(--color-white);
   border-radius: var(--border-radius-xl);
@@ -80,46 +66,19 @@
   max-width: 400px;
 }
 
-/* ========================================
-   EMPTY STATE
-======================================== */
-
 .empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: var(--spacing-16);
   background-color: var(--color-white);
   border: 2px dashed var(--color-border);
   border-radius: var(--border-radius-lg);
   margin: var(--spacing-8) 0;
 }
 
-.empty-state svg {
-  color: var(--color-text-muted);
-  margin-bottom: var(--spacing-6);
-}
-
-.empty-state h3 {
-  font-size: var(--font-size-xl);
-  color: var(--color-text-primary);
-  margin-bottom: var(--spacing-4);
-}
-
 .empty-state p {
-  color: var(--color-text-secondary);
   margin-bottom: var(--spacing-6);
   max-width: 400px;
   margin-left: auto;
   margin-right: auto;
-  line-height: 1.5;
 }
-
-/* ========================================
-   TRANSITION INFO
-======================================== */
 
 .transition-info {
   display: flex;
@@ -133,10 +92,6 @@
   color: var(--color-text-muted);
   font-style: italic;
 }
-
-/* ========================================
-   RESPONSIVE DESIGN
-======================================== */
 
 @media (max-width: 768px) {
   .year-summary {

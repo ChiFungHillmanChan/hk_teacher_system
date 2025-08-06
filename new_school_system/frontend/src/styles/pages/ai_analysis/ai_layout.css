@@ -1,19 +1,26 @@
-/* AI Analysis Layout Styles */
+/* AI Analysis Layout
+ * Page-level layout and structure for AI analysis interface
+ * Dependencies: CSS variables from base/variables.css
+ */
 
 /* ========================================
    PAGE LAYOUT
 ======================================== */
 
-.ai-analysis-page {
+.ai-analysis {
   width: 100%;
   max-width: var(--container-max-width);
   margin: 0 auto;
   padding: var(--spacing-6);
   box-sizing: border-box;
+  min-height: calc(100vh - var(--header-height));
 }
 
-/* Use the same header styling as year summary page */
-.ai-analysis__header {
+/* ========================================
+   PAGE HEADER
+======================================== */
+
+.ai-analysis .page-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -27,7 +34,7 @@
   gap: var(--spacing-4);
 }
 
-.ai-analysis__header-content {
+.ai-analysis .header-content {
   display: flex;
   align-items: center;
   gap: var(--spacing-4);
@@ -35,7 +42,7 @@
   min-width: 0;
 }
 
-.ai-analysis__header-icon {
+.ai-analysis .header-icon {
   width: 64px;
   height: 64px;
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
@@ -48,41 +55,37 @@
   box-shadow: var(--shadow-md);
 }
 
-.ai-analysis__title {
+.ai-analysis .page-title {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   margin: 0 0 var(--spacing-2) 0;
-  line-height: 1.2;
+  line-height: var(--line-height-tight);
 }
 
-.ai-analysis__subtitle {
+.ai-analysis .page-subtitle {
   font-size: var(--font-size-base);
   color: var(--color-text-secondary);
   margin: 0;
-  line-height: 1.4;
+  line-height: var(--line-height-normal);
 }
 
-/* ========================================
-   HEADER ACTIONS
-======================================== */
-
-.ai-analysis__header-actions {
+.ai-analysis .header-actions {
   display: flex;
   gap: var(--spacing-3);
   align-items: center;
   flex-shrink: 0;
 }
 
-.ai-analysis__section {
+/* ========================================
+   MAIN SECTIONS
+======================================== */
+
+.ai-analysis .main-section {
   margin-bottom: var(--spacing-8);
 }
 
-/* ========================================
-   CARD LAYOUTS
-======================================== */
-
-.ai-analysis__card {
+.ai-analysis .section-card {
   background-color: var(--color-white);
   border-radius: var(--border-radius-xl);
   box-shadow: var(--shadow-md);
@@ -91,18 +94,19 @@
   transition: all var(--transition-fast);
 }
 
-.ai-analysis__card:hover {
+.ai-analysis .section-card:hover {
   box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
 }
 
-.ai-analysis__card--success {
+.ai-analysis .section-card--success {
   text-align: center;
   padding: var(--spacing-12);
   border-color: var(--color-success);
   background: linear-gradient(135deg, var(--color-success-light), var(--color-white));
 }
 
-.ai-analysis__card-header {
+.ai-analysis .card-header {
   display: flex;
   align-items: center;
   gap: var(--spacing-4);
@@ -111,7 +115,7 @@
   background-color: var(--color-background-light);
 }
 
-.ai-analysis__card-header h2 {
+.ai-analysis .card-header h2 {
   flex: 1;
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
@@ -119,18 +123,23 @@
   margin: 0;
 }
 
-.ai-analysis__card-actions {
+.ai-analysis .card-actions {
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
 }
 
-.ai-analysis__actions {
-  display: flex;
-  justify-content: center;
-  gap: var(--spacing-4);
+.ai-analysis .card-body {
   padding: var(--spacing-6);
-  flex-wrap: wrap;
+}
+
+.ai-analysis .card-footer {
+  padding: var(--spacing-4) var(--spacing-6);
+  border-top: 1px solid var(--color-border-light);
+  background-color: var(--color-background-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* ========================================
@@ -138,61 +147,94 @@
 ======================================== */
 
 @media (max-width: 1024px) {
-  .ai-analysis-page {
+  .ai-analysis {
     padding: var(--spacing-4);
+  }
+
+  .ai-analysis .page-header {
+    padding: var(--spacing-6);
+  }
+
+  .ai-analysis .header-icon {
+    width: 56px;
+    height: 56px;
   }
 }
 
 @media (max-width: 768px) {
-  .ai-analysis__header {
+  .ai-analysis .page-header {
     flex-direction: column;
     align-items: stretch;
-    padding: var(--spacing-6);
+    padding: var(--spacing-5);
   }
 
-  .ai-analysis__header-content {
+  .ai-analysis .header-content {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-3);
   }
 
-  .ai-analysis__header-icon {
+  .ai-analysis .header-icon {
     width: 48px;
     height: 48px;
     margin: 0 auto;
   }
 
-  .ai-analysis__title {
+  .ai-analysis .page-title {
     font-size: var(--font-size-2xl);
   }
 
-  .ai-analysis__subtitle {
-    font-size: var(--font-size-sm);
-  }
-
-  .ai-analysis__header-actions {
+  .ai-analysis .header-actions {
     justify-content: center;
-    margin-top: var(--spacing-4);
+    flex-wrap: wrap;
   }
 
-  .ai-analysis__actions {
+  .ai-analysis .card-header {
+    padding: var(--spacing-4);
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-3);
+  }
+
+  .ai-analysis .card-actions {
+    justify-content: center;
+  }
+
+  .ai-analysis .card-body {
+    padding: var(--spacing-4);
+  }
+
+  .ai-analysis .card-footer {
+    padding: var(--spacing-3) var(--spacing-4);
     flex-direction: column;
     gap: var(--spacing-3);
   }
 }
 
 @media (max-width: 480px) {
-  .ai-analysis-page {
+  .ai-analysis {
     padding: var(--spacing-3);
   }
 
-  .ai-analysis__card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-3);
+  .ai-analysis .page-header {
+    padding: var(--spacing-4);
   }
 
-  .ai-analysis__card--success {
-    padding: var(--spacing-8);
+  .ai-analysis .page-title {
+    font-size: var(--font-size-xl);
+  }
+
+  .ai-analysis .page-subtitle {
+    font-size: var(--font-size-sm);
+  }
+
+  .ai-analysis .header-actions {
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .ai-analysis .header-actions .btn {
+    width: 100%;
+    justify-content: center;
   }
 }

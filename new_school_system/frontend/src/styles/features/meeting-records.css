@@ -1,19 +1,9 @@
-/* Meeting Records Feature Styles */
-
-/* ========================================
-   MEETING RECORDS PAGE LAYOUT
-======================================== */
-
 .meeting-records {
   max-width: var(--container-max-width);
   margin: 0 auto;
   padding: var(--spacing-6);
   min-height: calc(100vh - 80px);
 }
-
-/* ========================================
-   MEETING RECORDS HEADER
-======================================== */
 
 .meeting-records__header {
   display: flex;
@@ -57,10 +47,6 @@
   align-items: center;
 }
 
-/* ========================================
-   MEETING STATS SECTION
-======================================== */
-
 .meeting-records__stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -97,10 +83,6 @@
   margin: 0;
   font-weight: var(--font-weight-medium);
 }
-
-/* ========================================
-   MEETING FORM LAYOUT
-======================================== */
 
 .meeting-form {
   max-width: 1000px;
@@ -145,8 +127,7 @@
   color: var(--color-primary);
 }
 
-.student-class,
-.academic-year {
+.academic-year, .student-class {
   color: var(--color-text-secondary);
 }
 
@@ -158,10 +139,6 @@
   padding: var(--spacing-16);
   text-align: center;
 }
-
-/* ========================================
-   MEETING FORM SECTIONS
-======================================== */
 
 .meeting-form__form {
   display: flex;
@@ -222,16 +199,6 @@
   padding: var(--spacing-6);
 }
 
-/* ========================================
-   FORM GRID LAYOUTS
-======================================== */
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--spacing-6);
-}
-
 .form-grid--two {
   grid-template-columns: repeat(2, 1fr);
 }
@@ -239,14 +206,6 @@
 .form-grid--three {
   grid-template-columns: repeat(3, 1fr);
 }
-
-.form-group--full {
-  grid-column: 1 / -1;
-}
-
-/* ========================================
-   INPUT WITH ICONS
-======================================== */
 
 .input-with-icon {
   position: relative;
@@ -262,17 +221,7 @@
   pointer-events: none;
 }
 
-.input-with-icon .form-input,
-.input-with-icon .form-textarea {
-  padding-left: var(--spacing-10);
-}
-
-/* ========================================
-   FORM TEXTAREA VARIANTS
-======================================== */
-
 .form-textarea--large {
-  min-height: 150px;
   resize: vertical;
 }
 
@@ -282,13 +231,8 @@
 }
 
 .form-textarea--small {
-  min-height: 80px;
   resize: vertical;
 }
-
-/* ========================================
-   SEN CATEGORIES GRID
-======================================== */
 
 .sen-categories-grid {
   display: grid;
@@ -334,10 +278,6 @@
   flex: 1;
 }
 
-/* ========================================
-   IEP SUPPORT LEVEL INDICATOR
-======================================== */
-
 .iep-support-level {
   background-color: rgba(243, 156, 18, 0.1);
   border: 1px solid var(--color-warning-border);
@@ -367,35 +307,11 @@
   line-height: 1.5;
 }
 
-/* ========================================
-   MEETING TYPE BADGES
-======================================== */
-
 .meeting-type-badge {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-1);
-  padding: var(--spacing-1) var(--spacing-3);
-  border-radius: var(--border-radius-full);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
-
-.meeting-type-badge--regular {
-  background-color: var(--color-success-light);
-  color: var(--color-success);
-}
-
-.meeting-type-badge--iep {
-  background-color: var(--color-warning-light);
-  color: var(--color-warning);
-}
-
-/* ========================================
-   MEETING CARDS LIST
-======================================== */
 
 .meeting-records__content {
   background-color: var(--color-white);
@@ -509,10 +425,6 @@
   overflow: hidden;
 }
 
-/* ========================================
-   FILTER SECTIONS
-======================================== */
-
 .meeting-filters {
   background-color: var(--color-white);
   border-radius: var(--border-radius-xl);
@@ -562,10 +474,6 @@
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
 }
-
-/* ========================================
-   MEETING TYPE SELECTOR
-======================================== */
 
 .meeting-type-selector {
   display: grid;
@@ -621,12 +529,7 @@
   line-height: 1.4;
 }
 
-/* ========================================
-   EMPTY STATES
-======================================== */
-
-.meeting-records__empty,
-.meeting-records__no-selection {
+.meeting-records__empty, .meeting-records__no-selection {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -639,21 +542,18 @@
   margin: var(--spacing-8) 0;
 }
 
-.meeting-records__empty svg,
-.meeting-records__no-selection svg {
+.meeting-records__empty svg, .meeting-records__no-selection svg {
   color: var(--color-text-muted);
   margin-bottom: var(--spacing-6);
 }
 
-.meeting-records__empty h3,
-.meeting-records__no-selection h3 {
+.meeting-records__empty h3, .meeting-records__no-selection h3 {
   font-size: var(--font-size-xl);
   color: var(--color-text-primary);
   margin-bottom: var(--spacing-4);
 }
 
-.meeting-records__empty p,
-.meeting-records__no-selection p {
+.meeting-records__empty p, .meeting-records__no-selection p {
   color: var(--color-text-secondary);
   margin-bottom: var(--spacing-6);
   max-width: 400px;
@@ -661,10 +561,6 @@
   margin-right: auto;
   line-height: 1.5;
 }
-
-/* ========================================
-   ERROR MESSAGES
-======================================== */
 
 .error-message {
   display: flex;
@@ -684,9 +580,10 @@
   flex-shrink: 0;
 }
 
-/* ========================================
-   RESPONSIVE DESIGN
-======================================== */
+.meeting-card:focus, .meeting-type-option:focus, .sen-category-item:focus {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
 
 @media (max-width: 768px) {
   .meeting-records,
@@ -772,10 +669,6 @@
   }
 }
 
-/* ========================================
-   ACCESSIBILITY ENHANCEMENTS
-======================================== */
-
 @media (prefers-reduced-motion: reduce) {
   .meeting-card,
   .meeting-stat-card,
@@ -791,7 +684,6 @@
   }
 }
 
-/* High contrast mode */
 @media (prefers-contrast: high) {
   .meeting-card,
   .form-section {
@@ -802,18 +694,6 @@
     border-left-width: 6px;
   }
 }
-
-/* Focus styles for keyboard navigation */
-.meeting-card:focus,
-.sen-category-item:focus,
-.meeting-type-option:focus {
-  outline: 3px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-/* ========================================
-   PRINT STYLES
-======================================== */
 
 @media print {
   .meeting-records__actions,

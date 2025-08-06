@@ -1,19 +1,9 @@
-/* Students Management Page Styles */
-
-/* ========================================
-   STUDENTS MANAGEMENT LAYOUT
-======================================== */
-
 .students-management {
   max-width: var(--container-max-width);
   margin: 0 auto;
   padding: var(--spacing-6);
   min-height: calc(100vh - 80px);
 }
-
-/* ========================================
-   STUDENTS MANAGEMENT HEADER
-======================================== */
 
 .students-management__header {
   display: flex;
@@ -51,56 +41,6 @@
   align-items: center;
 }
 
-/* ========================================
-   SELECTION PANEL
-======================================== */
-
-.students-management__selection {
-  margin-bottom: var(--spacing-8);
-}
-
-.selection-panel {
-  background-color: var(--color-white);
-  border: 2px solid var(--color-border);
-  border-radius: var(--border-radius-xl);
-  padding: var(--spacing-6);
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-fast);
-}
-
-.selection-panel:hover {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-md);
-}
-
-.selection-panel__title {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  margin-bottom: var(--spacing-6);
-}
-
-.selection-panel__title::before {
-  content: '';
-  width: 4px;
-  height: 20px;
-  background-color: var(--color-primary);
-  border-radius: var(--border-radius-sm);
-}
-
-.selection-panel__content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-6);
-}
-
-/* ========================================
-   SEARCH AND CONTROLS
-======================================== */
-
 .students-management__controls {
   display: flex;
   gap: var(--spacing-4);
@@ -114,40 +54,9 @@
   min-width: 300px;
 }
 
-.search-bar__input {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.search-bar__input svg {
-  position: absolute;
-  left: var(--spacing-4);
-  color: var(--color-text-muted);
-  z-index: 1;
-}
-
 .search-bar__input .form-input {
   padding-left: var(--spacing-10);
   padding-right: var(--spacing-10);
-}
-
-.search-bar__clear {
-  position: absolute;
-  right: var(--spacing-3);
-  background: none;
-  border: none;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  padding: var(--spacing-1);
-  border-radius: var(--border-radius-sm);
-  transition: all var(--transition-fast);
-  z-index: 2;
-}
-
-.search-bar__clear:hover {
-  color: var(--color-text-secondary);
-  background-color: var(--color-background-light);
 }
 
 .filter-controls {
@@ -176,59 +85,18 @@
   transform: rotate(180deg);
 }
 
-/* ========================================
-   FILTER PANEL
-======================================== */
-
 .filter-panel {
-  background-color: var(--color-white);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-5);
-  margin-bottom: var(--spacing-6);
   box-shadow: var(--shadow-sm);
   animation: slideDown 0.2s ease-out;
 }
-
-.filter-panel__content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--spacing-4);
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
-.filter-label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
-}
-
-/* ========================================
-   RESULTS SUMMARY
-======================================== */
 
 .students-management__summary {
   margin-bottom: var(--spacing-4);
 }
 
 .results-summary {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  background-color: var(--color-background-light);
-  padding: var(--spacing-3) var(--spacing-4);
-  border-radius: var(--border-radius-md);
   border-left: 4px solid var(--color-primary);
-  margin: 0;
 }
-
-/* ========================================
-   STUDENTS TABLE
-======================================== */
 
 .students-table-container {
   background-color: var(--color-white);
@@ -238,87 +106,9 @@
   overflow: hidden;
 }
 
-.students-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--font-size-sm);
-}
-
-.students-table th {
-  background-color: var(--color-background-light);
-  color: var(--color-text-primary);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-xs);
-  text-align: left;
-  padding: var(--spacing-4);
-  border-bottom: 2px solid var(--color-border);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-}
-
-.students-table td {
-  padding: var(--spacing-4);
-  border-bottom: 1px solid var(--color-border-light);
-  vertical-align: middle;
-}
-
-.students-table tr:hover {
-  background-color: var(--color-background-light);
-}
-
-/* ========================================
-   STUDENT INFO COMPONENT
-======================================== */
-
-.student-info {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-  min-width: 0;
-}
-
-.student-info__avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--border-radius-full);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
-  color: var(--color-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: var(--font-weight-semibold);
-  flex-shrink: 0;
-}
-
-.student-info__details {
-  flex: 1;
-  min-width: 0;
-}
-
-.student-info__name {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  margin-bottom: 2px;
-  font-size: var(--font-size-sm);
-  line-height: 1.2;
-}
-
 .student-info__name-en {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
   line-height: 1.2;
 }
-
-.student-info__meta {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  line-height: 1.2;
-}
-
-/* ========================================
-   GRADE AND CLASS DISPLAY
-======================================== */
 
 .grade-class {
   display: flex;
@@ -352,24 +142,13 @@
   font-size: var(--font-size-sm);
 }
 
-/* ========================================
-   STUDENT ACTIONS
-======================================== */
-
 .student-actions {
   display: flex;
   gap: var(--spacing-2);
   align-items: center;
 }
 
-/* ========================================
-   LOADING AND EMPTY STATES
-======================================== */
-
-.students-management__loading,
-.students-management__error,
-.students-management__empty,
-.students-management__no-selection {
+.students-management__empty, .students-management__error, .students-management__loading, .students-management__no-selection {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -386,15 +165,11 @@
   background-color: var(--color-error-light);
 }
 
-.students-management__empty,
-.students-management__no-selection {
+.students-management__empty, .students-management__no-selection {
   border: 2px dashed var(--color-border);
 }
 
-.students-management__loading svg,
-.students-management__error svg,
-.students-management__empty svg,
-.students-management__no-selection svg {
+.students-management__empty svg, .students-management__error svg, .students-management__loading svg, .students-management__no-selection svg {
   color: var(--color-text-muted);
   margin-bottom: var(--spacing-6);
 }
@@ -403,10 +178,7 @@
   color: var(--color-error);
 }
 
-.students-management__loading h3,
-.students-management__error h2,
-.students-management__empty h3,
-.students-management__no-selection h3 {
+.students-management__empty h3, .students-management__error h2, .students-management__loading h3, .students-management__no-selection h3 {
   font-size: var(--font-size-xl);
   color: var(--color-text-primary);
   margin-bottom: var(--spacing-4);
@@ -416,30 +188,12 @@
   color: var(--color-error);
 }
 
-.students-management__loading p,
-.students-management__error p,
-.students-management__empty p,
-.students-management__no-selection p {
+.students-management__empty p, .students-management__error p, .students-management__loading p, .students-management__no-selection p {
   color: var(--color-text-secondary);
   margin-bottom: var(--spacing-6);
   max-width: 400px;
   margin-left: auto;
   margin-right: auto;
-}
-
-.loading-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid var(--color-border-light);
-  border-top: 3px solid var(--color-primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-.loading-spinner--large {
-  width: 48px;
-  height: 48px;
-  border-width: 4px;
 }
 
 .loading-message {
@@ -448,61 +202,24 @@
   font-size: var(--font-size-sm);
 }
 
-/* ========================================
-   PAGINATION
-======================================== */
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: var(--spacing-6);
-  background-color: var(--color-white);
-  border-top: 1px solid var(--color-border);
-  gap: var(--spacing-4);
-  flex-wrap: wrap;
-  border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
-}
-
-.pagination__btn {
-  background-color: var(--color-white);
-  border: 2px solid var(--color-border);
-  color: var(--color-text-secondary);
-  padding: var(--spacing-3) var(--spacing-5);
-  border-radius: var(--border-radius-lg);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  min-width: 100px;
-}
-
 .pagination__btn:hover:not(:disabled) {
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  border-color: var(--color-primary);
   transform: translateY(-1px);
 }
 
 .pagination__btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
   transform: none;
 }
 
-.pagination__info {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  padding: var(--spacing-3) var(--spacing-4);
-  font-weight: var(--font-weight-medium);
-  background-color: var(--color-background-light);
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--color-border);
+.students-cards {
+  display: none;
+  flex-direction: column;
+  gap: var(--spacing-4);
 }
 
-/* ========================================
-   ANIMATIONS
-======================================== */
+.filter-toggle:focus, .pagination__btn:focus, .search-bar__clear:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
 
 @keyframes spin {
   0% {
@@ -523,10 +240,6 @@
     transform: translateY(0);
   }
 }
-
-/* ========================================
-   RESPONSIVE DESIGN
-======================================== */
 
 @media (max-width: 1024px) {
   .students-management {
@@ -562,7 +275,7 @@
     grid-template-columns: 1fr;
   }
 
-  /* Convert table to cards on mobile */
+  
   .students-table-container {
     display: none;
   }
@@ -598,16 +311,6 @@
     min-width: 80px;
     padding: var(--spacing-2) var(--spacing-4);
   }
-}
-
-/* ========================================
-   MOBILE CARDS LAYOUT
-======================================== */
-
-.students-cards {
-  display: none; /* Hidden by default, shown on mobile */
-  flex-direction: column;
-  gap: var(--spacing-4);
 }
 
 @media (max-width: 768px) {
@@ -664,10 +367,6 @@
   }
 }
 
-/* ========================================
-   ACCESSIBILITY
-======================================== */
-
 @media (prefers-reduced-motion: reduce) {
   .selection-panel,
   .filter-toggle,
@@ -693,15 +392,6 @@
   }
 }
 
-/* Focus styles for keyboard navigation */
-.filter-toggle:focus,
-.search-bar__clear:focus,
-.pagination__btn:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-/* High contrast mode */
 @media (prefers-contrast: high) {
   .students-table-container,
   .selection-panel,

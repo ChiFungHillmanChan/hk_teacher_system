@@ -1,98 +1,16 @@
-/* Create Forms Pages Styling */
-
-/* ========================================
-   CREATE PAGES LAYOUT
-======================================== */
-
-.create-school-page,
-.create-student-page {
+.create-school-page, .create-student-page {
   max-width: 800px;
   margin: 0 auto;
   padding: var(--spacing-6);
   min-height: calc(100vh - 80px);
 }
 
-/* ========================================
-   PAGE HEADER
-======================================== */
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--spacing-8);
-  padding: var(--spacing-8);
-  background-color: var(--color-white);
-  border-radius: var(--border-radius-xl);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--color-border-light);
-  flex-wrap: wrap;
-  gap: var(--spacing-4);
-}
-
-.page-header__content {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-4);
-  flex: 1;
-  min-width: 0;
-}
-
-.page-header__icon {
-  width: 64px;
-  height: 64px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
-  border-radius: var(--border-radius-xl);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-white);
-  flex-shrink: 0;
-  box-shadow: var(--shadow-md);
-}
-
-.page-title {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-2) 0;
-  line-height: 1.2;
-}
-
-.page-subtitle {
-  font-size: var(--font-size-base);
-  color: var(--color-text-secondary);
-  margin: 0;
-  line-height: 1.5;
-}
-
-/* ========================================
-   FORM CONTAINER
-======================================== */
-
-.form-container {
-  background-color: var(--color-white);
-  border-radius: var(--border-radius-xl);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--color-border-light);
-  overflow: hidden;
-}
-
-/* ========================================
-   CREATE FORM STRUCTURE
-======================================== */
-
-.create-school-form,
-.create-student-form {
+.create-school-form, .create-student-form {
   padding: var(--spacing-8);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-8);
 }
-
-/* ========================================
-   FORM SECTIONS (CREATE-SPECIFIC)
-======================================== */
 
 .form-section {
   background-color: var(--color-background-light);
@@ -114,13 +32,7 @@
 }
 
 .form-section-title {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
   margin: 0 0 var(--spacing-6) 0;
-  padding-bottom: var(--spacing-3);
-  border-bottom: 2px solid var(--color-border);
-  position: relative;
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
@@ -137,13 +49,7 @@
   border-radius: var(--border-radius-sm);
 }
 
-/* ========================================
-   LABEL & REQUIRED (CREATE SPECIFIC OVERRIDES)
-   Recommend migrating these to modifier classes in labels.css
-======================================== */
-
-.create-school-form .form-label,
-.create-student-form .form-label {
+.create-school-form .form-label, .create-student-form .form-label {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
@@ -154,26 +60,18 @@
   line-height: 1.4;
 }
 
-.create-school-form .form-label svg,
-.create-student-form .form-label svg {
+.create-school-form .form-label svg, .create-student-form .form-label svg {
   color: var(--color-primary);
   flex-shrink: 0;
 }
 
-.create-school-form .form-required,
-.create-student-form .form-required {
+.create-school-form .form-required, .create-student-form .form-required {
   color: var(--color-error);
   font-weight: var(--font-weight-bold);
   margin-left: var(--spacing-1);
 }
 
-/* ========================================
-   ENHANCED INPUT STYLING FOR CREATE FORMS
-   (Overrides / variants of base inputs.css)
-======================================== */
-
-.create-school-form .form-input,
-.create-student-form .form-input {
+.create-school-form .form-input, .create-student-form .form-input {
   width: 100%;
   font-family: inherit;
   font-size: var(--font-size-base);
@@ -189,18 +87,14 @@
   position: relative;
 }
 
-.create-school-form .form-input:disabled,
-.create-student-form .form-input:disabled {
+.create-school-form .form-input:disabled, .create-student-form .form-input:disabled {
   background-color: var(--color-background-dark);
   color: var(--color-text-muted);
   cursor: not-allowed;
   opacity: 0.7;
 }
 
-/* Textarea and select adjustments specific to create forms */
-
-.create-school-form textarea.form-input,
-.create-student-form textarea.form-input {
+.create-school-form textarea.form-input, .create-student-form textarea.form-input {
   resize: vertical;
   min-height: 80px;
   line-height: var(--line-height-relaxed);
@@ -208,8 +102,7 @@
   padding-bottom: var(--spacing-3);
 }
 
-.create-school-form select.form-input,
-.create-student-form select.form-input {
+.create-school-form select.form-input, .create-student-form select.form-input {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23374151' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   background-position: right var(--spacing-3) center;
   background-repeat: no-repeat;
@@ -219,27 +112,18 @@
   cursor: pointer;
 }
 
-/* ========================================
-   ERROR STATES FOR CREATE FORMS
-   (Rename .form-error to avoid collision with base validation; consider unifying in validation.css)
-======================================== */
-
-.create-school-form .form-input--error,
-.create-student-form .form-input--error {
+.create-school-form .form-input--error, .create-student-form .form-input--error {
   border-color: var(--color-error);
   background-color: var(--color-error-light);
   box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
 }
 
-.create-school-form .form-input--error:focus,
-.create-student-form .form-input--error:focus {
+.create-school-form .form-input--error:focus, .create-student-form .form-input--error:focus {
   border-color: var(--color-error);
   box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
 }
 
-/* This is a create-form-specific error box; renaming or consolidating is recommended */
-.create-school-form .form-error,
-.create-student-form .form-error {
+.create-school-form .form-error, .create-student-form .form-error {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
@@ -254,17 +138,11 @@
   border-radius: var(--border-radius-md);
 }
 
-.create-school-form .form-error svg,
-.create-student-form .form-error svg {
+.create-school-form .form-error svg, .create-student-form .form-error svg {
   flex-shrink: 0;
 }
 
-/* ========================================
-   FORM HELP TEXT FOR CREATE FORMS
-======================================== */
-
-.create-school-form .form-help,
-.create-student-form .form-help {
+.create-school-form .form-help, .create-student-form .form-help {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   line-height: 1.4;
@@ -278,19 +156,13 @@
   gap: var(--spacing-2);
 }
 
-.create-school-form .form-help::before,
-.create-student-form .form-help::before {
+.create-school-form .form-help::before, .create-student-form .form-help::before {
   content: '💡';
   flex-shrink: 0;
   margin-top: 1px;
 }
 
-/* ========================================
-   FORM ACTIONS (CREATE-SPECIFIC)
-======================================== */
-
-.create-school-form .form-actions,
-.create-student-form .form-actions {
+.create-school-form .form-actions, .create-student-form .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-4);
@@ -306,15 +178,10 @@
   padding-bottom: var(--spacing-8);
 }
 
-.create-school-form .form-actions .btn,
-.create-student-form .form-actions .btn {
+.create-school-form .form-actions .btn, .create-student-form .form-actions .btn {
   min-width: 120px;
   font-weight: var(--font-weight-semibold);
 }
-
-/* ========================================
-   FORM ERROR BANNER
-======================================== */
 
 .form-error-banner {
   margin: var(--spacing-6) 0;
@@ -334,17 +201,8 @@
   flex-shrink: 0;
 }
 
-/* ========================================
-   LOADING STATES
-======================================== */
-
 .form-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   padding: var(--spacing-16);
-  text-align: center;
   background-color: var(--color-white);
   border-radius: var(--border-radius-lg);
 }
@@ -354,33 +212,16 @@
 }
 
 .form-loading p {
-  color: var(--color-text-secondary);
-  margin: 0;
   font-size: var(--font-size-base);
 }
 
-/* ========================================
-   BUTTON ENHANCEMENTS
-======================================== */
-
 .btn--loading {
-  position: relative;
   pointer-events: none;
 }
 
 .btn-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid transparent;
-  border-top: 2px solid currentColor;
-  border-radius: var(--border-radius-full);
-  animation: spin 1s linear infinite;
   margin-right: var(--spacing-2);
 }
-
-/* ========================================
-   ANIMATIONS
-======================================== */
 
 @keyframes slideDown {
   from {
@@ -401,10 +242,6 @@
     transform: rotate(360deg);
   }
 }
-
-/* ========================================
-   RESPONSIVE DESIGN
-======================================== */
 
 @media (max-width: 768px) {
   .create-school-page,
@@ -503,10 +340,6 @@
   }
 }
 
-/* ========================================
-   HIGH CONTRAST MODE
-======================================== */
-
 @media (prefers-contrast: high) {
   .create-school-form .form-input,
   .create-student-form .form-input,
@@ -524,10 +357,6 @@
     font-weight: var(--font-weight-bold);
   }
 }
-
-/* ========================================
-   REDUCED MOTION
-======================================== */
 
 @media (prefers-reduced-motion: reduce) {
   .create-school-form .form-input:focus,

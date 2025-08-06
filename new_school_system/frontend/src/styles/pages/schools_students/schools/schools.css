@@ -1,7 +1,3 @@
-/* ========================================
-   SEARCH AND CONTROLS
-======================================== */
-
 .schools-management__controls {
   background-color: var(--color-white);
   border-radius: var(--border-radius-lg);
@@ -55,10 +51,6 @@
   background-color: var(--color-background-light);
 }
 
-/* ========================================
-   FILTER PANEL
-======================================== */
-
 .filter-panel {
   background-color: var(--color-background-light);
   border: 1px solid var(--color-border-light);
@@ -79,16 +71,6 @@
   gap: var(--spacing-2);
 }
 
-.filter-label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
-}
-
-/* ========================================
-   RESULTS SUMMARY
-======================================== */
-
 .schools-management__summary {
   margin-bottom: var(--spacing-6);
 }
@@ -102,10 +84,6 @@
   border-radius: var(--border-radius-md);
   border: 1px solid var(--color-border-light);
 }
-
-/* ========================================
-   SCHOOLS GRID
-======================================== */
 
 .schools-grid {
   display: grid;
@@ -259,10 +237,6 @@
   justify-content: center;
 }
 
-/* ========================================
-   SCHOOL DETAIL PAGE
-======================================== */
-
 .school-detail {
   max-width: var(--container-max-width);
   margin: 0 auto;
@@ -333,10 +307,6 @@
   gap: var(--spacing-8);
 }
 
-/* ========================================
-   SCHOOL INFO SECTION
-======================================== */
-
 .school-detail__info-section {
   background-color: var(--color-white);
   border-radius: var(--border-radius-xl);
@@ -406,10 +376,6 @@
   flex-shrink: 0;
 }
 
-/* ========================================
-   STUDENTS SECTION
-======================================== */
-
 .school-detail__students-section {
   background-color: var(--color-white);
   border-radius: var(--border-radius-xl);
@@ -441,10 +407,6 @@
   color: var(--color-primary);
 }
 
-/* ========================================
-   FILTERS
-======================================== */
-
 .school-detail__filters {
   padding: var(--spacing-6);
   background-color: var(--color-background-light);
@@ -472,10 +434,6 @@
 .filter-group .form-input {
   min-width: 200px;
 }
-
-/* ========================================
-   STUDENTS TABLE
-======================================== */
 
 .students-table-container {
   overflow-x: auto;
@@ -512,55 +470,13 @@
   background-color: var(--color-background-light);
 }
 
-.student-info {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-  min-width: 0;
-}
-
 .student-info__avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--border-radius-full);
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
-  color: var(--color-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  flex-shrink: 0;
-}
-
-.student-info__details {
-  flex: 1;
-  min-width: 0;
-}
-
-.student-info__name {
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  margin-bottom: 2px;
-  font-size: var(--font-size-sm);
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .student-info__name-en {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   font-style: italic;
 }
-
-/* ========================================
-   EMPTY STATE
-======================================== */
 
 .empty-state {
   display: flex;
@@ -588,10 +504,6 @@
   margin: 0;
   line-height: 1.5;
 }
-
-/* ========================================
-   WARNING BOX
-======================================== */
 
 .warning-box {
   display: flex;
@@ -623,44 +535,12 @@
   line-height: 1.4;
 }
 
-/* ========================================
-   MODAL STYLES
-======================================== */
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-modal-backdrop);
-  padding: var(--spacing-4);
-}
-
-.modal-content {
-  background-color: var(--color-white);
-  border-radius: var(--border-radius-xl);
-  box-shadow: var(--shadow-2xl);
-  max-width: 500px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
 .modal-content--danger {
   border-top: 4px solid var(--color-error);
 }
 
 .modal-header {
-  display: flex;
-  align-items: center;
   gap: var(--spacing-3);
-  padding: var(--spacing-6);
-  border-bottom: 1px solid var(--color-border);
 }
 
 .modal-header svg {
@@ -672,10 +552,6 @@
   margin: 0;
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
-}
-
-.modal-body {
-  padding: var(--spacing-6);
 }
 
 .modal-body p {
@@ -692,10 +568,6 @@
   border-top: 1px solid var(--color-border);
   background-color: var(--color-background-light);
 }
-
-/* ========================================
-   RESPONSIVE DESIGN
-======================================== */
 
 @media (max-width: 768px) {
 

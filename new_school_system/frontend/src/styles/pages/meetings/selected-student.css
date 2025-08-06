@@ -1,9 +1,3 @@
-/* Selected Student Section */
-
-/* ========================================
-   SELECTED STUDENT SECTION
-======================================== */
-
 .selected-student-section {
   margin-bottom: var(--spacing-8);
 }
@@ -26,14 +20,7 @@
   transform: translateY(-2px);
 }
 
-/* ========================================
-   SELECTED STUDENT INFO
-======================================== */
-
 .selected-student-info {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-4);
   flex: 1;
 }
 
@@ -66,15 +53,6 @@
   animation: shimmer 2s infinite;
 }
 
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%) translateY(-100%) rotate(45deg);
-  }
-  100% {
-    transform: translateX(100%) translateY(100%) rotate(45deg);
-  }
-}
-
 .selected-student-details {
   flex: 1;
   min-width: 0;
@@ -105,10 +83,6 @@
   color: var(--color-text-muted);
   font-weight: var(--font-weight-normal);
 }
-
-/* ========================================
-   SELECTED STUDENT BADGES
-======================================== */
 
 .student-grade-badge {
   display: inline-flex;
@@ -153,10 +127,6 @@
   border-color: rgba(52, 152, 219, 0.3);
 }
 
-/* ========================================
-   SELECTED STUDENT ACTIONS
-======================================== */
-
 .selected-student-actions {
   display: flex;
   gap: var(--spacing-3);
@@ -164,9 +134,19 @@
   flex-shrink: 0;
 }
 
-/* ========================================
-   RESPONSIVE SELECTED STUDENT
-======================================== */
+.selected-student-card:focus-within {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
 
 @media (max-width: 768px) {
   .selected-student-card {
@@ -219,7 +199,7 @@
   }
 
   .selected-student-meta span:nth-child(even) {
-    display: none; /* Hide separators on mobile */
+    display: none; 
   }
 
   .selected-student-actions {
@@ -232,10 +212,6 @@
     justify-content: center;
   }
 }
-
-/* ========================================
-   ACCESSIBILITY
-======================================== */
 
 @media (prefers-reduced-motion: reduce) {
   .selected-student-card {
@@ -250,15 +226,6 @@
     animation: none;
   }
 }
-
-.selected-student-card:focus-within {
-  outline: 3px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-/* ========================================
-   HIGH CONTRAST MODE
-======================================== */
 
 @media (prefers-contrast: high) {
   .selected-student-card {
