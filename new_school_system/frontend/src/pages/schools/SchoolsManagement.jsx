@@ -161,8 +161,8 @@ const SchoolsManagement = () => {
 
   if (loading) {
     return (
-      <div className="dashboard__loading">
-        <div className="dashboard__loading">
+      <div className="schools-management">
+        <div className="schools-management__loading">
           <div className="loading-spinner loading-spinner--large"></div>
           <p className="loading-message">載入學校資料中...</p>
         </div>
@@ -205,6 +205,19 @@ const SchoolsManagement = () => {
             學校管理
           </h1>
           <p className="schools-management__subtitle">管理系統內的所有學校資料</p>
+
+          {/* Debug info in header */}
+          <div
+            style={{
+              fontSize: '12px',
+              color: '#666',
+              marginTop: '0.5rem',
+              fontFamily: 'monospace',
+            }}
+          >
+            🔍 Debug: {schools.length} schools loaded, User: {user?.email || 'Not logged in'}
+          </div>
+        </div>
 
         <div className="schools-management__actions">
           <Link to="/schools/create" className="btn btn--primary">
