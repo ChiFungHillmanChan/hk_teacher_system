@@ -75,7 +75,8 @@ const getSchool = async (req, res) => {
       .populate('teachers.user', 'name email teacherId')
       .populate('createdBy', 'name email');
 
-    console.log('📊 Schools found:', schools.length);
+    // ✅ FIXED: Remove the problematic line that referenced undefined 'schools'
+    console.log(`👁️ Fetching school: ${req.params.id}`);
 
     if (!school) {
       return res.status(404).json({
@@ -84,28 +85,61 @@ const getSchool = async (req, res) => {
       });
     }
 
-    if (req.user.role !== 'admin') {
-      const hasAccess = req.user.schools.some(
-        userSchool => userSchool.toString() === school._id.toString()
-      );
+    // ✅ UPDATED: Allow all users to VIEW any school
+    console.log(`👁️ User ${req.user.email} viewing school: ${school.name}`);
 
-      if (!hasAccess) {
-        return res.status(403).json({
-          success: false,
-          message: 'Not authorized to access this school',
-        });
-      }
-    }
+    // Add permission metadata
+    const isAssignedTeacher = req.user.schools?.some(
+      userSchoolId => userSchoolId.toString() === school._id.toString()
+    );
+
+    const isSchoolTeacher = school.teachers?.some(
+      teacher => teacher.user._id.toString() === req.user._id.toString()
+    );
+
+    const teacherRole = school.teachers?.find(
+      teacher => teacher.user._id.toString() === req.user._id.toString()
+    )?.role;
+
+    const schoolWithPermissions = {
+      ...school.toObject(),
+      userPermissions: {
+        canView: true,
+        canEdit: req.user.role === 'admin' || isAssignedTeacher || isSchoolTeacher,
+        canDelete:
+          req.user.role === 'admin' ||
+          (isSchoolTeacher && teacherRole === 'head_teacher') ||
+          (isAssignedTeacher && teacherRole === 'head_teacher'),
+        canManageTeachers:
+          req.user.role === 'admin' || (isSchoolTeacher && teacherRole === 'head_teacher'),
+        isAssigned: isAssignedTeacher,
+        isTeacher: isSchoolTeacher,
+        teacherRole: teacherRole || null,
+      },
+    };
+
+    console.log(`✅ School found: ${school.name}, permissions calculated`);
 
     res.status(200).json({
       success: true,
-      data: school,
+      data: schoolWithPermissions,
     });
   } catch (error) {
-    console.error('Get school error:', error);
+    console.error('❌ Get school error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      schoolId: req.params.id,
+      userId: req.user?._id,
+    });
+
     res.status(500).json({
       success: false,
       message: 'Server error retrieving school',
+      ...(process.env.NODE_ENV === 'development' && {
+        error: error.message,
+        stack: error.stack,
+      }),
     });
   }
 };

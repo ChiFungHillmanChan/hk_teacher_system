@@ -176,35 +176,6 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// Add to server.js - NO authentication required
-app.get('/api/public-test-schools', async (req, res) => {
-  try {
-    const mongoose = require('mongoose');
-
-    // Import your School model (adjust path as needed)
-    const School = mongoose.model('School') || require('./models/School');
-
-    const schools = await School.find().limit(5); // Just get first 5
-
-    console.log('📊 Public test - Found schools:', schools.length);
-
-    res.json({
-      success: true,
-      message: 'Public test endpoint',
-      data: {
-        schoolCount: schools.length,
-        schools: schools,
-        sampleSchool: schools[0],
-      },
-    });
-  } catch (error) {
-    console.error('❌ Public test error:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-});
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/schools', schoolRoutes);

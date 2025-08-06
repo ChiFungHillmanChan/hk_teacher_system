@@ -1,19 +1,9 @@
 // File: src/pages/dashboard/Dashboard.jsx
-import React, { useState, useEffect } from 'react';
+import { AlertCircle, Bell, Calendar, Plus, School, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Users, 
-  School, 
-  BookOpen, 
-  BarChart3, 
-  Calendar,
-  Bell,
-  Plus,
-  TrendingUp,
-  AlertCircle
-} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { studentHelpers, schoolHelpers, handleApiError } from '../../services/api';
+import { handleApiError, schoolHelpers, studentHelpers } from '../../services/api';
 
 const Dashboard = () => {
   const { user, isAdmin } = useAuth();
@@ -23,7 +13,7 @@ const Dashboard = () => {
     schools: { count: 0, change: 0 },
     students: { count: 0, change: 0 },
     teachers: { count: 0, change: 0 },
-    reports: { count: 0, change: 0 }
+    reports: { count: 0, change: 0 },
   });
   const [schools, setSchools] = useState([]);
   const [students, setStudents] = useState([]);
@@ -32,7 +22,7 @@ const Dashboard = () => {
   useEffect(() => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   }, []);
 
@@ -44,8 +34,8 @@ const Dashboard = () => {
 
         // Fetch schools and students concurrently
         const [schoolsData, studentsData] = await Promise.all([
-          schoolHelpers.getAll({ limit: 200 }),  // returns array directly
-          studentHelpers.getAll({ limit: 100 })  // returns array directly
+          schoolHelpers.getAll({ limit: 200 }), // returns array directly
+          studentHelpers.getAll({ limit: 100 }), // returns array directly
         ]);
 
         // Defensive: ensure arrays
@@ -60,18 +50,18 @@ const Dashboard = () => {
         const lastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
 
         // Count schools added this month
-        const schoolsThisMonth = schools.filter(school =>
-          school.createdAt && new Date(school.createdAt) >= lastMonth
+        const schoolsThisMonth = schools.filter(
+          school => school.createdAt && new Date(school.createdAt) >= lastMonth
         ).length;
 
         // Count students added this month
-        const studentsThisMonth = students.filter(student =>
-          student.createdAt && new Date(student.createdAt) >= lastMonth
+        const studentsThisMonth = students.filter(
+          student => student.createdAt && new Date(student.createdAt) >= lastMonth
         ).length;
 
         // Total teachers from all schools (teachers array may or may not exist)
-        const totalTeachers = schools.reduce((acc, school) =>
-          acc + (Array.isArray(school.teachers) ? school.teachers.length : 0),
+        const totalTeachers = schools.reduce(
+          (acc, school) => acc + (Array.isArray(school.teachers) ? school.teachers.length : 0),
           0
         );
 
@@ -86,20 +76,20 @@ const Dashboard = () => {
         setStats({
           schools: {
             count: schools.length,
-            change: schoolsThisMonth
+            change: schoolsThisMonth,
           },
           students: {
             count: students.length,
-            change: studentsThisMonth
+            change: studentsThisMonth,
           },
           teachers: {
             count: totalTeachers,
-            change: teachersThisMonth
+            change: teachersThisMonth,
           },
           reports: {
             count: activeReports,
-            change: reportsThisWeek
-          }
+            change: reportsThisWeek,
+          },
         });
       } catch (err) {
         console.error('Failed to load dashboard data:', err);
@@ -112,20 +102,19 @@ const Dashboard = () => {
     loadDashboardData();
   }, []);
 
-
   // Helper function to calculate time ago
-  const getTimeAgo = (date) => {
+  const getTimeAgo = date => {
     const now = new Date();
     const diffInMinutes = Math.floor((now - date) / (1000 * 60));
-    
+
     if (diffInMinutes < 60) return `${diffInMinutes} 分鐘前`;
-    
+
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) return `${diffInHours} 小時前`;
-    
+
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays < 7) return `${diffInDays} 天前`;
-    
+
     return `${Math.floor(diffInDays / 7)} 週前`;
   };
 
@@ -138,16 +127,18 @@ const Dashboard = () => {
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 3);
 
-    recentStudents.forEach((student) => {
+    recentStudents.forEach(student => {
       const timeAgo = getTimeAgo(new Date(student.createdAt));
       const schoolName = schools.find(s => s._id === student.school)?.name || '未知學校';
       activities.push({
         id: `student-${student._id}`,
         type: 'student_added',
-        message: `新學生 ${student.name} 已註冊至 ${schoolName} ${student.grade}${student.class || ''}`,
+        message: `新學生 ${student.name} 已註冊至 ${schoolName} ${student.grade}${
+          student.class || ''
+        }`,
         time: timeAgo,
         icon: <Users size={16} />,
-        status: 'success'
+        status: 'success',
       });
     });
 
@@ -156,7 +147,7 @@ const Dashboard = () => {
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 2);
 
-    recentSchools.forEach((school) => {
+    recentSchools.forEach(school => {
       const timeAgo = getTimeAgo(new Date(school.createdAt));
       activities.push({
         id: `school-${school._id}`,
@@ -164,7 +155,7 @@ const Dashboard = () => {
         message: `學校 ${school.name} 已更新資料`,
         time: timeAgo,
         icon: <School size={16} />,
-        status: 'info'
+        status: 'info',
       });
     });
 
@@ -180,7 +171,7 @@ const Dashboard = () => {
       icon: <Plus size={24} />,
       link: '/students/create',
       color: 'var(--color-primary)',
-      available: true
+      available: true,
     },
     {
       title: '管理學生',
@@ -188,8 +179,8 @@ const Dashboard = () => {
       icon: <Users size={24} />,
       link: '/students',
       color: 'var(--color-primary)',
-      available: true
-    }
+      available: true,
+    },
   ];
 
   // Add admin-specific actions at the beginning
@@ -200,7 +191,7 @@ const Dashboard = () => {
     icon: <School size={24} />,
     link: '/schools/create',
     color: 'var(--color-success)',
-    available: true
+    available: true,
   });
 
   quickActions.push({
@@ -209,7 +200,7 @@ const Dashboard = () => {
     icon: <School size={24} />,
     link: '/schools',
     color: 'var(--color-error)',
-    available: true
+    available: true,
   });
 
   // Loading state
@@ -232,10 +223,7 @@ const Dashboard = () => {
           <AlertCircle size={48} />
           <h2>載入控制台失敗</h2>
           <p>{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="btn btn--primary"
-          >
+          <button onClick={() => window.location.reload()} className="btn btn--primary">
             重試
           </button>
         </div>
@@ -248,17 +236,15 @@ const Dashboard = () => {
       {/* Header */}
       <div className="dashboard__header">
         <div className="dashboard__welcome">
-          <h1 className="dashboard__title">
-            歡迎回來，{user?.name}！
-          </h1>
+          <h1 className="dashboard__title">歡迎回來，{user?.name}！</h1>
         </div>
         <div className="dashboard__date">
           <Calendar size={16} />
-          {new Date().toLocaleDateString('zh-TW', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+          {new Date().toLocaleDateString('zh-TW', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
           })}
         </div>
       </div>
@@ -271,24 +257,24 @@ const Dashboard = () => {
             <p className="section-subtitle">常用功能快速入口</p>
           </div>
         </div>
-        
+
         <div className="quick-actions-grid quick-actions-grid--enhanced">
-          {quickActions.filter(action => action.available).map((action) => (
-            <Link
-              key={action.title}
-              to={action.link}
-              className="quick-action-card quick-action-card--enhanced"
-              style={{ '--action-color': action.color }}
-            >
-              <div className="quick-action-card__icon">
-                {action.icon}
-              </div>
-              <div className="quick-action-card__content">
-                <h3 className="quick-action-card__title">{action.title}</h3>
-                <p className="quick-action-card__description">{action.description}</p>
-              </div>
-            </Link>
-          ))}
+          {quickActions
+            .filter(action => action.available)
+            .map(action => (
+              <Link
+                key={action.title}
+                to={action.link}
+                className="quick-action-card quick-action-card--enhanced"
+                style={{ '--action-color': action.color }}
+              >
+                <div className="quick-action-card__icon">{action.icon}</div>
+                <div className="quick-action-card__content">
+                  <h3 className="quick-action-card__title">{action.title}</h3>
+                  <p className="quick-action-card__description">{action.description}</p>
+                </div>
+              </Link>
+            ))}
         </div>
       </div>
 
@@ -302,18 +288,18 @@ const Dashboard = () => {
               <p className="section-subtitle">關鍵指標和表現</p>
             </div>
           </div>
-          
+
           <div className="performance-metrics">
             <div className="performance-metric">
               <div className="performance-metric__value">
-                {((stats.students.count / Math.max(stats.schools.count, 1)) || 0).toFixed(1)}
+                {(stats.students.count / Math.max(stats.schools.count, 1) || 0).toFixed(1)}
               </div>
               <div className="performance-metric__label">平均每校學生數</div>
               <div className="performance-metric__change">
                 {stats.schools.count > 0 ? '正常範圍' : '等待數據'}
               </div>
             </div>
-            
+
             <div className="performance-metric">
               <div className="performance-metric__value">
                 {stats.students.count > 0 ? '87%' : '0%'}
@@ -331,22 +317,25 @@ const Dashboard = () => {
               <h2 className="section-title">最近活動</h2>
               <p className="section-subtitle">最新更新和通知</p>
             </div>
-            <Link to="/activity" className="section-link">查看全部</Link>
+            <Link to="/activity" className="section-link">
+              查看全部
+            </Link>
           </div>
-          
+
           <div className="activity-list activity-list--enhanced">
-            {generateRecentActivity(schools, students).map((activity) => (
-              <div key={activity.id} className={`activity-item activity-item--enhanced activity-item--${activity.status}`}>
-                <div className="activity-item__icon">
-                  {activity.icon}
-                </div>
+            {generateRecentActivity(schools, students).map(activity => (
+              <div
+                key={activity.id}
+                className={`activity-item activity-item--enhanced activity-item--${activity.status}`}
+              >
+                <div className="activity-item__icon">{activity.icon}</div>
                 <div className="activity-item__content">
                   <p className="activity-item__message">{activity.message}</p>
                   <span className="activity-item__time">{activity.time}</span>
                 </div>
               </div>
             ))}
-            
+
             {generateRecentActivity(schools, students).length === 0 && (
               <div className="activity-item activity-item--empty">
                 <div className="activity-item__icon">

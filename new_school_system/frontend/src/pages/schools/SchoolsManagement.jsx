@@ -34,23 +34,7 @@ const SchoolsManagement = () => {
       try {
         setLoading(true);
         setError(null);
-
-        // ✅ ENHANCED DEBUG LOGGING - No API import needed
-        console.log('🔍 Starting school load...');
-        console.log('👤 Current user:', {
-          id: user?._id,
-          email: user?.email,
-          role: user?.role,
-          isLoggedIn: !!user,
-        });
-
-        console.log('🔧 Testing with schoolHelpers...');
         const schoolsData = await schoolHelpers.getAll({ limit: 200 });
-
-        console.log('📥 SchoolHelpers raw response:', schoolsData);
-        console.log('📥 Response type:', typeof schoolsData);
-        console.log('📥 Is array:', Array.isArray(schoolsData));
-        console.log('📥 Response length:', schoolsData?.length);
 
         // Log first few items to see structure
         if (Array.isArray(schoolsData) && schoolsData.length > 0) {
@@ -62,7 +46,6 @@ const SchoolsManagement = () => {
         }
 
         const schools = Array.isArray(schoolsData) ? schoolsData : [];
-        console.log('✅ Final schools array length:', schools.length);
 
         setSchools(schools);
         setFilteredSchools(schools);
@@ -84,28 +67,19 @@ const SchoolsManagement = () => {
       }
     };
 
-    // Only load if user exists
     if (user) {
-      console.log('✅ User authenticated, loading schools...');
       loadSchools();
     } else {
       console.log('⏳ No user found, waiting for authentication...');
       setLoading(false);
       setError('請先登入系統');
     }
-  }, [user]); // Added user dependency
+  }, [user]);
 
   useEffect(() => {
     const loadStudentCounts = async () => {
       try {
-        console.log('📊 Loading student counts...');
         const studentsData = await studentHelpers.getAll({ limit: 1000 });
-
-        console.log('📊 Students response:', {
-          type: typeof studentsData,
-          isArray: Array.isArray(studentsData),
-          length: studentsData?.length,
-        });
 
         if (!Array.isArray(studentsData)) {
           console.log('⚠️ Students data is not an array:', studentsData);
@@ -118,7 +92,6 @@ const SchoolsManagement = () => {
           return acc;
         }, {});
 
-        console.log('📊 Student counts calculated:', counts);
         setStudentCounts(counts);
       } catch (err) {
         console.error('❌ Failed to load student counts:', err);
@@ -131,14 +104,11 @@ const SchoolsManagement = () => {
     } else {
       console.log('⏸️ No schools loaded, skipping student count load');
     }
-  }, [schools]); // Changed dependency to schools
+  }, [schools]);
 
-  // Apply filters
   useEffect(() => {
-    // Start filtering from the full school list (do NOT modify original array)
     let filtered = schools;
 
-    // Search filter by school name (any language)
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase().trim();
       filtered = filtered.filter(
@@ -191,8 +161,8 @@ const SchoolsManagement = () => {
 
   if (loading) {
     return (
-      <div className="schools-management">
-        <div className="schools-management__loading">
+      <div className="dashboard__loading">
+        <div className="dashboard__loading">
           <div className="loading-spinner loading-spinner--large"></div>
           <p className="loading-message">載入學校資料中...</p>
         </div>
@@ -207,25 +177,6 @@ const SchoolsManagement = () => {
           <AlertCircle size={48} />
           <h2>載入學校資料失敗</h2>
           <p>{typeof error === 'string' ? error : error.message}</p>
-
-          {/* Enhanced error debugging */}
-          <div
-            style={{
-              background: '#f8f9fa',
-              padding: '1rem',
-              marginTop: '1rem',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontFamily: 'monospace',
-              textAlign: 'left',
-            }}
-          >
-            <strong>Debug Info:</strong>
-            <br />
-            User: {user ? `${user.email} (${user.role})` : 'Not logged in'}
-            <br />
-            Error: {typeof error === 'object' ? JSON.stringify(error, null, 2) : error}
-          </div>
 
           <div style={{ marginTop: '1rem' }}>
             <button
@@ -254,19 +205,6 @@ const SchoolsManagement = () => {
             學校管理
           </h1>
           <p className="schools-management__subtitle">管理系統內的所有學校資料</p>
-
-          {/* Debug info in header */}
-          <div
-            style={{
-              fontSize: '12px',
-              color: '#666',
-              marginTop: '0.5rem',
-              fontFamily: 'monospace',
-            }}
-          >
-            🔍 Debug: {schools.length} schools loaded, User: {user?.email || 'Not logged in'}
-          </div>
-        </div>
 
         <div className="schools-management__actions">
           <Link to="/schools/create" className="btn btn--primary">
