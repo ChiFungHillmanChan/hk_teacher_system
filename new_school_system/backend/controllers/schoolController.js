@@ -75,18 +75,12 @@ const getSchool = async (req, res) => {
       .populate('teachers.user', 'name email teacherId')
       .populate('createdBy', 'name email');
 
-    // ✅ FIXED: Remove the problematic line that referenced undefined 'schools'
-    console.log(`👁️ Fetching school: ${req.params.id}`);
-
     if (!school) {
       return res.status(404).json({
         success: false,
         message: 'School not found',
       });
     }
-
-    // ✅ UPDATED: Allow all users to VIEW any school
-    console.log(`👁️ User ${req.user.email} viewing school: ${school.name}`);
 
     // Add permission metadata
     const isAssignedTeacher = req.user.schools?.some(

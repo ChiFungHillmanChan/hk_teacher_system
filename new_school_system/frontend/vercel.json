@@ -3,6 +3,10 @@
     {
       "source": "/api/(.*)",
       "destination": "https://hk-teacher-system.vercel.app/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
