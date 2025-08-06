@@ -1,4 +1,4 @@
-// File: src/pages/schools/SchoolsManagement.jsx
+// File: src/pages/schools/SchoolsManagement.jsx - FIXED DEBUG VERSION
 import { AlertCircle, Mail, MapPin, Phone, Plus, School, Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -35,38 +35,103 @@ const SchoolsManagement = () => {
         setLoading(true);
         setError(null);
 
+        // ✅ ENHANCED DEBUG LOGGING - No API import needed
+        console.log('🔍 Starting school load...');
+        console.log('👤 Current user:', {
+          id: user?._id,
+          email: user?.email,
+          role: user?.role,
+          isLoggedIn: !!user,
+        });
+
+        console.log('🔧 Testing with schoolHelpers...');
         const schoolsData = await schoolHelpers.getAll({ limit: 200 });
+
+        console.log('📥 SchoolHelpers raw response:', schoolsData);
+        console.log('📥 Response type:', typeof schoolsData);
+        console.log('📥 Is array:', Array.isArray(schoolsData));
+        console.log('📥 Response length:', schoolsData?.length);
+
+        // Log first few items to see structure
+        if (Array.isArray(schoolsData) && schoolsData.length > 0) {
+          console.log('📥 First school sample:', {
+            id: schoolsData[0]._id,
+            name: schoolsData[0].name,
+            type: schoolsData[0].schoolType,
+          });
+        }
+
         const schools = Array.isArray(schoolsData) ? schoolsData : [];
+        console.log('✅ Final schools array length:', schools.length);
 
         setSchools(schools);
         setFilteredSchools(schools);
       } catch (err) {
-        console.error('Failed to load schools:', err);
+        console.error('❌ School loading failed:', err);
+
+        // Enhanced error logging
+        console.error('Error details:', {
+          message: err.message,
+          status: err.status,
+          data: err.data,
+          isNetworkError: err.isNetworkError,
+          fullError: err,
+        });
+
         setError(handleApiError(err));
       } finally {
         setLoading(false);
       }
     };
 
-    loadSchools();
-  }, []);
+    // Only load if user exists
+    if (user) {
+      console.log('✅ User authenticated, loading schools...');
+      loadSchools();
+    } else {
+      console.log('⏳ No user found, waiting for authentication...');
+      setLoading(false);
+      setError('請先登入系統');
+    }
+  }, [user]); // Added user dependency
 
   useEffect(() => {
     const loadStudentCounts = async () => {
       try {
+        console.log('📊 Loading student counts...');
         const studentsData = await studentHelpers.getAll({ limit: 1000 });
+
+        console.log('📊 Students response:', {
+          type: typeof studentsData,
+          isArray: Array.isArray(studentsData),
+          length: studentsData?.length,
+        });
+
+        if (!Array.isArray(studentsData)) {
+          console.log('⚠️ Students data is not an array:', studentsData);
+          return;
+        }
+
         const counts = studentsData.reduce((acc, student) => {
           const schoolId = student.school?._id || student.school;
           if (schoolId) acc[schoolId] = (acc[schoolId] || 0) + 1;
           return acc;
         }, {});
+
+        console.log('📊 Student counts calculated:', counts);
         setStudentCounts(counts);
       } catch (err) {
-        console.error('Failed to load student counts:', err);
+        console.error('❌ Failed to load student counts:', err);
       }
     };
-    loadStudentCounts();
-  }, []);
+
+    // Only load student counts if we have schools
+    if (schools.length > 0) {
+      loadStudentCounts();
+    } else {
+      console.log('⏸️ No schools loaded, skipping student count load');
+    }
+  }, [schools]); // Changed dependency to schools
 
   // Apply filters
   useEffect(() => {
@@ -141,10 +206,39 @@ const SchoolsManagement = () => {
         <div className="schools-management__error">
           <AlertCircle size={48} />
           <h2>載入學校資料失敗</h2>
-          <p>{error}</p>
-          <button onClick={() => window.location.reload()} className="btn btn--primary">
-            重試
-          </button>
+          <p>{typeof error === 'string' ? error : error.message}</p>
+
+          {/* Enhanced error debugging */}
+          <div
+            style={{
+              background: '#f8f9fa',
+              padding: '1rem',
+              marginTop: '1rem',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontFamily: 'monospace',
+              textAlign: 'left',
+            }}
+          >
+            <strong>Debug Info:</strong>
+            <br />
+            User: {user ? `${user.email} (${user.role})` : 'Not logged in'}
+            <br />
+            Error: {typeof error === 'object' ? JSON.stringify(error, null, 2) : error}
+          </div>
+
+          <div style={{ marginTop: '1rem' }}>
+            <button
+              onClick={() => window.location.reload()}
+              className="btn btn--primary"
+              style={{ marginRight: '1rem' }}
+            >
+              重試
+            </button>
+            <Link to="/login" className="btn btn--secondary">
+              重新登入
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -160,6 +254,18 @@ const SchoolsManagement = () => {
             學校管理
           </h1>
           <p className="schools-management__subtitle">管理系統內的所有學校資料</p>
+
+          {/* Debug info in header */}
+          <div
+            style={{
+              fontSize: '12px',
+              color: '#666',
+              marginTop: '0.5rem',
+              fontFamily: 'monospace',
+            }}
+          >
+            🔍 Debug: {schools.length} schools loaded, User: {user?.email || 'Not logged in'}
+          </div>
         </div>
 
         <div className="schools-management__actions">
